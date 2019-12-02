@@ -12,6 +12,7 @@
   "license": "ISC",
   "devDependencies": {
     "@types/jest": "^24.0.23",
+    "@types/knex": "^0.16.1",
     "@types/koa": "^2.11.0",
     "@types/koa-bodyparser": "^4.3.0",
     "@types/koa__cors": "^2.2.3",
@@ -43,10 +44,11 @@
     ]
   },
   "dependencies": {
-    "koa": "latest",
-    "@koa/router": "latest",
-    "koa-bodyparser": "latest",
     "@koa/cors": "latest",
+    "@koa/router": "latest",
+    "knex": "^0.20.3",
+    "koa": "latest",
+    "koa-bodyparser": "latest",
     "pino": "latest"
   }
 }
