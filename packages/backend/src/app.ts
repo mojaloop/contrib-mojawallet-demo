@@ -34,7 +34,7 @@ export function createApp (appConfig: AppConfig): Koa<any, AccountsAppContext> {
   })
 
   // Health Endpoint
-  publicRouter.get('/', (ctx) => {
+  publicRouter.get('/healthz', (ctx) => {
     ctx.status = 200
   })
 
