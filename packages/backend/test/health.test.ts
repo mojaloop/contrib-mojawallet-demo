@@ -13,11 +13,15 @@ describe('Health API Test', () => {
 
     app = createApp({
       logger: createLogger(),
+      accountsService: {} as any,
+      hydraApi: {} as any,
+      transactionsService: {} as any
     })
     server = app.listen(0)
     // eslint-disable-next-line @typescript-eslint/ban-ts-ignore
     // @ts-ignore
     port = server.address().port
+    return
   })
 
   afterAll(() => {
