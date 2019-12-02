@@ -8,7 +8,7 @@ import createLogger from 'pino'
 import { HydraApi, TokenInfo } from '../src/apis/hydra'
 import Knex = require('knex')
 
-describe('Transactions API Test', () => {
+describe('Faucet API Test', () => {
   let server: Server
   let port: number
   let app: Koa
@@ -74,7 +74,7 @@ describe('Transactions API Test', () => {
     knex.destroy()
   })
 
-  describe('Create a transaction', () => {
+  describe('Add from faucet', () => {
     let account: any
     beforeEach(async () => {
       account = await accountsService.add({
@@ -86,14 +86,13 @@ describe('Transactions API Test', () => {
       })
     })
 
-    it('Allowed Service can add a transaction to an account', async () => {
-      const response = await axios.post(`http://localhost:${port}/transactions`, {
-        accountId: account.id,
-        amount: '100'
+    it('User can add money via fuacet', async () => {
+      const response = await axios.post(`http://localhost:${port}/faucet`, {
+        accountId: account.id
       }
       , {
         headers: {
-          authorization: 'Bearer usersServiceToken'
+          authorization: 'Bearer user1token'
         }
       }).then(resp => {
         expect(resp.status).toBe(201)
@@ -101,78 +100,21 @@ describe('Transactions API Test', () => {
       })
 
       const acc = await accountsService.get(account.id)
-      expect(acc.balance.toString()).toBe('100')
+      expect(acc.balance.toString()).toBe('100000000')
     })
 
-    it('User cant add a transaction for an account', async () => {
+    it('User cant add a transaction for an account not theirs', async () => {
       const response = axios.post(`http://localhost:${port}/transactions`, {
         accountId: account.id,
         amount: '100'
       }
       , {
         headers: {
-          authorization: 'Bearer user1token'
+          authorization: 'Bearer user2token'
         }
       })
 
       await expect(response).rejects.toEqual(Error('Request failed with status code 404'))
-    })
-  })
-
-  describe('Getting a transaction for account', () => {
-    let account: any
-    beforeEach(async () => {
-      account = await accountsService.add({
-        assetCode: 'XRP',
-        assetScale: 6,
-        limit: 0n,
-        name: 'Test',
-        userId: '1'
-      })
-      await transactionsService.create(account.id, 100n)
-    })
-
-    it('Allowed Service can get accounts transactions', async () => {
-      const response = await axios.get(`http://localhost:${port}/transactions?accountId=${account.id}`
-        , {
-          headers: {
-            authorization: 'Bearer usersServiceToken'
-          }
-        }).then(resp => {
-        expect(resp.status).toBe(200)
-        return resp.data
-      })
-
-      expect(response.length).toBe(1)
-      expect(response[0].amount).toBe('100')
-      expect(response[0].accountId).toBe(account.id.toString())
-    })
-
-    it('User can get own accounts transactions', async () => {
-      const response = await axios.get(`http://localhost:${port}/transactions?accountId=${account.id}`
-        , {
-          headers: {
-            authorization: 'Bearer user1token'
-          }
-        }).then(resp => {
-        expect(resp.status).toBe(200)
-        return resp.data
-      })
-
-      expect(response.length).toBe(1)
-      expect(response[0].amount).toBe('100')
-      expect(response[0].accountId).toBe(account.id.toString())
-    })
-
-    it('User cant get someone elses accounts transactions', async () => {
-      const response = axios.get(`http://localhost:${port}/transactions?accountId=${account.id}`
-        , {
-          headers: {
-            authorization: 'Bearer user2token'
-          }
-        })
-
-      await expect(response).rejects.toEqual(Error('Request failed with status code 403'))
     })
   })
 })
