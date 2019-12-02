@@ -32,12 +32,19 @@
     "typescript": "^3.7.2"
   },
   "dependencies": {
-    "axios": "^0.19.0",
     "@koa/cors": "latest",
     "@koa/router": "latest",
+    "@types/bcrypt": "^3.0.0",
+    "@types/koa-joi-router": "^5.2.3",
+    "axios": "^0.19.0",
+    "bcrypt": "^3.0.7",
     "knex": "^0.20.3",
     "koa": "latest",
     "koa-bodyparser": "latest",
+    "koa-joi-router": "^6.0.0",
+    "libphonenumber-js": "^1.7.29",
+    "objection": "^2.0.0",
+    "openid-client": "^3.8.4",
     "pino": "latest"
   }
 }
