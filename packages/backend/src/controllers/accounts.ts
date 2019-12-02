@@ -23,8 +23,8 @@ export async function create(ctx: AccountsAppContext): Promise<void> {
   const accountProps: AccountProps = {
     userId: ctx.state.user.sub,
     name: body.name,
-    assetCode: "XRP",
-    assetScale: 6,
+    assetCode: "XML",
+    assetScale: 2,
     limit: 0n
   };
 
