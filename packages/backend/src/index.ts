@@ -1,12 +1,22 @@
 import { Server } from "http";
-import createLogger from "pino";
+import createLogger, { Logger } from "pino";
 import { createApp } from "./app";
 import Knex = require("knex");
+import { Context } from "koa";
+import { KnexAccountService } from "./services/accounts-service";
+import { KnexTransactionService } from "./services/transactions-service";
 
 const logger = createLogger();
 logger.level = process.env.LOG_LEVEL || "info";
+
 const PORT = process.env.PORT || 3001;
 const KNEX_CLIENT = process.env.KNEX_CLIENT || "sqlite3";
+
+export interface AccountsAppContext extends Context {
+  accounts: KnexAccountService;
+  transactions: KnexTransactionService;
+  logger: Logger;
+}
 
 const knex =
   KNEX_CLIENT === "mysql"
@@ -26,7 +36,12 @@ const knex =
         }
       });
 
+const accountsService = new KnexAccountService(knex);
+const transactionsService = new KnexTransactionService(knex);
+
 const app = createApp({
+  accountsService,
+  transactionsService,
   logger
 });
 

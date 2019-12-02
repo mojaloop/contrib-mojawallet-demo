@@ -20,7 +20,6 @@ describe('Health API Test', () => {
     port = server.address().port
   })
 
-
   afterAll(() => {
     server.close()
   })
