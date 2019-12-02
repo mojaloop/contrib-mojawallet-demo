@@ -4,7 +4,7 @@ import { createApp } from '../src/app'
 import { Server } from 'http'
 import createLogger from 'pino'
 
-describe('Transactions API Test', () => {
+describe('Health API Test', () => {
   let server: Server
   let port: number
   let app: Koa
