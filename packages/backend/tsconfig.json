@@ -1,11 +1,22 @@
 {
   "compilerOptions": {
-    "target": "esnext",
-    "module": "commonjs",
-    "outDir": "build",
     "rootDir": "src",
     "strict": true,
-    "esModuleInterop": true
+    "target": "esnext",
+    "module": "commonjs",
+    "esModuleInterop":true,
+    "declaration": true,
+    "noImplicitAny": true,
+    "removeComments": true,
+    "moduleResolution": "node",
+    "resolveJsonModule": true,
+    "sourceMap": true,
+    "inlineSources": true,
+    "skipLibCheck": true,
+    "strictNullChecks": true,
+    "suppressImplicitAnyIndexErrors": true,
+    "outDir": "./build",
+    "incremental": true
   },
   "exclude": [
     "node_modules",
