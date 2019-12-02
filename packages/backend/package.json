@@ -45,7 +45,7 @@
     "libphonenumber-js": "^1.7.29",
     "objection": "^2.0.0",
     "openid-client": "^3.8.4",
-    "pino": "latest"
+    "pino": "latest",
     "sqlite": "^3.0.3"
   }
 }
