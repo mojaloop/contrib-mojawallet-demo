@@ -7,16 +7,23 @@ import bodyParser from 'koa-bodyparser'
 import { create as createFaucet } from './controllers/faucet'
 import { create as createTransaction, index as indexTransactions } from './controllers/transactions'
 import { create as createAccount, update as updateAccount, show as showAccount, index as indexAccount } from './controllers/accounts'
+import { show as showUser, store as storeUser, update as updateUser, createValidation as createValidationUser } from './controllers/user'
+import { getValidation as getValidationLogin, show as showLogin, createValidation as createValidationLogin, store as storeLogin } from './controllers/login'
+import { store as storeLogout } from './controllers/logout'
+import { getValidation as getValidationConsent, show as showConsent, storeValidation as storeValidationConsent, store as storeConsent } from './controllers/consent'
+import { createValidation as createValidationOauth2, store as storeOauth2 } from './controllers/oauth2Client'
 import { AccountsAppContext } from './index'
 import { HydraApi } from './apis/hydra'
 import { createAuthMiddleware } from './middleware/auth'
 import cors from '@koa/cors'
+import { TokenService } from './services/token-service'
 
 export type AppConfig = {
   logger: Logger;
   accountsService: KnexAccountService;
   transactionsService: KnexTransactionService;
   hydraApi: HydraApi;
+  tokenService: TokenService;
 }
 
 export function createApp (appConfig: AppConfig): Koa<any, AccountsAppContext> {
@@ -30,6 +37,7 @@ export function createApp (appConfig: AppConfig): Koa<any, AccountsAppContext> {
     ctx.accounts = appConfig.accountsService
     ctx.transactions = appConfig.transactionsService
     ctx.logger = appConfig.logger
+    ctx.tokenService = appConfig.tokenService
     await next()
   })
 
@@ -49,6 +57,20 @@ export function createApp (appConfig: AppConfig): Koa<any, AccountsAppContext> {
   privateRouter.post('/transactions', createTransaction)
 
   privateRouter.post('/faucet', createFaucet)
+
+  privateRouter.post('/users', createValidationUser, storeUser)
+  privateRouter.patch('/users/:id', updateUser)
+  privateRouter.get('/users/me', createAuthMiddleware(appConfig.hydraApi), showUser)
+
+  privateRouter.get('/login', getValidationLogin, showLogin)
+  privateRouter.post('/login', createValidationLogin, storeLogin)
+
+  privateRouter.post('/logout', storeLogout)
+
+  privateRouter.get('/consent', getValidationConsent, showConsent)
+  privateRouter.post('/consent', storeValidationConsent, storeConsent)
+
+  privateRouter.post('/oauth2/clients', createValidationOauth2, storeOauth2)
 
   app.use(publicRouter.routes())
   app.use(privateRouter.routes())
