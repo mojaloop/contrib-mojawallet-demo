@@ -46,5 +46,6 @@
     "objection": "^2.0.0",
     "openid-client": "^3.8.4",
     "pino": "latest"
+    "sqlite": "^3.0.3"
   }
 }
