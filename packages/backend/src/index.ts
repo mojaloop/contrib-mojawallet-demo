@@ -1,7 +1,7 @@
 import { Context } from 'koa'
 import { KnexAccountService } from './services/accounts-service'
 import { KnexTransactionService } from './services/transactions-service'
-import { KnexUserService } from '../src/services/user-service'
+import { KnexUserService } from './services/user-service'
 import { Server } from 'http'
 import { hydraApi } from './apis/hydra'
 import createLogger, { Logger } from 'pino'
