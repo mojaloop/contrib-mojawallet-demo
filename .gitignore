@@ -90,4 +90,6 @@ typings/
 # TypeScript build directory
 build/*
 
+**/dist/*
+
 .idea
