@@ -9,14 +9,27 @@ module.exports = {
         "@typescript-eslint"
     ],
     "env": {
-        "node": true
+        "node": true,
+        "jest": true
     },
     "parserOptions": {
         "ecmaVersion": 2017,
         "sourceType": "module",
         "project": "./tsconfig.json"
     },
+    "globals":{
+      "BigInt": true
+    },
     "rules": {
+        "require-atomic-updates": [
+            "off"
+        ],
+        "camelcase": [
+            "off"
+        ],
+        "@typescript-eslint/camelcase": [
+            "error", { "properties": "never" }
+        ],
         "@typescript-eslint/indent": [
             "error",
             2

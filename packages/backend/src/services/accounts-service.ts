@@ -45,8 +45,9 @@ const dbAccountToAccount = (dbAccount: DatabaseAccount): Account => {
 }
 
 export class KnexAccountService implements AccountsService {
-  constructor (private _knex: Knex) {
-
+  private _knex: Knex
+  constructor (knex: Knex) {
+    this._knex = knex
   }
 
   async add (account: AccountProps): Promise<Account> {

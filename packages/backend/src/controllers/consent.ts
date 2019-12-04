@@ -4,11 +4,10 @@ import { AccountsAppContext } from '..'
 import { hydraApi } from '../apis/hydra'
 import { accounts } from '../services/user-accounts-service'
 import { Context } from 'koa'
-import { User } from '../models/user'
 
 const INTENTS_URL = process.env.INTENTS_URL || 'http://localhost:3001/intents'
 const MANDATES_URL = process.env.MANDATES_URL || 'http://localhost:3001/mandates'
-const BASE_PAYMENT_POINTER_URL = process.env.BASE_PAYMENT_POINTER_URL || '$rafiki.money/p'
+// const BASE_PAYMENT_POINTER_URL = process.env.BASE_PAYMENT_POINTER_URL || '$rafiki.money/p'
 
 export function getAgreementUrlFromScopes (scopes: string[]): string | undefined {
   const agreementScopes = scopes.filter(scope => {
@@ -28,12 +27,12 @@ export function getAgreementUrlFromScopes (scopes: string[]): string | undefined
 }
 
 async function getUsersPaymentPointer (userId: string): Promise<string> {
-  const user = await User.query().where('id', userId).first()
+  const user = null
   if (!user) {
     throw new Error('No user found to create mandate scope. userId=' + userId)
   }
 
-  return `${BASE_PAYMENT_POINTER_URL}/${user.username}`
+  return `null`
 }
 
 export async function generateAccessAndIdTokenInfo (scopes: string[], userId: string, assert: Context['assert'], accountId?: number): Promise<{ accessTokenInfo: { [k: string]: any }; idTokenInfo: { [k: string]: any } }> {
@@ -112,12 +111,12 @@ export async function show (ctx: AccountsAppContext): Promise<void> {
   const agreementUrl = getAgreementUrlFromScopes(grantScopes)
   ctx.logger.debug('grantScopes and agreementUrl', { grantScopes, agreementUrl })
 
-  let accountList = undefined
-  if(agreementUrl) {
+  let accountList
+  if (agreementUrl) {
     const token = await ctx.tokenService.getAccessToken()
     ctx.logger.debug('access token', { token })
 
-    const accountList = await accounts.getUserAccounts(consentRequest['subject'], token)
+    accountList = await accounts.getUserAccounts(consentRequest['subject'], token)
     ctx.logger.debug('Got account list', { accountList })
   }
 

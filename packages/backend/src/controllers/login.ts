@@ -1,7 +1,6 @@
-import bcrypt from 'bcrypt'
+// import bcrypt from 'bcrypt'
 import { Context } from 'koa'
 import { Config, Joi } from 'koa-joi-router'
-import { User } from '../models/user'
 import { hydraApi } from '../apis/hydra'
 import { AccountsAppContext } from '..'
 
@@ -30,27 +29,27 @@ export async function show (ctx: AccountsAppContext): Promise<void> {
   ctx.body = { redirectTo: null }
 }
 export async function store (ctx: Context): Promise<void> {
-  const { username, password } = ctx.request.body
-  const challenge = ctx.request.query.login_challenge
-  ctx.logger.debug('Post login request', { username: username, challenge })
+  // const { username, password } = ctx.request.body
+  // const challenge = ctx.request.query.login_challenge
+  // ctx.logger.debug('Post login request', { username: username, challenge })
 
-  const user = await User.query().where('username', username).first()
-  ctx.assert(user, 401, 'Invalid username or password.')
+  // const user = await User.query().where('username', username).first()
+  // ctx.assert(user, 401, 'Invalid username or password.')
 
-  ctx.assert(await bcrypt.compare(password, user!.password), 401, 'Invalid username or password.')
+  // ctx.assert(await bcrypt.compare(password, user!.password), 401, 'Invalid username or password.')
 
-  const acceptLogin = await hydraApi.acceptLoginRequest(challenge, {
-    subject: user!.id.toString(),
-    remember: true,
-    remember_for: 604800 // 1 week
-  }).catch(error => {
-    ctx.logger.error(error, 'error in accept login request')
-    throw error
-  })
+  // const acceptLogin = await hydraApi.acceptLoginRequest(challenge, {
+  //   subject: user!.id.toString(),
+  //   remember: true,
+  //   remember_for: 604800 // 1 week
+  // }).catch(error => {
+  //   ctx.logger.error(error, 'error in accept login request')
+  //   throw error
+  // })
 
-  ctx.body = {
-    redirectTo: acceptLogin['redirect_to']
-  }
+  // ctx.body = {
+  //   redirectTo: acceptLogin['redirect_to']
+  // }
 }
 
 export function createValidation (): Config {

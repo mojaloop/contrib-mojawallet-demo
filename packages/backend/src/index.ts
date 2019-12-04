@@ -1,12 +1,13 @@
 import { Context } from 'koa'
 import { KnexAccountService } from './services/accounts-service'
 import { KnexTransactionService } from './services/transactions-service'
+import { KnexUserService } from '../src/services/user-service'
 import { Server } from 'http'
 import { hydraApi } from './apis/hydra'
 import createLogger, { Logger } from 'pino'
 import { createApp } from './app'
-import Knex = require('knex')
 import { TokenService } from './services/token-service'
+import Knex = require('knex')
 const logger = createLogger()
 logger.level = process.env.LOG_LEVEL || 'info'
 
@@ -37,6 +38,7 @@ const knex = KNEX_CLIENT === 'mysql' ? Knex({
 
 const accountsService = new KnexAccountService(knex)
 const transactionsService = new KnexTransactionService(knex)
+const userService = new KnexUserService(knex)
 
 const tokenService = new TokenService({
   clientId: process.env.OAUTH_CLIENT_ID || 'wallet-users-service',
@@ -50,7 +52,8 @@ const app = createApp({
   transactionsService,
   logger,
   hydraApi,
-  tokenService
+  tokenService,
+  userService
 })
 
 let server: Server
@@ -77,7 +80,6 @@ export const start = async (): Promise<void> => {
       if (shuttingDown) {
         logger.warn('received second SIGINT during graceful shutdown, exiting forcefully.')
         process.exit(1)
-        return
       }
 
       shuttingDown = true

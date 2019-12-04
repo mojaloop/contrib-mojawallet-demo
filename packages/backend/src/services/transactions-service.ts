@@ -14,8 +14,9 @@ interface TransactionsService {
 }
 
 export class KnexTransactionService implements TransactionsService {
-  constructor (private _knex: Knex) {
-
+  private _knex: Knex
+  constructor (knex: Knex) {
+    this._knex = knex
   }
 
   async create (accountId: string, amount: bigint, description = ''): Promise<void> {
