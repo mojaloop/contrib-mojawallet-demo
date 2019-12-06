@@ -8,10 +8,10 @@ import { create as createFaucet } from './controllers/faucet'
 import { create as createTransaction, index as indexTransactions } from './controllers/transactions'
 import { create as createAccount, update as updateAccount, show as showAccount, index as indexAccount } from './controllers/accounts'
 import { show as showUser, store as storeUser, update as updateUser } from './controllers/user'
-import { getValidation as getValidationLogin, show as showLogin, createValidation as createValidationLogin, store as storeLogin } from './controllers/login'
+import { show as showLogin, store as storeLogin } from './controllers/login'
 import { store as storeLogout } from './controllers/logout'
-import { getValidation as getValidationConsent, show as showConsent, storeValidation as storeValidationConsent, store as storeConsent } from './controllers/consent'
-import { createValidation as createValidationOauth2, store as storeOauth2 } from './controllers/oauth2Client'
+import { show as showConsent, store as storeConsent } from './controllers/consent'
+// import { createValidation as createValidationOauth2, store as storeOauth2 } from './controllers/oauth2Client'
 import { AccountsAppContext } from './index'
 import { HydraApi } from './apis/hydra'
 import { createAuthMiddleware } from './middleware/auth'
@@ -63,17 +63,17 @@ export function createApp (appConfig: AppConfig): Koa<any, AccountsAppContext> {
 
   publicRouter.post('/users', storeUser)
   privateRouter.patch('/users', updateUser)
-  privateRouter.get('/users/me', createAuthMiddleware(appConfig.hydraApi), showUser)
+  privateRouter.get('/users/me', showUser)
 
-  privateRouter.get('/login', getValidationLogin, showLogin)
-  privateRouter.post('/login', createValidationLogin, storeLogin)
+  publicRouter.get('/login', showLogin)
+  publicRouter.post('/login', storeLogin)
 
-  privateRouter.post('/logout', storeLogout)
+  publicRouter.post('/logout', storeLogout)
 
-  privateRouter.get('/consent', getValidationConsent, showConsent)
-  privateRouter.post('/consent', storeValidationConsent, storeConsent)
+  publicRouter.get('/consent', showConsent)
+  publicRouter.post('/consent', storeConsent)
 
-  privateRouter.post('/oauth2/clients', createValidationOauth2, storeOauth2)
+  // privateRouter.post('/oauth2/clients', createValidationOauth2, storeOauth2)
 
   app.use(publicRouter.routes())
   app.use(privateRouter.routes())

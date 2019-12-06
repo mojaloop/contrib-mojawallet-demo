@@ -13,8 +13,7 @@
     "esModuleInterop": true,
     "baseUrl": ".",
     "paths": {
-      "backend" : ["packages/backend/src"],
-      "frontend" : ["packages/frontend/src"]
+      "backend" : ["packages/backend/src"]
     }
   },
   "exclude": [

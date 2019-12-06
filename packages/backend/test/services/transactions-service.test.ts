@@ -45,8 +45,6 @@ describe('Accounts Services', () => {
     account = await accountService.get(account.id)
 
     const transaction = await knex<Transaction>('transactions').first()
-
-    console.log(transaction)
     expect(transaction!.accountId).toEqual(account.id.toString())
     expect(transaction!.amount).toEqual('100')
     expect(account.balance.toString()).toBe('100')

@@ -1,17 +1,23 @@
 import bcrypt from 'bcrypt'
 import { Config, Joi } from 'koa-joi-router'
 import { AccountsAppContext } from '..'
-import { UserProps } from '../services/user-service'
+import { UserProps, User } from '../services/user-service'
 import { parseNumber, isValidNumber } from 'libphonenumber-js'
 
 export async function show (ctx: AccountsAppContext): Promise<void> {
+  const { users } = ctx
   ctx.logger.debug('Get me request')
   ctx.assert(ctx.state.user && ctx.state.user.sub, 401)
-
-  // const user = await User.query().where('id', ctx.state.user.sub).first()
-  // ctx.assert(user, 404, 'User not found')
-
-  // ctx.body = user!.$formatJson()
+  let user: User
+  try {
+    user = await users.getById(ctx.state.user.sub)
+    ctx.assert(user, 404, 'User not found.')
+    ctx.body = {
+      ...user
+    }
+  } catch (error) {
+    ctx.throw(400, error)
+  }
 }
 
 export async function store (ctx: AccountsAppContext): Promise<void> {

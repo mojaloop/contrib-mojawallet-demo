@@ -59,6 +59,22 @@ export class KnexUserService implements UserService {
     return updatedUser
   }
 
+  async getByUsername (username: string): Promise<User> {
+    const user = await this._knex<User>('users').where('username', username).first()
+    if (!user) {
+      throw new Error('Error fetching user')
+    }
+    return user
+  }
+
+  async getById (id: number): Promise<User> {
+    const user = await this._knex<User>('users').where('id', id).first()
+    if (!user) {
+      throw new Error('Error fetching user')
+    }
+    return user
+  }
+
   //   async get (id: string): Promise<User> {
   //     const account = await this._knex<User>('users').where('id', id).first()
 

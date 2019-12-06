@@ -173,7 +173,7 @@ describe('Users Service', function () {
   })
 
   describe('Edit', function () {
-    test('hashes the new password', async () => {
+    test('Updates and hashes new password', async () => {
       const user = await axios.post(`http://localhost:${port}/users`, {
         username: '+27844444444',
         password: 'oldPassword'
