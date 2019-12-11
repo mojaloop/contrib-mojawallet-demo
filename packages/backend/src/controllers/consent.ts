@@ -12,7 +12,7 @@ export async function show (ctx: AccountsAppContext): Promise<void> {
   })
   ctx.logger.debug('Got hydra consent request', { consentRequest })
 
-  if (consentRequest['skip'] || consentRequest['client'].client_id === 'frontend-client') {
+  if (consentRequest['skip'] || consentRequest['client'].client_id === 'frontend-service') {
     const acceptConsent = await hydraApi.acceptConsentRequest(challenge, {
       remember: true,
       remember_for: 0,
