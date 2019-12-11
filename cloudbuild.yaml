@@ -1,9 +1,9 @@
 steps:
   - id: 'build backend'
     name: 'gcr.io/cloud-builders/gcloud'
-    args: ['builds', 'submit', '--config /packages/backend/cloudbuild.yaml']
+    args: ['builds', 'submit', '--config=cloudbuild.backend.yaml']
     waitFor: ['-'] #start in parallel
   - id: 'build frontend'
     name: 'gcr.io/cloud-builders/gcloud'
-    args: ['builds', 'submit', '--config /packages/frontend/cloudbuild.yaml']
+    args: ['builds', 'submit', '--config=cloudbuild.frontend.yaml']
     waitFor: ['-'] # start in parallel
