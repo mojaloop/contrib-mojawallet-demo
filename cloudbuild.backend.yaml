@@ -9,7 +9,7 @@ steps:
       - image
       - deployment
       - backend
-      - 'mojawallet-frontend-sha256=gcr.io/mojaloop-prod/mojawallet-backend:$SHORT_SHA'
+      - 'mojawallet-backend-sha256=gcr.io/mojaloop-prod/mojawallet-backend:$SHORT_SHA'
     env:
       - 'CLOUDSDK_COMPUTE_ZONE=europe-west2-b'
       - 'CLOUDSDK_CONTAINER_CLUSTER=mojawallet'
