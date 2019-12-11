@@ -17,7 +17,6 @@ import { AccountsAppContext } from './index'
 import { HydraApi } from './apis/hydra'
 import { createAuthMiddleware } from './middleware/auth'
 import cors from '@koa/cors'
-import { TokenService } from './services/token-service'
 import { KnexUserService } from './services/user-service'
 import { KnexTransactionRequestService } from './services/transaction-request-service'
 
@@ -28,7 +27,6 @@ export type AppConfig = {
   transactionRequestService: KnexTransactionRequestService;
   hydraApi: HydraApi;
   userService: KnexUserService;
-  tokenService: TokenService;
 }
 
 export function createApp (appConfig: AppConfig): Koa<any, AccountsAppContext> {
@@ -42,7 +40,6 @@ export function createApp (appConfig: AppConfig): Koa<any, AccountsAppContext> {
     ctx.accounts = appConfig.accountsService
     ctx.transactions = appConfig.transactionsService
     ctx.logger = appConfig.logger
-    ctx.tokenService = appConfig.tokenService
     ctx.users = appConfig.userService
     ctx.transactionRequests = appConfig.transactionRequestService
     await next()

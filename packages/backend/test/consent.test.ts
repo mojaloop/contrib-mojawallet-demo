@@ -1,21 +1,14 @@
 import Knex from 'knex'
 import Koa from 'koa'
-import axios from 'axios'
-import createLogger from 'pino'
 import { Server } from 'http'
-import { createApp } from '../src/app'
-import { HydraApi, TokenInfo } from '../src/apis/hydra'
+import { HydraApi } from '../src/apis/hydra'
 import { KnexAccountService } from '../src/services/accounts-service'
 import { KnexTransactionService } from '../src/services/transactions-service'
-import { accounts } from '../src/services/user-accounts-service'
-import { getAgreementUrlFromScopes } from '../src/controllers/consent'
-import { TokenService } from '../src/services/token-service'
 
 describe('Consent', function () {
   let knex: Knex
   let accountsService: KnexAccountService
   let transactionsService: KnexTransactionService
-  let tokenService: TokenService
   let app: Koa
   let server: Server
   let port: number
@@ -27,7 +20,7 @@ describe('Consent', function () {
       expect(1)
     })
   })
-  
+
   // beforeAll(async () => {
   //   knex = Knex({
   //     client: 'sqlite3',

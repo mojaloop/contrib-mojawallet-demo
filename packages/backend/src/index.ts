@@ -7,7 +7,6 @@ import { Server } from 'http'
 import { hydraApi } from './apis/hydra'
 import createLogger, { Logger } from 'pino'
 import { createApp } from './app'
-import { TokenService } from './services/token-service'
 import Knex = require('knex')
 const logger = createLogger()
 logger.level = process.env.LOG_LEVEL || 'info'
@@ -19,7 +18,6 @@ export interface AccountsAppContext extends Context {
   accounts: KnexAccountService;
   transactions: KnexTransactionService;
   transactionRequests: KnexTransactionRequestService;
-  tokenService: TokenService;
   logger: Logger;
 }
 
@@ -43,19 +41,11 @@ const transactionsService = new KnexTransactionService(knex)
 const userService = new KnexUserService(knex)
 const transactionRequestService = new KnexTransactionRequestService(knex)
 
-const tokenService = new TokenService({
-  clientId: process.env.OAUTH_CLIENT_ID || 'wallet-users-service',
-  clientSecret: process.env.OAUTH_CLIENT_SECRET || '',
-  issuerUrl: process.env.OAUTH_ISSUER_URL || 'https://auth.rafiki.money',
-  tokenRefreshTime: 0
-})
-
 const app = createApp({
   accountsService,
   transactionsService,
   logger,
   hydraApi,
-  tokenService,
   userService,
   transactionRequestService
 })

@@ -1,76 +1,6 @@
-import axios from 'axios'
 import { Config, Joi } from 'koa-joi-router'
 import { AccountsAppContext } from '..'
 import { hydraApi } from '../apis/hydra'
-import { accounts } from '../services/user-accounts-service'
-import { Context } from 'koa'
-
-const INTENTS_URL = process.env.INTENTS_URL || 'http://localhost:3001/intents'
-const MANDATES_URL = process.env.MANDATES_URL || 'http://localhost:3001/mandates'
-// const BASE_PAYMENT_POINTER_URL = process.env.BASE_PAYMENT_POINTER_URL || '$rafiki.money/p'
-
-export function getAgreementUrlFromScopes (scopes: string[]): string | undefined {
-  const agreementScopes = scopes.filter(scope => {
-    return scope.startsWith('intents.') || scope.startsWith('mandates.')
-  })
-
-  if (agreementScopes.length > 1) {
-    throw new Error('Can only ask for single agreement scope at a time')
-  }
-
-  if (agreementScopes.length === 0) {
-    return undefined
-  }
-
-  return agreementScopes[0].startsWith('intents.')
-    ? INTENTS_URL + '/' + agreementScopes[0].slice(8) : MANDATES_URL + '/' + agreementScopes[0].slice(9)
-}
-
-async function getUsersPaymentPointer (userId: string): Promise<string> {
-  const user = null
-  if (!user) {
-    throw new Error('No user found to create mandate scope. userId=' + userId)
-  }
-
-  return `null`
-}
-
-export async function generateAccessAndIdTokenInfo (scopes: string[], userId: string, assert: Context['assert'], accountId?: number): Promise<{ accessTokenInfo: { [k: string]: any }; idTokenInfo: { [k: string]: any } }> {
-  const agreementUrl = getAgreementUrlFromScopes(scopes)
-  if (!agreementUrl) {
-    return {
-      accessTokenInfo: {},
-      idTokenInfo: {}
-    }
-  }
-
-  assert(accountId, 400, 'accountId is required when accepting consent for intent/mandate')
-
-  const agreement = await axios.get(agreementUrl).then(resp => resp.data)
-  const usersPaymentPointer = await getUsersPaymentPointer(userId)
-  if (agreement.scope) {
-    assert(agreement.scope === usersPaymentPointer, 401, 'You are not allowed to give consent to this agreement.')
-  }
-
-  const updateScopeData = { accountId, userId }
-  if (agreementUrl.match(/mandate/)) {
-    updateScopeData['scope'] = usersPaymentPointer
-  }
-  const updatedAgreement = await axios.patch(agreementUrl, updateScopeData).then(resp => resp.data)
-
-  return {
-    accessTokenInfo: {
-      interledger: {
-        agreement: updatedAgreement
-      }
-    },
-    idTokenInfo: {
-      interledger: {
-        agreement: updatedAgreement
-      }
-    }
-  }
-}
 
 export async function show (ctx: AccountsAppContext): Promise<void> {
   const challenge = ctx.request.query['consent_challenge']
@@ -107,25 +37,10 @@ export async function show (ctx: AccountsAppContext): Promise<void> {
     return
   }
 
-  const grantScopes: string[] = Array.from(consentRequest['requested_scope'])
-  const agreementUrl = getAgreementUrlFromScopes(grantScopes)
-  ctx.logger.debug('grantScopes and agreementUrl', { grantScopes, agreementUrl })
-
-  let accountList
-  if (agreementUrl) {
-    const token = await ctx.tokenService.getAccessToken()
-    ctx.logger.debug('access token', { token })
-
-    accountList = await accounts.getUserAccounts(consentRequest['subject'], token)
-    ctx.logger.debug('Got account list', { accountList })
-  }
-
   ctx.body = {
     requestedScopes: consentRequest['requested_scope'],
     client: consentRequest['client'], // TODO we should probably not leak all this data to the frontend
-    user: consentRequest['subject'],
-    accounts: accountList,
-    agreementUrl
+    user: consentRequest['subject']
   }
 }
 
@@ -152,8 +67,6 @@ export async function store (ctx: AccountsAppContext): Promise<void> {
   const consentRequest = await hydraApi.getConsentRequest(challenge)
   ctx.logger.debug('consent request from hydra', { consentRequest })
 
-  const { accessTokenInfo, idTokenInfo } = await generateAccessAndIdTokenInfo(scopes, consentRequest['subject'], ctx.assert, accountId)
-  ctx.logger.debug('Making accept request to hydra', { accessTokenInfo, idTokenInfo })
   const acceptConsent = await hydraApi.acceptConsentRequest(challenge, {
     remember: true,
     remember_for: 0,
@@ -162,10 +75,13 @@ export async function store (ctx: AccountsAppContext): Promise<void> {
     session: {
       // This data will be available when introspecting the token. Try to avoid sensitive information here,
       // unless you limit who can introspect tokens.
-      access_token: accessTokenInfo,
+      access_token: {
 
+      },
       // This data will be available in the ID token.
-      id_token: idTokenInfo
+      id_token: {
+
+      }
     }
   }).catch(error => {
     ctx.logger.error('Error with hydra accepting consent', { error })
