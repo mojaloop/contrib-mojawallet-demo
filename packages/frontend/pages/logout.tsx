@@ -14,7 +14,7 @@ Logout.getInitialProps = async (ctx) => {
 
   if(!logout_challenge) {
     ctx.res.writeHead(302, {
-      Location: 'https://auth.rafiki.money/oauth2/sessions/logout'
+      Location: 'https://auth.mojaloop.app/oauth2/sessions/logout'
     })
     ctx.res.end()
   }
