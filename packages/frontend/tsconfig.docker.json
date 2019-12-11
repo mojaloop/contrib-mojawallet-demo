@@ -1,0 +1,23 @@
+{
+  "compilerOptions": {
+    "composite": true,
+    "baseUrl": ".",
+    "rootDir": "src",
+    "outDir": "dist",
+    "tsBuildInfoFile": "./dist/tsconfig.build.tsbuildinfo",
+    "target": "esnext",
+    "module": "commonjs",
+    "declaration": true,
+    "noImplicitAny": true,
+    "removeComments": true,
+    "moduleResolution": "node",
+    "sourceMap": true,
+    "inlineSources": true,
+    "strictNullChecks": true,
+    "suppressImplicitAnyIndexErrors": true,
+    "esModuleInterop": true,
+  },
+  "include": [
+    "src/**/*"
+  ]
+}
