@@ -7,7 +7,6 @@ import { KnexTransactionService } from '../src/services/transactions-service'
 import createLogger from 'pino'
 import { HydraApi, TokenInfo } from '../src/apis/hydra'
 import Knex = require('knex')
-import { TokenService } from '../src/services/token-service'
 
 describe('Faucet API Test', () => {
   let server: Server
@@ -17,7 +16,6 @@ describe('Faucet API Test', () => {
   let accountsService: KnexAccountService
   let transactionsService: KnexTransactionService
   let hydraApi: HydraApi
-  let tokenService: TokenService
 
   describe('Mock test', () => {
     test('Nothing', () => {

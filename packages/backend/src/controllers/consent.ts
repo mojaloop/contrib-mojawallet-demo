@@ -46,7 +46,7 @@ export async function show (ctx: AccountsAppContext): Promise<void> {
 
 export async function store (ctx: AccountsAppContext): Promise<void> {
   const challenge = ctx.request.query['consent_challenge']
-  const { accepts, scopes, accountId } = ctx.request.body
+  const { accepts, scopes } = ctx.request.body
   ctx.logger.debug('Post consent request', { body: ctx.request.body, challenge })
 
   if (!accepts) {

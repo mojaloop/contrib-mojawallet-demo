@@ -6,7 +6,6 @@ import createLogger from 'pino'
 import { Server } from 'http'
 import { createApp } from '../src/app'
 import { HydraApi, TokenInfo } from '../src/apis/hydra'
-import { TokenService } from '../src/services/token-service'
 import { KnexAccountService } from '../src/services/accounts-service'
 import { KnexTransactionService } from '../src/services/transactions-service'
 
@@ -17,7 +16,6 @@ describe('Login', function () {
   let accountsService: KnexAccountService
   let transactionsService: KnexTransactionService
   let hydraApi: HydraApi
-  let tokenService: TokenService
   let knex: Knex
   const logger = createLogger()
 

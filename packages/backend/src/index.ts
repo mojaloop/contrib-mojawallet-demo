@@ -7,6 +7,7 @@ import { Server } from 'http'
 import { hydraApi } from './apis/hydra'
 import createLogger, { Logger } from 'pino'
 import { createApp } from './app'
+import { KnexQuoteService } from './services/quote-service'
 import Knex = require('knex')
 const logger = createLogger()
 logger.level = process.env.LOG_LEVEL || 'info'
@@ -40,6 +41,7 @@ const accountsService = new KnexAccountService(knex)
 const transactionsService = new KnexTransactionService(knex)
 const userService = new KnexUserService(knex)
 const transactionRequestService = new KnexTransactionRequestService(knex)
+const quoteService = new KnexQuoteService(knex)
 
 const app = createApp({
   accountsService,
@@ -47,7 +49,8 @@ const app = createApp({
   logger,
   hydraApi,
   userService,
-  transactionRequestService
+  transactionRequestService,
+  quoteService
 })
 
 let server: Server
