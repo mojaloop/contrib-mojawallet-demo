@@ -11,6 +11,8 @@ import { createApp } from '../src/app'
 import { HydraApi, TokenInfo } from '../src/apis/hydra'
 import Knex = require('knex')
 import { KnexQuoteService } from '../src/services/quote-service'
+import { MojaloopRequests } from '@mojaloop/sdk-standard-components'
+jest.mock('@mojaloop/sdk-standard-components');
 
 describe('Users Service', function () {
   let server: Server
@@ -23,6 +25,18 @@ describe('Users Service', function () {
   let quoteService: KnexQuoteService
   let userService: KnexUserService
   let hydraApi: HydraApi
+  const mojaloopRequests = new MojaloopRequests({
+    dfspId: 'mojawallet',
+    jwsSign: false,
+    jwsSigningKey: 'test',
+    logger: console,
+    peerEndpoint: '',
+    tls: {outbound: {mutualTLS: {enabled: false}}}
+  })
+  const postParticipantsMock =  jest.fn().mockImplementation(() => {
+    return Promise.resolve()
+  })
+  mojaloopRequests.postParticipants = postParticipantsMock
 
   beforeAll(async () => {
     knex = Knex({
@@ -67,7 +81,8 @@ describe('Users Service', function () {
       logger: createLogger(),
       hydraApi,
       userService,
-      quoteService
+      quoteService,
+      mojaloopRequests
     })
     server = app.listen(0)
     // eslint-disable-next-line @typescript-eslint/ban-ts-ignore
@@ -80,6 +95,7 @@ describe('Users Service', function () {
   })
 
   afterEach(async () => {
+    postParticipantsMock.mockClear()
     await knex.migrate.rollback()
   })
 
@@ -98,6 +114,24 @@ describe('Users Service', function () {
         return resp.data
       })
       expect(response.username).toEqual('+27844444444')
+    })
+
+    test('creating a user registers the number at the ALS', async () => {
+
+      const response = await axios.post(`http://localhost:${port}/users`, {
+        username: '+27844444444',
+        password: 'test'
+      }).then(resp => {
+        expect(resp.status).toEqual(200)
+        return resp.data
+      })
+
+      expect(postParticipantsMock.mock.calls.length).toBe(1)
+      expect(postParticipantsMock.mock.calls[0][0].partyList).toStrictEqual([{
+        partyIdentifier: '+27844444444',
+        partyIdType: 'MSISDN',
+        fspId: 'mojawallet'
+      }])
     })
 
     test('throws invalid phonenumber', async () => {

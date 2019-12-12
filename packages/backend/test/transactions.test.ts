@@ -10,6 +10,7 @@ import createLogger from 'pino'
 import { HydraApi, TokenInfo } from '../src/apis/hydra'
 import Knex = require('knex')
 import { KnexQuoteService } from '../src/services/quote-service'
+import { MojaloopRequests } from "@mojaloop/sdk-standard-components"
 
 describe('Transactions API Test', () => {
   let server: Server
@@ -22,6 +23,14 @@ describe('Transactions API Test', () => {
   let quoteService: KnexQuoteService
   let userService: KnexUserService
   let hydraApi: HydraApi
+  const mojaloopRequests = new MojaloopRequests({
+    dfspId: 'mojawallet',
+    jwsSign: false,
+    jwsSigningKey: 'test',
+    logger: console,
+    peerEndpoint: '',
+    tls: {outbound: {mutualTLS: {enabled: false}}}
+  })
 
   beforeAll(async () => {
     knex = Knex({
@@ -65,7 +74,8 @@ describe('Transactions API Test', () => {
       logger: createLogger(),
       hydraApi,
       userService,
-      quoteService
+      quoteService,
+      mojaloopRequests
     })
     server = app.listen(0)
     // eslint-disable-next-line @typescript-eslint/ban-ts-ignore

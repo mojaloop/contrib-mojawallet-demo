@@ -20,6 +20,7 @@ import cors from '@koa/cors'
 import { KnexUserService } from './services/user-service'
 import { KnexTransactionRequestService } from './services/transaction-request-service'
 import { KnexQuoteService } from './services/quote-service'
+import { MojaloopRequests } from '@mojaloop/sdk-standard-components'
 
 export type AppConfig = {
   logger: Logger;
@@ -29,6 +30,7 @@ export type AppConfig = {
   quoteService: KnexQuoteService;
   hydraApi: HydraApi;
   userService: KnexUserService;
+  mojaloopRequests: MojaloopRequests;
 }
 
 export function createApp (appConfig: AppConfig): Koa<any, AccountsAppContext> {
@@ -45,6 +47,7 @@ export function createApp (appConfig: AppConfig): Koa<any, AccountsAppContext> {
     ctx.users = appConfig.userService
     ctx.transactionRequests = appConfig.transactionRequestService
     ctx.quotes = appConfig.quoteService
+    ctx.mojaloopRequests = appConfig.mojaloopRequests
     await next()
   })
 

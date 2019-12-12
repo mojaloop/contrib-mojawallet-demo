@@ -3,6 +3,9 @@ import { Config, Joi } from 'koa-joi-router'
 import { AccountsAppContext } from '..'
 import { UserProps, User } from '../services/user-service'
 import { parseNumber, isValidNumber } from 'libphonenumber-js'
+import { v4 } from 'uuid'
+
+const DFSP_ID = process.env.DFSP_ID || 'mojawallet'
 
 export async function show (ctx: AccountsAppContext): Promise<void> {
   const { users } = ctx
@@ -21,7 +24,7 @@ export async function show (ctx: AccountsAppContext): Promise<void> {
 }
 
 export async function store (ctx: AccountsAppContext): Promise<void> {
-  const { users } = ctx
+  const { users, mojaloopRequests } = ctx
   const { username, password } = ctx.request.body
   ctx.logger.debug(`Creating user ${username}`)
   ctx.assert(username != null, 400, '"username" is required')
@@ -33,14 +36,29 @@ export async function store (ctx: AccountsAppContext): Promise<void> {
     username: username,
     password: hashedPassword
   }
+
   ctx.assert(isValidNumber(parseNumber(username)), 400, 'Invalid phonenumber.')
+
   try {
     const user = await users.store(userProps)
     ctx.logger.debug(`Creating user ${user}`)
+
+    await mojaloopRequests.postParticipants({
+      requestId: v4(),
+      partyList: [ {
+        partyIdentifier: username,
+        partyIdType: 'MSISDN',
+        fspId: DFSP_ID
+      }]
+    }).catch(error => {
+      ctx.logger.error('Error adding participant to ALS', error)
+    })
+
     ctx.body = {
       ...user
     }
   } catch (error) {
+    console.log(error)
     ctx.throw(400, error)
   }
 }

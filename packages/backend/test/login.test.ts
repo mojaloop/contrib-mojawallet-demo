@@ -8,6 +8,7 @@ import { createApp } from '../src/app'
 import { HydraApi, TokenInfo } from '../src/apis/hydra'
 import { KnexAccountService } from '../src/services/accounts-service'
 import { KnexTransactionService } from '../src/services/transactions-service'
+import { MojaloopRequests } from "@mojaloop/sdk-standard-components"
 
 describe('Login', function () {
   let server: Server
@@ -18,6 +19,14 @@ describe('Login', function () {
   let hydraApi: HydraApi
   let knex: Knex
   const logger = createLogger()
+  const mojaloopRequests = new MojaloopRequests({
+    dfspId: 'mojawallet',
+    jwsSign: false,
+    jwsSigningKey: 'test',
+    logger: console,
+    peerEndpoint: '',
+    tls: {outbound: {mutualTLS: {enabled: false}}}
+  })
 
   describe('Mock test', () => {
     test('Nothing', () => {
