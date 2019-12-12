@@ -49,7 +49,7 @@ const quoteService = new KnexQuoteService(knex)
 const mojaloopRequests = new MojaloopRequests({
   dfspId: DFSP_ID,
   jwsSign: false,
-  jwsSigningKey: '',
+  jwsSigningKey: 'dummykey',
   logger: undefined,
   peerEndpoint: '',
   tls: { outbound: { mutualTLS: { enabled: false } } }
