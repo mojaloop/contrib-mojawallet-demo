@@ -50,7 +50,7 @@ const mojaloopRequests = new MojaloopRequests({
   dfspId: DFSP_ID,
   jwsSign: false,
   jwsSigningKey: 'dummykey',
-  logger: undefined,
+  logger: console,
   peerEndpoint: '',
   tls: { outbound: { mutualTLS: { enabled: false } } }
 })
