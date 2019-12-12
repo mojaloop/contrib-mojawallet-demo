@@ -1,119 +1,130 @@
 import React from 'react'
 import Head from 'next/head'
-import Nav from '../components/nav'
 import { NextPage } from 'next'
-import { parseCookies } from 'nookies'
-import { UsersService } from '../services/users'
+import Link from 'next/link'
+import { formatCurrency, checkUser } from "../utils"
+import { AccountsPageProps, AccountCardProps, Totals } from "../types"
+import { motion } from 'framer-motion'
+import { AccountsService } from '../services/accounts'
 
-const usersService = UsersService()
+const accountsService = AccountsService()
 
-const Home: NextPage = () => {
+const Home: NextPage<AccountsPageProps> = ({accounts, user}) => {
   return (
     <div>
       <Head>
-        <title>Home</title>
+        <title>Accounts</title>
         <link rel="icon" href="/favicon.ico" />
       </Head>
+      <div>
+        <div className='w-full rounded-b-2xl fixed top-0' style={{height: '21rem', background: 'linear-gradient(#225980, #7caab2)', zIndex:-3000 }}/>
+        <div className='' style={{textDecoration: 'none', color: 'inherit', zIndex:0, marginTop: '6rem' }}>
+          <div className='w-full mx-auto max-w-lg'>
+            <div className="flex">
+              <div className="text-3xl text-white flex-1 text-base mx-4 px-4">
+                Accounts
+              </div>
+              <div className="mr-8" style={{ zIndex:1 }}>
+                <Link href={{ pathname: '/profile' }}>
+                  <img style={{ height: '32px'}} src={'../icons/person-24px-white.svg'}/>
+                </Link>
+              </div>
+            </div>
 
-      <Nav />
-
-      <div className="hero">
-        <h1 className="title">Welcome to Next.js!</h1>
-        <p className="description">
-          To get started, edit <code>pages/index.js</code> and save to reload.
-        </p>
-
-        <div className="row">
-          <a href="https://nextjs.org/docs" className="card">
-            <h3>Documentation &rarr;</h3>
-            <p>Learn more about Next.js in the documentation.</p>
-          </a>
-          <a href="https://nextjs.org/learn" className="card">
-            <h3>Next.js Learn &rarr;</h3>
-            <p>Learn about Next.js by following an interactive tutorial!</p>
-          </a>
-          <a
-            href="https://github.com/zeit/next.js/tree/master/examples"
-            className="card"
-          >
-            <h3>Examples &rarr;</h3>
-            <p>Find other example boilerplates on the Next.js GitHub.</p>
-          </a>
+            <div className="w-full flex my-4 flex-wrap">
+              <Balance balance={accounts.reduce((sum, current) => sum + current.balance, 0)} assetScale={2}/>
+                { accounts.length > 0 ? accounts.map(account => <AccountCard key={'account_' + account.id} account={account}/>) : <Empty/> }
+              <AddAccount/>
+            </div>
+          </div>
         </div>
       </div>
-
-      <style jsx>{`
-      .hero {
-        width: 100%;
-        color: #333;
-      }
-      .title {
-        margin: 0;
-        width: 100%;
-        padding-top: 80px;
-        line-height: 1.15;
-        font-size: 48px;
-      }
-      .title,
-      .description {
-        text-align: center;
-      }
-      .row {
-        max-width: 880px;
-        margin: 80px auto 40px;
-        display: flex;
-        flex-direction: row;
-        justify-content: space-around;
-      }
-      .card {
-        padding: 18px 18px 24px;
-        width: 220px;
-        text-align: left;
-        text-decoration: none;
-        color: #434343;
-        border: 1px solid #9b9b9b;
-      }
-      .card:hover {
-        border-color: #067df7;
-      }
-      .card h3 {
-        margin: 0;
-        color: #067df7;
-        font-size: 18px;
-      }
-      .card p {
-        margin: 0;
-        padding: 12px 0 0;
-        font-size: 13px;
-        color: #333;
-      }
-    `}</style>
     </div>
+  )
+}
+
+const Balance: React.FC<Totals> = ({ balance, assetScale }) => {
+  return (
+    <div className="bg-white max-w-xl sm:max-w-xs rounded-xl elevation-4 flex flex-col w-full mt-8 px-6 py-4 mx-8" style={{textDecoration: 'none', color: 'inherit'}}>
+      <div className="flex flex-wrap text-2xl">
+        <div className="w-1/2">
+          Balance
+        </div>
+        <div className="w-1/2 text-right">
+          {formatCurrency(balance, assetScale)}
+        </div>
+      </div>
+    </div>
+  )
+}
+
+const Empty: React.FC = () => {
+  return (
+    <div className="bg-white max-w-xl sm:max-w-xs rounded-xl elevation-4 flex flex-col w-full mt-8 px-6 py-4 mx-8" style={{textDecoration: 'none', color: 'inherit'}}>
+      <div className="flex flex-wrap content-center text-center mx-10">
+        <div className="w-full mb-2">
+          <img src={'../../icons/undraw_empty_xct9.svg'}/>
+        </div>
+        <div className="w-full text-lg">
+          No accounts found! Add an account to get started.
+        </div>
+      </div>
+    </div>
+  )
+}
+
+const AddAccount: React.FC = () => {
+  return (
+    <Link href={{ pathname: '/create/account' }}>
+      <div className="bg-white max-w-xl hover:bg-grey-lightest text-grey-darkest sm:max-w-xs font-semibold rounded-xl elevation-4 flex flex-col w-full my-8 px-6 py-4 mx-8" style={{textDecoration: 'none', color: 'inherit'}}>
+        <div className="flex flex-wrap">
+          <div className="mr-1 ml-auto">
+            <img className="" src={'../../icons/add-24px.svg'}/>
+          </div>
+          <div className="ml-1 mr-auto">
+            Add Account
+          </div>
+        </div>
+      </div>
+    </Link>
+  )
+}
+
+const AccountCard: React.FC<AccountCardProps> = ({ account }) => {
+  return (
+    <Link href="/account/[account.id]"  as={`/account/${account.id}`}>
+      <div className="bg-white max-w-xl sm:max-w-xs rounded-xl elevation-4 flex flex-col w-full mt-8 px-6 py-4 mx-8" style={{textDecoration: 'none', color: 'inherit'}}>
+        <div className="flex flex-1">
+          <div className="flex-1">
+            <div className="text-3xl">
+              {formatCurrency(account.balance, account.assetScale)}
+            </div>
+            <div className="text-sm text-grey">
+              Balance
+            </div>
+          </div>
+          {/* <div>
+            <img src={process.env.PUBLIC_URL + '/icons/xrp.svg'}/>
+          </div> */}
+        </div>
+        <div style={{height: '3rem'}}></div>
+        <div className="text-grey-dark">
+          {account.name}
+        </div>
+      </div>
+    </Link>
   )
 }
 
 export default Home
 
 Home.getInitialProps = async (ctx) => {
-  const cookies = parseCookies(ctx)
-
+  let accounts
+  const user = await checkUser(ctx)
   try {
-    if(cookies && cookies.token) {
-      const user = await usersService.getUser(cookies.token)
-      console.log(user)
-    } else {
-      throw new Error('no token')
-    }
+    accounts = await accountsService.getAccounts(user.id, user.token)
   } catch(error) {
-    // if (typeof window === 'undefined') {
-    //   ctx.res.writeHead(302, {
-    //     Location: '/login'
-    //   }).end()
-    //   return
-    // }
-
-    // window.location.href = '/login'
+    console.log(error)
   }
-
-  return {}
+  return { user, accounts: accounts.data }
 }

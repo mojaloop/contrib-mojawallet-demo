@@ -13,7 +13,6 @@ export function createAuthMiddleware (hydraApi: HydraApi) {
         token = parts[1]
       }
     }
-
     // Introspect it
     const introspection = await hydraApi.introspectToken(token).catch(error => {
       ctx.logger.debug('Error introspecting token', { error: error.response })

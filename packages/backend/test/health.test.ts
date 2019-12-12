@@ -10,7 +10,6 @@ describe('Health API Test', () => {
   let app: Koa
 
   beforeAll(async () => {
-
     app = createApp({
       logger: createLogger(),
       accountsService: {} as any,

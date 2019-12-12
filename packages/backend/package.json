@@ -5,10 +5,9 @@
   "main": "index.js",
   "scripts": {
     "test": "jest",
-    "tsc": "tsc",
-    "start": "node dist/index.js",
+    "build:docker": "tsc -p tsconfig.docker.json",
     "build": "tsc -p tsconfig.build.json",
-    "build:docker": "tsc -p tsconfig.docker.json"
+    "start": "node dist/index.js"
   },
   "keywords": [],
   "author": "",

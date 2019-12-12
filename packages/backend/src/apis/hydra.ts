@@ -1,4 +1,5 @@
 import axios, { AxiosResponse } from 'axios'
+import got from 'got'
 
 const hydraAdminUrl = process.env.HYDRA_ADMIN_URL || 'http://localhost:9001'
 let mockTlsTermination = {}
@@ -78,10 +79,24 @@ export const hydraApi: HydraApi = {
   // Introspects the token
   introspectToken: function (token: string) {
     const url = new URL('/oauth2/introspect', hydraAdminUrl)
-    const introspectParams = new URLSearchParams()
-    introspectParams.set('token', token)
-    const headers = Object.assign({ 'content-type': 'application/x-www-form-urlencoded' }, mockTlsTermination)
-    return axios.post<TokenInfo>(url.href, introspectParams, { headers }).then(resp => resp.data)
+    const headers = Object.assign({ 'Content-Type': 'application/x-www-form-urlencoded' }, mockTlsTermination)
+    const body = (new URLSearchParams({ token })).toString()
+    console.log('in introspect token: ', token, ' typeof token', typeof token)
+    const instance = got.extend({
+      hooks: {
+        beforeRequest: [
+          options => {
+            console.log('headers before going out', options.headers)
+            console.log('body before going out', options.body)
+            if (options.headers) {
+              options.headers['content-type'] = 'application/x-www-form-urlencoded'
+            }
+          }
+        ]
+      }
+    })
+
+    return instance.post(url.toString(), { body, headers }).then(resp => JSON.parse(resp.body))
   },
   // Fetches information on a login request.
   getLoginRequest: async function (challenge: string): Promise<AxiosResponse> {
