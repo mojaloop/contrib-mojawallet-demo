@@ -36,7 +36,7 @@ const knex = KNEX_CLIENT === 'mysql' ? Knex({
 }) : Knex({
   client: 'sqlite3',
   connection: {
-    filename: './test.db'
+    filename: ':memory:'
   }
 })
 
