@@ -16,7 +16,8 @@ export async function show (ctx: AccountsAppContext): Promise<void> {
     user = await users.getById(ctx.state.user.sub)
     ctx.assert(user, 404, 'User not found.')
     ctx.body = {
-      ...user
+      id: user.id,
+      username: user.username
     }
   } catch (error) {
     ctx.throw(400, error)
@@ -55,7 +56,8 @@ export async function store (ctx: AccountsAppContext): Promise<void> {
     })
 
     ctx.body = {
-      ...user
+      id: user.id,
+      username: user.username
     }
   } catch (error) {
     console.log(error)
@@ -83,7 +85,8 @@ export async function update (ctx: AccountsAppContext): Promise<void> {
     const user = await users.update(userProps)
     ctx.logger.debug(`Creating user ${user}`)
     ctx.body = {
-      ...user
+      id: user.id,
+      username: user.username
     }
   } catch (error) {
     ctx.throw(400, error)

@@ -219,7 +219,8 @@ describe('Users Service', function () {
         return resp.data
       })
       expect(user.username).toEqual('+27844444444')
-      const updatedUser = await axios.patch(`http://localhost:${port}/users`, {
+
+      await axios.patch(`http://localhost:${port}/users`, {
         username: '+27844444444',
         password: 'newPassword'
       }, {
@@ -230,6 +231,9 @@ describe('Users Service', function () {
         expect(resp.status).toEqual(200)
         return resp.data
       })
+
+      const updatedUser = await userService.getById(user.id)
+
       expect(updatedUser.password).not.toEqual('oldPassword')
       expect(updatedUser.password).not.toEqual('newPassword')
       expect(bcrypt.compare('newPassword', updatedUser.password)).toBeTruthy()
