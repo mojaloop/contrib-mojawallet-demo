@@ -1,9 +1,10 @@
 import bcrypt from 'bcrypt'
-import { Config, Joi } from 'koa-joi-router'
+import { Joi } from 'koa-joi-router'
 import { AccountsAppContext } from '..'
 import { UserProps, User } from '../services/user-service'
 import { parseNumber, isValidNumber } from 'libphonenumber-js'
 import { v4 } from 'uuid'
+import { ValidationError } from 'joi'
 
 const DFSP_ID = process.env.DFSP_ID || 'mojawallet'
 
@@ -24,12 +25,66 @@ export async function show (ctx: AccountsAppContext): Promise<void> {
   }
 }
 
+export const createUserSchema = Joi.object({
+  username: Joi.string().required(),
+  password: Joi.string().required()
+})
+
 export async function store (ctx: AccountsAppContext): Promise<void> {
   const { users, mojaloopRequests } = ctx
   const { username, password } = ctx.request.body
+
   ctx.logger.debug(`Creating user ${username}`)
-  ctx.assert(username != null, 400, '"username" is required')
-  ctx.assert(password != null, 400, '"password" is required')
+
+  try {
+    await createUserSchema.validate({ username, password })
+  } catch (error) {
+    const e: ValidationError = error
+    ctx.body = {
+      message: 'Validation Failed',
+      errors: e.details.map(detail => {
+        return {
+          field: detail.context!.label,
+          message: detail.message
+        }
+      })
+    }
+    ctx.status = 422
+    return
+  }
+
+  if (!isValidNumber(parseNumber(username))) {
+    ctx.body = {
+      message: 'Validation Failed',
+      errors: [
+        {
+          field: 'username',
+          message: 'Invalid phone number entered'
+        }
+      ]
+    }
+    ctx.status = 422
+    return
+  }
+
+  try {
+    if (await users.getByUsername(username)) {
+      ctx.body = {
+        message: 'Validation Failed',
+        errors: [
+          {
+            field: 'username',
+            message: 'Username already exists'
+          }
+        ]
+      }
+      ctx.status = 422
+      return
+    }
+  } catch (error) {
+    ctx.logger.info('Tried creating user that already exists')
+  }
+
   const salt = await bcrypt.genSalt()
   const hashedPassword = bcrypt.hashSync(password, salt)
 
@@ -37,8 +92,6 @@ export async function store (ctx: AccountsAppContext): Promise<void> {
     username: username,
     password: hashedPassword
   }
-
-  ctx.assert(isValidNumber(parseNumber(username)), 400, 'Invalid phonenumber.')
 
   try {
     const user = await users.store(userProps)
@@ -93,16 +146,4 @@ export async function update (ctx: AccountsAppContext): Promise<void> {
   }
 
   ctx.response.status = 200
-}
-
-export function createValidation (): Config {
-  return {
-    validate: {
-      type: 'json',
-      body: Joi.object().keys({
-        username: Joi.string().required(),
-        password: Joi.string().required()
-      })
-    }
-  }
 }

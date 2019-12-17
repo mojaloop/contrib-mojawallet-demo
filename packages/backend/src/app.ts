@@ -47,6 +47,7 @@ export function createApp (appConfig: AppConfig): Koa<any, AccountsAppContext> {
     ctx.users = appConfig.userService
     ctx.transactionRequests = appConfig.transactionRequestService
     ctx.quotes = appConfig.quoteService
+    ctx.hydraApi = appConfig.hydraApi
     ctx.mojaloopRequests = appConfig.mojaloopRequests
     await next()
   })

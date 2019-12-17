@@ -141,8 +141,10 @@ describe('Users Service', function () {
       }).then(resp => {
         return resp.data
       }).catch(error => {
-        expect(error.response.status).toEqual(400)
-        expect(error.response.data).toEqual('Invalid phonenumber.')
+        const { data } = error.response
+        expect(error.response.status).toEqual(422)
+        expect(data.errors[0].field).toBe("username")
+        expect(data.errors[0].message).toBe('Invalid phone number entered')
         return error
       })
       expect(response.username).toBeUndefined()
@@ -158,14 +160,16 @@ describe('Users Service', function () {
       expect(response.password).not.toEqual('test')
     })
 
-    test('userName is required', async () => {
+    test('username is required', async () => {
       const response = await axios.post(`http://localhost:${port}/users`, {
         password: 'test'
       }).then(resp => {
         return resp.data
       }).catch(error => {
-        expect(error.response.status).toEqual(400)
-        expect(error.response.data).toEqual('"username" is required')
+        const { data } = error.response
+        expect(error.response.status).toEqual(422)
+        expect(data.errors[0].field).toBe("username")
+        expect(data.errors[0].message).toBe('"username" is required')
         return error
       })
       expect(response.username).toBeUndefined()
@@ -177,8 +181,10 @@ describe('Users Service', function () {
       }).then(resp => {
         return resp.data
       }).catch(error => {
-        expect(error.response.status).toEqual(400)
-        expect(error.response.data).toEqual('"password" is required')
+        const { data } = error.response
+        expect(error.response.status).toEqual(422)
+        expect(data.errors[0].field).toBe("password")
+        expect(data.errors[0].message).toBe('"password" is required')
         return error
       })
       expect(response.username).toBeUndefined()
@@ -192,6 +198,7 @@ describe('Users Service', function () {
         expect(resp.status).toEqual(200)
         return resp.data
       })
+
       expect(response.username).toEqual('+27844444444')
       try {
         await axios.post(`http://localhost:${port}/users`, {
@@ -199,8 +206,11 @@ describe('Users Service', function () {
           password: 'test'
         })
       } catch (error) {
-        expect(error.response.status).toEqual(400)
-        expect(error.response.data).toEqual('A user with this username already exists.')
+        const { data } = error.response
+        expect(error.response.status).toEqual(422)
+        expect(data.errors[0].field).toBe("username")
+        expect(data.errors[0].message).toBe('Username already exists')
+        return error
       }
     })
   })
