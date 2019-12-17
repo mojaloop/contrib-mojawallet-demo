@@ -20,13 +20,13 @@ export const checkUser = async (ctx) => {
     console.log(error)
     if (typeof window === 'undefined') {
       ctx.res.writeHead(302, {
-        Location: '/login'
+        Location: '/signup'
       })
       ctx.res.end()
       return
     }
 
-    window.location.href = '/login'
+    window.location.href = '/signup'
   }
   return { ...user, token: cookies.token }
 }

@@ -2,13 +2,29 @@ import React from 'react'
 import Head from 'next/head'
 import { NextPage, NextPageContext } from 'next'
 import Link from 'next/link'
+import PhoneInput, { isValidPhoneNumber } from 'react-phone-number-input'
 import { ProfilePageProps } from "../../types"
 import { formatCurrency, checkUser } from "../../utils"
 import { AccountsService } from '../../services/accounts'
+import Input from '../../components/input'
+import useForm from "react-hook-form"
 
 const accountsService = AccountsService()
 
+type FormData = {
+  firstName: string
+  phoneNumber: string
+}
+
 const Account: NextPage<ProfilePageProps> = ({ user }) => {
+  const { register, setValue, handleSubmit, errors, setError } = useForm<FormData>()
+  let phoneError = ''
+  const onSubmit = handleSubmit((props) => {
+    if (!isValidPhoneNumber(props.phoneNumber)) {
+      setError('phoneNumber', 'Invalid phone number.', 'Invalid phone number.')
+    }
+    console.log(errors)
+  })
   return (
     <div>
       <Head>
@@ -22,9 +38,14 @@ const Account: NextPage<ProfilePageProps> = ({ user }) => {
           </div>
         </Link>
       </div>
-      <form className="w-full max-w-sm">
+      <form className="w-full max-w-sm" onSubmit={onSubmit}>
         <div className="flex items-center py-2">
-          <input autoFocus className="appearance-none bg-transparent border-b border-b-2 border-teal-500 w-full text-gray-700 mr-3 py-1 px-2 leading-tight focus:outline-none focus:border-teal-900" type="text" placeholder="Account Name" aria-label="Full name"/>
+          <input type="hidden" name="phoneNumber" ref={register({ required: true })}></input>
+            <PhoneInput smartCaret={false} name={'phoneNumber'} placeholder="Enter phone number" error={typeof errors.phoneError !== 'undefined' ? errors.phoneError.type : ''} onChange={value => { setValue('phoneNumber', value, true); console.log(errors) }}/>
+            {/* <Input type={'phone'} formRef={register} name={'phoneNumber'} className={'shadow appearance-none border border-red-500 rounded w-full py-2 px-3 text-gray-700 mb-3 leading-tight focus:outline-none focus:shadow-outline'} placeholder={'TEsting tghe placeholder'}/> */}
+            <Input type={'text'} formRef={register} name={'firstName'} className={'shadow appearance-none border border-red-500 rounded w-full py-2 px-3 text-gray-700 mb-3 leading-tight focus:outline-none focus:shadow-outline'} placeholder={'TEsting tghe placeholder'}/>
+            <Input type={'submit'} className={'bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline'} value={'Login'}/>
+          {/* <input autoFocus className="appearance-none bg-transparent border-b border-b-2 border-teal-500 w-full text-gray-700 mr-3 py-1 px-2 leading-tight focus:outline-none focus:border-teal-900" type="text" placeholder="Account Name" aria-label="Full name"/> */}
           {/* <button className="flex-shrink-0 bg-teal-500 hover:bg-teal-700 border-teal-500 hover:border-teal-700 text-sm border-4 text-white py-1 px-2 rounded" type="button">
             Sign Up
           </button>

@@ -2,7 +2,8 @@ import React from 'react'
 import { NextPage } from "next"
 import useForm from 'react-hook-form'
 import Link from 'next/link'
-import { UsersService } from '../services/users'
+import { UsersService } from '../../services/users'
+import { checkUser } from '../../utils'
 
 
 const Signup: NextPage = () => {
@@ -21,12 +22,12 @@ const Signup: NextPage = () => {
   return (
     <div className="w-full max-w-xs mx-auto md:mt-32">
       <div className="flex flex-col mb-6">
-        <img className="mx-auto h-32" src={'/logo.png'}/>
+        <img className="mx-auto h-16" src={'/logo.png'}/>
         <div className="text-center text-gray-800 text-lg font-light">
           Create an Account!
         </div>
       </div>
-      <form className="bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4" onSubmit={handleSubmit(onSubmit)}>
+      <form className="bg-white elevation-4 rounded px-8 pt-6 pb-8 mb-4" onSubmit={handleSubmit(onSubmit)}>
         <div className="mb-3">
           <label className="block text-gray-700 text-sm font-bold mb-2">Username</label>
           <input
@@ -56,7 +57,7 @@ const Signup: NextPage = () => {
       </div>
       <a href="/login">
         <button
-          className="shadow-md border-2 border-gray-500 text-gray-600 hover:bg-gray-500 hover:text-white w-full font-bold py-2 px-4 my-4 rounded"
+          className="elevation-2 border-2 border-gray-500 text-gray-600 hover:bg-gray-500 hover:text-white w-full font-bold py-2 px-4 my-4 rounded"
           type="button">
           Login
         </button>
@@ -67,9 +68,6 @@ const Signup: NextPage = () => {
 }
 
 Signup.getInitialProps = async ({}) => {
-
-  // TODO Perhaps do a check if user is logged in already and rather redirect
-
   return {}
 }
 
