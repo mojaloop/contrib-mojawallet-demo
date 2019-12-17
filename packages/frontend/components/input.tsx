@@ -28,6 +28,4 @@ const Input: React.FC<props> = (props) => {
   )
 }
 
-{/* <input type="submit" value="Send Request"/> */}
-
 export default Input
