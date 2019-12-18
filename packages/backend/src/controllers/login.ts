@@ -40,6 +40,29 @@ export async function show (ctx: AccountsAppContext): Promise<void> {
     throw error
   })
 
+  if (loginRequest['request_url']) {
+    const requestUrl = new URL(loginRequest['request_url'])
+    const signupSessionId = requestUrl.searchParams.get('signupSessionId')
+
+    const session = signupSessionId ? await ctx.knex('signupSessions').where('id', signupSessionId).first() : null
+    // Auto login users if they just signed up
+    if (session) {
+      const now = Date.now()
+      if (session.expiresAt > now) {
+        const acceptLogin = await hydraApi.acceptLoginRequest(challenge, { subject: session.userId,
+          remember: true,
+          remember_for: 604800 // 1 week
+        }).catch((error: any) => {
+          ctx.logger.error(error, 'error in accept login request')
+          throw error
+        })
+        ctx.status = 200
+        ctx.body = { redirectTo: acceptLogin['redirect_to'] }
+        return
+      }
+    }
+  }
+
   if (loginRequest['skip']) {
     const acceptLogin = await hydraApi.acceptLoginRequest(challenge, { subject: loginRequest['subject'],
       remember: true,

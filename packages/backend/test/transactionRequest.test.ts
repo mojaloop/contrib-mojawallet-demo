@@ -82,6 +82,7 @@ describe('Trnsaction Request Test', () => {
     } as HydraApi
 
     app = createApp({
+      knex,
       accountsService,
       transactionsService,
       transactionRequestService,

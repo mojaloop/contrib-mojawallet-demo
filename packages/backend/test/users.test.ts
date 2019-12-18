@@ -75,6 +75,7 @@ describe('Users Service', function () {
     const logger = createLogger()
     logger.level = 'trace'
     app = createApp({
+      knex,
       accountsService,
       transactionsService,
       transactionRequestService,
@@ -132,6 +133,20 @@ describe('Users Service', function () {
         partyIdType: 'MSISDN',
         fspId: 'mojawallet'
       }])
+    })
+
+    test('creating a user creates a signup session', async () => {
+
+      const response = await axios.post(`http://localhost:${port}/users`, {
+        username: '+27844444444',
+        password: 'test'
+      }).then(resp => {
+        expect(resp.status).toEqual(200)
+        return resp.data
+      })
+
+      const session = await knex('signupSessions').where('id', response.signupSessionId).first()
+      expect(response.id.toString()).toBe(session.userId)
     })
 
     test('throws invalid phonenumber', async () => {

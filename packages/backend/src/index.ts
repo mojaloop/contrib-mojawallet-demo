@@ -24,6 +24,7 @@ export interface AccountsAppContext extends Context {
   quotes: KnexQuoteService;
   logger: Logger;
   mojaloopRequests: MojaloopRequests
+  knex: Knex
 }
 
 const knex = KNEX_CLIENT === 'mysql' ? Knex({
@@ -57,6 +58,7 @@ const mojaloopRequests = new MojaloopRequests({
 })
 
 const app = createApp({
+  knex,
   accountsService,
   transactionsService,
   logger,

@@ -95,7 +95,15 @@ export async function store (ctx: AccountsAppContext): Promise<void> {
 
   try {
     const user = await users.store(userProps)
+
     ctx.logger.debug(`Creating user ${user}`)
+
+    const signupSessionId = v4()
+    await ctx.knex('signupSessions').insert({
+      id: signupSessionId,
+      userId: user.id,
+      expiresAt: (new Date(Date.now() + 1000 * 30)).getTime()
+    })
 
     await mojaloopRequests.postParticipants({
       requestId: v4(),
@@ -110,7 +118,8 @@ export async function store (ctx: AccountsAppContext): Promise<void> {
 
     ctx.body = {
       id: user.id,
-      username: user.username
+      username: user.username,
+      signupSessionId
     }
   } catch (error) {
     console.log(error)

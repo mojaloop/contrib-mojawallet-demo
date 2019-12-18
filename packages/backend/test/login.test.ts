@@ -60,6 +60,7 @@ describe('Login', function () {
     } as HydraApi
 
     app = createApp({
+      knex,
       accountsService,
       transactionsService,
       logger: createLogger(),
@@ -90,7 +91,10 @@ describe('Login', function () {
 
   describe('Get login request', function () {
     test('does not accept hydra login if user is not currently logged in', async () => {
-      hydraApi.getLoginRequest = jest.fn().mockResolvedValue({ skip: false })
+      hydraApi.getLoginRequest = jest.fn().mockResolvedValue({
+        skip: false,
+        request_url: 'http://auth.localhost'
+      })
       hydraApi.acceptLoginRequest = jest.fn()
 
       const { status } = await axios.get(`http://localhost:${port}/login?login_challenge=test`)
@@ -103,7 +107,8 @@ describe('Login', function () {
     test('accepts hydra login and returns a redirect url if user is logged in already', async () => {
       hydraApi.getLoginRequest = jest.fn().mockResolvedValue({
         skip: true,
-        subject: '2'
+        subject: '2',
+        request_url: 'http://auth.localhost'
       })
       hydraApi.acceptLoginRequest = jest.fn().mockResolvedValue({
         redirect_to: `http://localhost:${port}/redirect`

@@ -78,6 +78,7 @@ describe('Response from switch after a quote is sent', () => {
     } as HydraApi
 
     app = createApp({
+      knex,
       accountsService,
       transactionsService,
       transactionRequestService,
