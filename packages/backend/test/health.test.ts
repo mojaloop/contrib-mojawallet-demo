@@ -11,6 +11,7 @@ describe('Health API Test', () => {
 
   beforeAll(async () => {
     app = createApp({
+      knex: {} as any,
       logger: createLogger(),
       accountsService: {} as any,
       hydraApi: {} as any,

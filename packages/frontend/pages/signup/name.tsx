@@ -41,7 +41,7 @@ const Signup: NextPage = () => {
 
   return (
     <div className="flex flex-wrap content-center items-center justify-center text-center w-full h-screen">
-      <div className="w-full text-gray-800 text-headline">Sign up</div>
+      <div className="w-full text-gray-800 mb-10 text-headline">Sign up</div>
       <form className="w-3/4 max-w-sm" onSubmit={onSubmit}>
         <div className="w-full">
           <input type="hidden" name="phoneNumber" ref={register({ required: true })}/>

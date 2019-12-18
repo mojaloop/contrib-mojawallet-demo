@@ -17,7 +17,7 @@ const Home: NextPage<AccountsPageProps> = ({accounts, user}) => {
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <div>
-        <div className='w-full rounded-b-2xl fixed top-0' style={{height: '21rem', background: 'linear-gradient(#225980, #7caab2)', zIndex:-3000 }}/>
+        <div className='w-full rounded-b-2xl fixed top-0' style={{height: '21rem', background: 'linear-gradient(#023347, #025C5E, #B1CDAC)', zIndex:-3000 }}/>
         <div className='' style={{textDecoration: 'none', color: 'inherit', zIndex:0, marginTop: '6rem' }}>
           <div className='w-full mx-auto max-w-lg'>
             <div className="flex">

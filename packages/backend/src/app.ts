@@ -13,7 +13,6 @@ import { store as storeLogout } from './controllers/logout'
 import { create as createTransactionRequest } from './controllers/transactionRequest'
 import { show as showConsent, store as storeConsent } from './controllers/consent'
 import { quoteResponse } from './controllers/quoteResponse'
-// import { createValidation as createValidationOauth2, store as storeOauth2 } from './controllers/oauth2Client'
 import { AccountsAppContext } from './index'
 import { HydraApi } from './apis/hydra'
 import { createAuthMiddleware } from './middleware/auth'
@@ -22,6 +21,7 @@ import { KnexUserService } from './services/user-service'
 import { KnexTransactionRequestService } from './services/transaction-request-service'
 import { KnexQuoteService } from './services/quote-service'
 import { MojaloopRequests } from '@mojaloop/sdk-standard-components'
+import Knex from 'knex'
 
 export type AppConfig = {
   logger: Logger;
@@ -32,6 +32,7 @@ export type AppConfig = {
   hydraApi: HydraApi;
   userService: KnexUserService;
   mojaloopRequests: MojaloopRequests;
+  knex: Knex
 }
 
 export function createApp (appConfig: AppConfig): Koa<any, AccountsAppContext> {
@@ -42,6 +43,7 @@ export function createApp (appConfig: AppConfig): Koa<any, AccountsAppContext> {
   app.use(cors())
   app.use(bodyParser())
   app.use(async (ctx, next) => {
+    ctx.knex = appConfig.knex
     ctx.accounts = appConfig.accountsService
     ctx.transactions = appConfig.transactionsService
     ctx.logger = appConfig.logger
