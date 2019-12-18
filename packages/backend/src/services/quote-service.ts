@@ -23,6 +23,15 @@ export type MojaQuoteObj = {
   quoteId: string;
   transactionId: string;
   serializedQuote: string;
+  quoteResponse?: string;
+}
+
+type MojaQuoteProps = {
+  id?: number;
+  quoteId?: string;
+  transactionId?: string;
+  serializedQuote?: string;
+  quoteResponse?: string;
 }
 
 export class QuoteTools {
@@ -77,10 +86,22 @@ export class KnexQuoteService {
     return (insertedQuote[0])
   }
 
-  async get (quoteId: string) {
+  async get (quoteId: string): Promise<MojaQuoteObj | undefined> {
     const retirevedQuote = await this._knex<MojaQuoteObj>('mojaQuote')
       .where({ quoteId })
       .first()
     return (retirevedQuote)
+  }
+
+  async update (quoteId: string, updatedFields: MojaQuoteProps): Promise<MojaQuoteObj> {
+    await this._knex<MojaQuoteObj>('mojaQuote').update(updatedFields).where('quoteId', quoteId)
+
+    const updatedQuote = await this._knex<MojaQuoteObj>('mojaQuote').where('quoteId', quoteId).first()
+
+    if (!updatedQuote) {
+      throw new Error('The quote to be updated does not exist')
+    } else {
+      return updatedQuote
+    }
   }
 }

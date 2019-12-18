@@ -12,6 +12,7 @@ import { show as showLogin, store as storeLogin } from './controllers/login'
 import { store as storeLogout } from './controllers/logout'
 import { create as createTransactionRequest } from './controllers/transactionRequest'
 import { show as showConsent, store as storeConsent } from './controllers/consent'
+import { quoteResponse } from './controllers/quoteResponse'
 // import { createValidation as createValidationOauth2, store as storeOauth2 } from './controllers/oauth2Client'
 import { AccountsAppContext } from './index'
 import { HydraApi } from './apis/hydra'
@@ -57,8 +58,6 @@ export function createApp (appConfig: AppConfig): Koa<any, AccountsAppContext> {
     ctx.status = 200
   })
 
-  publicRouter.post('/transactionRequests', createTransactionRequest)
-
   privateRouter.use(createAuthMiddleware(appConfig.hydraApi))
   privateRouter.get('/accounts/:id', showAccount)
   privateRouter.get('/accounts', indexAccount)
@@ -82,6 +81,9 @@ export function createApp (appConfig: AppConfig): Koa<any, AccountsAppContext> {
 
   publicRouter.get('/consent', showConsent)
   publicRouter.post('/consent', storeConsent)
+
+  publicRouter.post('/transactionRequests', createTransactionRequest)
+  publicRouter.put('/quotes/:id', quoteResponse)
 
   // privateRouter.post('/oauth2/clients', createValidationOauth2, storeOauth2)
 

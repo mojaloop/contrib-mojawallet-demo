@@ -6,24 +6,20 @@ import { KnexAccountService } from '../src/services/accounts-service'
 import { KnexTransactionService } from '../src/services/transactions-service'
 import { KnexUserService } from '../src/services/user-service'
 import { KnexTransactionRequestService, TransactionRequest } from '../src/services/transaction-request-service'
-import createLogger from 'pino'
+import { KnexQuoteService, Quote, MojaQuoteObj } from '../src/services/quote-service'
+import { QuoteResponse } from '../src/services/quoteResponse-service'
 import { HydraApi, TokenInfo } from '../src/apis/hydra'
+import createLogger from 'pino'
+import { authorizeQuote } from '../src/services/authorization-service'
 import Knex = require('knex')
-import cors from '@koa/cors'
-import { KnexQuoteService } from '../src/services/quote-service'
-
-jest.mock('../src/services/mojaResponseService', () => ({
-  mojaResponseService: {
-    putResponse: jest.fn(),
-    putErrorResponse: jest.fn(),
-    quoteResponse: jest.fn()
-  }
-}))
-import { mojaResponseService } from '../src/services/mojaResponseService'
+import uuid from 'uuid'
 import { MojaloopRequests } from "@mojaloop/sdk-standard-components"
 
+jest.mock('../src/services/authorization-service', () => ({
+  authorizeQuote: jest.fn()
+}))
 
-describe('Trnsaction Request Test', () => {
+describe('Response from switch after a quote is sent', () => {
   let server: Server
   let port: number
   let app: Koa
@@ -34,8 +30,9 @@ describe('Trnsaction Request Test', () => {
   let transactionRequestService: KnexTransactionRequestService
   let quoteService: KnexQuoteService
   let hydraApi: HydraApi
-  let validRequest: TransactionRequest
-  let invalidRequest: TransactionRequest
+  let validQuote: Quote
+  let validQuoteResponse: QuoteResponse
+  let invalidQuoteResponse: QuoteResponse
   const mojaloopRequests = new MojaloopRequests({
     dfspId: 'mojawallet',
     jwsSign: false,
@@ -46,7 +43,6 @@ describe('Trnsaction Request Test', () => {
   })
 
   beforeAll(async () => {
-
     knex = Knex({
       client: 'sqlite3',
       connection: {
@@ -92,24 +88,25 @@ describe('Trnsaction Request Test', () => {
       mojaloopRequests
     })
     server = app.listen(0)
-    // eslint-disable-next-line @typescript-eslint/ban-ts-ignore
     // @ts-ignore
     port = server.address().port
 
-    validRequest = {
-      transactionRequestId: 'ca919568-e559-42a8-b763-1be22179decc',
+    validQuote = {
+      quoteId: 'aa602839-6acb-49b8-9bed-3dc0ca3e09ab',
+      transactionId: '2c6af2fd-f0cb-43f5-98be-8abf539ee2c2',
       payee: {
         partyIdInfo: {
           partyIdType: 'MSISDN',
-          partyIdentifier: 'party1'
+          partyIdentifier: 'partyA'
         }
       },
       payer: {
         partyIdInfo: {
           partyIdType: 'MSISDN',
-          partyIdentifier: 'party2'
+          partyIdentifier: 'partyB'
         }
       },
+      amountType: 'RECEIVE',
       amount: {
         currency: 'USD',
         amount: '20'
@@ -120,29 +117,23 @@ describe('Trnsaction Request Test', () => {
         initiatorType: 'CONSUMER'
       }
     }
-    invalidRequest = {
-      transactionRequestId: 'ca919568-e559-42a8763-1be22179decc',
-      payee: {
-        partyIdInfo: {
-          partyIdType: 'MSISDN',
-          partyIdentifier: 'party1'
-        }
-      },
-      payer: {
-        partyIdInfo: {
-          partyIdType: 'MSISDN',
-          partyIdentifier: 'party2'
-        }
-      },
-      amount: {
+    validQuoteResponse = {
+      transferAmount:{
         currency: 'USD',
         amount: '20'
       },
-      transactionType: {
-        scenario: 'DEPOSIT' ,
-        initiator: 'PAYER',
-        initiatorType: 'CONSUMER'
-      }
+      expiration: new Date().toISOString(),
+      ilpPacket: 'abc123',
+      condition: '1234567890123456789012345678901234567890123'
+    }
+    invalidQuoteResponse = {
+      transferAmount:{
+        currency: 'USD',
+        amount: '20'
+      },
+      expiration: 'asd',
+      ilpPacket: 'abc123',
+      condition: '1234567890123456789012345678901234567890123'
     }
   })
 
@@ -151,48 +142,63 @@ describe('Trnsaction Request Test', () => {
   })
 
   afterEach(async () => {
+    jest.clearAllMocks()
     await knex.migrate.rollback()
   })
 
-  afterAll(() => {
+  afterAll(async () => {
+    await knex.destroy()
     server.close()
-    knex.destroy()
   })
 
-  describe('Handling a transaction request post', () => {
-    test('Can store a valid transaction request and returns 200', async () => {
-      const response = await axios.post(`http://localhost:${port}/transactionRequests`, validRequest)
-      const storedRequest = await transactionRequestService.getByRequestId(validRequest.transactionRequestId)
+  describe('Handling PUT to "/quotes"', () => {
+    test('Should return 200 status, store response and initiate Authorization on valid quote response', async () => {
 
-      if (storedRequest) {
+      quoteService.add(validQuote)
+      const response = await axios.put(`http://localhost:${port}/quotes/${validQuote.quoteId}`, validQuoteResponse)
+      const retrievedQuote = await knex<MojaQuoteObj>('mojaQuote').where({ quoteId: validQuote.quoteId }).first()
+
+      if (retrievedQuote) {
+        expect(retrievedQuote.quoteResponse).toEqual(JSON.stringify(validQuoteResponse))
         expect(response.status).toEqual(200)
-        expect(storedRequest.transactionRequestId).toEqual(validRequest.transactionRequestId)
-        expect(mojaResponseService.putResponse).toHaveBeenCalledWith({
-          transactionRequestState: 'RECEIVED'
-        }, validRequest.transactionRequestId)
+        expect(authorizeQuote).toBeCalledTimes(1)
       } else {
-        expect(storedRequest).toBeDefined()
+        expect(true).toEqual(false)
       }
+
     })
 
-    test('An invalid transaction request does not store data and returns 400', async () => {
-      await axios.post(`http://localhost:${port}/transactionRequests`, invalidRequest)
-      .then( resp => {
+    test('Should return 400 status and not initiate Authorization on invalid quote response', async () => {
+
+      quoteService.add(validQuote)
+      axios.put(`http://localhost:${port}/quotes/${validQuote.quoteId}`, invalidQuoteResponse)
+      .then(response => {
         expect(true).toEqual(false)
       })
-      .catch( async error => {
-        const storedRequest = await transactionRequestService.getByRequestId(invalidRequest.transactionRequestId)
-        expect(storedRequest).toBeUndefined()
+      .catch(async error => {
         expect(error.response.status).toEqual(400)
-        expect(mojaResponseService.putErrorResponse).toHaveBeenCalledWith({
-          errorInformation: {
-            errorCode: '3100',
-            errorDescription: 'Invalid transaction request',
-            extensionList: []
-          }
-        }, invalidRequest.transactionRequestId)
+        const retrievedQuote = await knex<MojaQuoteObj>('mojaQuote').where({ quoteId: validQuote.quoteId }).first()
+        if (retrievedQuote) {
+          expect(retrievedQuote.quoteResponse).toEqual(null)
+          expect(authorizeQuote).toBeCalledTimes(0)
+        } else {
+          expect(true).toEqual(false)
+        }
       })
+
+    })
+
+    test('Should return 404 status and not initiate Authorization on unknown quote id', async () => {
+
+      axios.put(`http://localhost:${port}/quotes/${uuid.v4}`, validQuoteResponse)
+      .then(response => {
+        expect(true).toEqual(false)
+      })
+      .catch(error => {
+        expect(error.response.status).toEqual(404)
+        expect(authorizeQuote).toBeCalledTimes(0)
+      })
+
     })
   })
-
 })

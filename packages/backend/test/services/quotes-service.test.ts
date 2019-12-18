@@ -1,11 +1,13 @@
 import Knex from 'knex'
 import { Quote, KnexQuoteService, QuoteTools } from '../../src/services/quote-service'
 import { TransactionRequest, KnexTransactionRequestService } from '../../src/services/transaction-request-service'
+import { QuoteResponse } from 'packages/backend/src/services/quoteResponse-service'
 
 describe('Quotes service', () => {
   let knex: Knex
   let quote: Quote
   let quoteService: KnexQuoteService
+  let validQuoteResponse: QuoteResponse
 
   describe('Quotes service database interaction', () => {
     beforeAll(async () => {
@@ -42,6 +44,15 @@ describe('Quotes service', () => {
           initiator: 'PAYER',
           initiatorType: 'CONSUMER'
         }
+      }
+      validQuoteResponse = {
+        transferAmount:{
+          currency: 'USD',
+          amount: '20'
+        },
+        expiration: new Date().toISOString(),
+        ilpPacket: 'abc123',
+        condition: '1234567890123456789012345678901234567890123'
       }
 
       quoteService = new KnexQuoteService(knex)
@@ -80,6 +91,23 @@ describe('Quotes service', () => {
       if (retrievedQuote) {
         expect(retrievedQuote.quoteId).toEqual('2c6af2fd-f0cb-43f5-98be-8abf539ee2c2')
       }
+    })
+
+    test('should add response to a quote with a given ID', async () => {
+      await knex('mojaQuote').insert({
+        quoteId: '2c6af2fd-f0cb-43f5-98be-8abf539ee2c2',
+        transactionId: '2c6af2fd-f0cb-43f5-98be-8abf539ee2c2',
+        serializedQuote: ''
+      })
+      const updatedQuote = await quoteService.update('2c6af2fd-f0cb-43f5-98be-8abf539ee2c2', {
+        quoteResponse: JSON.stringify(validQuoteResponse)
+      })
+
+      const storedQuote = await knex('mojaQuote').first()
+      
+      expect(storedQuote).toBeDefined()
+      expect(storedQuote.quoteResponse).toEqual(JSON.stringify(validQuoteResponse))
+      expect(updatedQuote.quoteResponse).toEqual(JSON.stringify(validQuoteResponse))
     })
   })
 
