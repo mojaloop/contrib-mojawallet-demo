@@ -27,13 +27,20 @@ const Login: NextPage<Props> = ({login_challenge}) => {
     if (!isValidPhoneNumber(props.phoneNumber)) {
       setError('phoneNumber', 'Invalid phone number.', '')
     } else {
-      await usersService.login(props.phoneNumber, props.password, login_challenge).then(resp => {
+      let resp = await usersService.login(props.phoneNumber, props.password, login_challenge).then(resp => {
         if(resp.redirectTo) {
           window.location.href = resp.redirectTo
         }
-      }).catch(error => {
-        console.log(error)
+      }).catch(async error => {
+        let message = await error.response.json()
+        console.log(message.errors[0].field)
+        if (message.errors[0].field === 'password') {
+          setError('password', message.errors[0].message, '')
+        } else {
+          setError('phoneNumber', message.errors[0].message, '')
+        }
       })
+      console.log('error.response.body', resp)
     }
   })
   const onValueChange = (phoneNumber) => {
@@ -68,6 +75,7 @@ const Login: NextPage<Props> = ({login_challenge}) => {
             name={'password'}
             className={'appearance-none bg-gray-100 border-b border-light focus:border-primary w-full py-2 px-3 mb-3 leading-tight focus:outline-none'}
             placeholder={'***********'}
+            hint={errors.password ? errors.password.type : ''}
           />
         </div>
         <div className="w-full">

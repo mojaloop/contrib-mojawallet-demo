@@ -28,7 +28,7 @@ export const UsersService = (authErrorCallback?: () => void) => {
       url.searchParams.set('login_challenge', challenge)
       return ky.post(url.toString(), {
         json: { username, password }
-      }).then(resp => resp.json()).catch(error => { handleError(error.response.status, authErrorCallback); return error })
+      }).then(resp => resp.json())
     },
     getConsent: async (challenge: string) => {
       const url = new URL('consent', USERS_API_URL)

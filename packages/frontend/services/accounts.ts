@@ -18,7 +18,7 @@ export const AccountsService = (authErrorCallback?: () => void) => {
       return ky.post(url.toString(), {
         headers: { authorization: `Bearer ${authToken}` },
         json: { name }
-      }).then(resp => resp.json()).catch(error => { handleError(error.response.status, authErrorCallback); return error })
+      }).then(resp => resp.json())
     },
     getAccount: async (accountId: string, authToken: string) => {
       const url = new URL(`accounts/${accountId}`, ACCOUNTS_API_URL)

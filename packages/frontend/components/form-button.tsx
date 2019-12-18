@@ -8,7 +8,7 @@ type props = {
 
 const FormButton: React.FC = (props) => {
   return (
-    <input className="inline-block px-5 py-3 rounded-xl elevation-2 bg-primary hover:elevation-8 active:bg-dark focus:outline-none text-button text-white uppercase tracking-wider sm:text-base" type="submit" value={props.children.toString()}/>
+    <input className="inline-block px-5 py-3 rounded-xl elevation-2 bg-primary hover:elevation-8 active:bg-dark focus:outline-none text-button text-white uppercase tracking-wider" type="submit" value={props.children.toString()}/>
   )
 }
 

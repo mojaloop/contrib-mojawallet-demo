@@ -2,18 +2,35 @@ import React from 'react'
 import Head from 'next/head'
 import { NextPage } from 'next'
 import Link from 'next/link'
+import useForm from 'react-hook-form'
 import { ProfilePageProps } from "../../types"
-import { formatCurrency, checkUser } from "../../utils"
+import { checkUser } from "../../utils"
 import { AccountsService } from '../../services/accounts'
+import Input from '../../components/input'
+import FormButton from '../../components/form-button'
 
 const accountsService = AccountsService()
 
 type FormData = {
-  firstName: string
-  phoneNumber: string
+  name: string
 }
 
 const Account: NextPage<ProfilePageProps> = ({ user }) => {
+  const { register, setValue, handleSubmit, errors, setError } = useForm<FormData>()
+
+  const onSubmit = handleSubmit(async (props) => {
+    let resp = await accountsService.createAccount(props.name, user.token).then(resp => {
+      window.location.href = '/'
+    }).catch(async error => {
+      let message = await error.response.json()
+      if (message.errors[0].field === 'password') {
+        setError('password', message.errors[0].message, '')
+      } else {
+        setError('phoneNumber', message.errors[0].message, '')
+      }
+    })
+  })
+
   return (
     <div>
       <Head>
@@ -23,74 +40,30 @@ const Account: NextPage<ProfilePageProps> = ({ user }) => {
       <div className="fixed top-0 right-0" style={{ zIndex:1 }}>
         <Link href={{ pathname: '/' }}>
           <div className="mr-5 mt-5">
-            <img style={{ height: '35px'}} src={'../../icons/close-24px.svg'}/>
+            <img className="h-10" src={'../../icons/close-24px.svg'}/>
           </div>
         </Link>
       </div>
-      {/* <div className='w-full fixed top-0 shadow-2xl' style={{textDecoration: 'none', color: 'inherit', height: '16rem', background: 'linear-gradient(#225980, #7caab2)', borderRadius: '0 0 20px 20px',zIndex:0 }}>
-        <div className='w-full mx-auto max-w-lg'>
-          
-          <div className="flex">
-          
-            <div className="text-3xl text-white flex-1 text-base mx-4 px-4 mt-20">
-              {account.name}
-            </div>
-          </div>
-          <div className="flex flex-wrap text-2xl text-white mx-10">
-            <div className="w-1/2">
-              Balance:
-            </div>
-            <div className="w-1/2 text-right">
-              {formatCurrency(account.balance, account.assetScale)}
-            </div>
-          </div>
-
+      <div className="flex flex-wrap content-center items-center justify-center text-center w-full h-screen">
+      <img className="h-40" src={'/icons/undraw_things_to_say_ewwb.svg'}/>
+      <div className="w-full text-gray-800 text-headline my-5">Give your new<br/>account a name</div>
+      <form className="w-3/4 max-w-sm" onSubmit={onSubmit}>
+        <div className="w-full">
+          <Input
+            type={'name'}
+            formRef={register({ required: true })}
+            name={'name'}
+            className={'appearance-none bg-gray-100 border-b border-light focus:border-primary w-full py-2 px-3 mb-3 leading-tight focus:outline-none'}
+            placeholder={'New account'}
+            hint={errors.name ? errors.name.type : ''}
+          />
         </div>
-      </div>
-      <div className="w-full flex my-4 flex-wrap" style={{marginTop: '16rem'}}>
-        <div className="mt-4 text-xl px-6 py-4 mx-8">
-          Transactions
+        <div className="w-full">
+          <FormButton>Save</FormButton>
         </div>
-        { accountList.length > 0 ? accountList.map(account => <AccountCard key={'account_' + account.id} account={account}/>) : 'No Accounts present.'}
-      </div> */}
+      </form>
     </div>
-  )
-}
-
-export interface AccountDetails {
-  id: number
-  name: string
-  balance: number
-  owner: number,
-  assetScale: number
-}
-
-type AccountCardProps = {
-  account: AccountDetails
-}
-
-const AccountCard: React.FC<AccountCardProps> = ({ account }) => {
-  return (
-    <Link href="/account/[account.id]"  as={`/account/${account.id}`}>
-      <div className="w-auto rounded-lg shadow-md flex flex-col w-full mt-8 px-6 py-4 mx-8" style={{textDecoration: 'none', color: 'inherit', background: 'white'}}>
-        <div className="flex flex-1">
-          <div className="flex-1">
-            <div className="text-3xl">
-              {formatCurrency(account.balance, 6)}
-            </div>
-            <div className="text-sm text-grey">
-              Balance
-            </div>
-          </div>
-          <div>
-            {/* <img src={'../../icons/close-24px-white.svg'}/> */}
-          </div>
-        </div>
-        <div className="text-grey-dark">
-          {account.name}
-        </div>
-      </div>
-    </Link>
+    </div>
   )
 }
 
