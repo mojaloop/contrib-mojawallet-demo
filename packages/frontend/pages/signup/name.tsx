@@ -25,7 +25,7 @@ const Signup: NextPage = () => {
     } else {
       await usersService.signup(props.phoneNumber, props.password).then((user) => {
         console.log(user)
-        window.location.href = '/login'
+        window.location.href = `/login?signupSessionId=${user.signupSessionId}`
       })
     }
   })
