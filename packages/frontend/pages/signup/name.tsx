@@ -57,8 +57,8 @@ const Signup: NextPage = () => {
         <div className="w-full">
           <Input
             type={'password'}
-            formRef={register}
-            name={'firstName'}
+            formRef={register({ required: true })}
+            name={'password'}
             className={'appearance-none bg-gray-100 border-b border-light focus:border-primary w-full py-2 px-3 mb-3 leading-tight focus:outline-none'}
             placeholder={'***********'}
           />
