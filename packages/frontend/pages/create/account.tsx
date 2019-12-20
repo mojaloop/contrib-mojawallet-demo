@@ -23,10 +23,8 @@ const Account: NextPage<ProfilePageProps> = ({ user }) => {
       window.location.href = '/'
     }).catch(async error => {
       let message = await error.response.json()
-      if (message.errors[0].field === 'password') {
-        setError('password', message.errors[0].message, '')
-      } else {
-        setError('phoneNumber', message.errors[0].message, '')
+      if (message.errors[0].field === 'name') {
+        setError('name', message.errors[0].message, '')
       }
     })
   })
