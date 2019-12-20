@@ -40,29 +40,29 @@ const Account: NextPage<ProfilePageProps> = ({ user }) => {
       <div className="fixed top-0 right-0" style={{ zIndex:1 }}>
         <Link href={{ pathname: '/' }}>
           <div className="mr-5 mt-5">
-            <img className="h-10" src={'../../icons/close-24px.svg'}/>
+            <img className="h-10" src={'/icons/close-24px.svg'}/>
           </div>
         </Link>
       </div>
       <div className="flex flex-wrap content-center items-center justify-center text-center w-full h-screen">
-      <img className="h-40" src={'/icons/undraw_things_to_say_ewwb.svg'}/>
-      <div className="w-full text-gray-800 text-headline my-5">Give your new<br/>account a name</div>
-      <form className="w-3/4 max-w-sm" onSubmit={onSubmit}>
-        <div className="w-full">
-          <Input
-            type={'name'}
-            formRef={register({ required: true })}
-            name={'name'}
-            className={'appearance-none bg-gray-100 border-b border-light focus:border-primary w-full py-2 px-3 mb-3 leading-tight focus:outline-none'}
-            placeholder={'New account'}
-            hint={errors.name ? errors.name.type : ''}
-          />
-        </div>
-        <div className="w-full">
-          <FormButton>Save</FormButton>
-        </div>
-      </form>
-    </div>
+        <img className="h-40" src={'/icons/undraw_things_to_say_ewwb.svg'}/>
+        <div className="w-full text-gray-800 text-headline my-5">Give your new<br/>account a name</div>
+        <form className="w-3/4 max-w-sm" onSubmit={onSubmit}>
+          <div className="w-full">
+            <Input
+              type={'name'}
+              formRef={register({ required: true })}
+              name={'name'}
+              className={'appearance-none bg-gray-100 border-b border-light focus:border-primary w-full py-2 px-3 mb-3 leading-tight focus:outline-none'}
+              placeholder={'New account'}
+              hint={errors.name ? errors.name.type : ''}
+            />
+          </div>
+          <div className="w-full">
+            <FormButton>Save</FormButton>
+          </div>
+        </form>
+      </div>
     </div>
   )
 }

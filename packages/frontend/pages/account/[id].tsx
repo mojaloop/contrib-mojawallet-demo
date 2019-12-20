@@ -1,8 +1,9 @@
-import React from 'react'
+import React, { ReactNode } from 'react'
 import Head from 'next/head'
-import { NextPage, NextPageContext } from 'next'
+import dynamic from 'next/dynamic'
+import { NextPage } from 'next'
 import { TransactionService } from '../../services/transactions'
-import { TransactionCardProps, AccountPageProps } from "../../types"
+import { TransactionCardProps, AccountPageProps, Totals } from "../../types"
 import Link from 'next/link'
 import { formatCurrency, checkUser } from "../../utils"
 import { AccountsService } from '../../services/accounts'
@@ -11,72 +12,128 @@ const accountsService = AccountsService()
 const transactionService = TransactionService()
 
 const Account: NextPage<AccountPageProps> = ({ account, transactions }) => {
-
   return (
     <div>
       <Head>
-        <title>Account</title>
+        <title>{account.name}</title>
         <link rel="icon" href="/favicon.ico" />
       </Head>
-      <div className="fixed top-0 right-0" style={{ zIndex:1 }}>
-        <Link href={{ pathname: '/' }}>
-          <div className="mr-5 mt-5">
-            <img style={{ height: '35px'}} src={'../../icons/close-24px-white.svg'}/>
-          </div>
-        </Link>
-      </div>
-      <div className='w-full fixed top-0 elevation-4' style={{textDecoration: 'none', color: 'inherit', height: '16rem', background: 'linear-gradient(#225980, #7caab2)', borderRadius: '0 0 20px 20px',zIndex:0 }}>
-        <div className='w-full mx-auto max-w-lg'>
-          
-          <div className="flex">
-          
-            <div className="text-3xl text-white flex-1 text-base mx-4 px-4 mt-20">
-              {account.name}
+      <div>
+        <div className="fixed top-0 right-0" style={{ zIndex:1 }}>
+          <Link href={{ pathname: '/' }}>
+            <div className="mr-8 mt-8">
+              <img className="h-10" src={'/icons/close-24px-white.svg'}/>
             </div>
-          </div>
-          <div className="flex flex-wrap text-2xl text-white mx-10">
-            <div className="w-1/2">
-              Balance
-            </div>
-            <div className="w-1/2 text-right">
-              {formatCurrency(account.balance, account.assetScale)}
-            </div>
-          </div>
-
+          </Link>
         </div>
-      </div>
-      <div className="w-full flex my-4 flex-wrap" style={{marginTop: '16rem'}}>
-        <div className="mt-4 text-xl px-6 py-4 mx-8">
-          Transactions
+        <div className='flex flex-wrap content-center items-center justify-center  top-0 w-full'>
+        <div className='w-11/12 rounded-2xl fixed top-0 mt-4 mx-auto elevation-8' style={{ height: '16rem', background: 'linear-gradient(#023347, #025C5E, #B1CDAC)', zIndex:0 }}>
+          <div className='' style={{textDecoration: 'none', color: 'inherit', zIndex:0, marginTop: '6rem' }}>
+            <div className='w-full mx-auto max-w-lg'>
+              <div className="flex">
+                <div className="text-headline text-white flex-1 text-base mx-4 px-4">
+                  {account.name}
+                </div>
+              </div>
+              
+              <div className="w-full flex  flex-wrap">
+                <AddTransaction/>
+              </div>
+            </div>
+          </div>
         </div>
-        { transactions.length > 0 ? transactions.map(transaction => <TransactionCard key={'transaction_' + transaction.id} transaction={transaction}/>) : 'No Accounts present.'}
+        </div>
+        <div className="w-full flex mt-4 mb-12 flex-wrap" style={{marginTop: '16rem'}}>
+          <Balance balance={account.balance} assetScale={2}/>
+          <div className="mt-4 text-subheader px-6 py-4 mx-8">
+            Transactions
+          </div>
+          { transactions.length > 0 ? transactions.map(transaction => <TransactionCard key={'transaction_' + transaction.id} transaction={transaction}/>) : <Empty/>}
+        </div>
       </div>
     </div>
   )
 }
 
+
 const TransactionCard: React.FC<TransactionCardProps> = ({ transaction }) => {
+  const time = new Date(transaction.epoch).toLocaleString()
+  const cardColour = transaction.amount >= 0 ? "success" : "error"
+  const TimeNoSSR = dynamic(() => Promise.resolve(Time), { ssr: false })
   return (
-    <Link href="/account/[account.id]"  as={`/account/${transaction.id}`}>
-      <div className="w-auto rounded-lg elevation-1 flex flex-col w-full mt-8 px-6 py-4 mx-8" style={{textDecoration: 'none', color: 'inherit', background: 'white'}}>
+    // <Link href="/account/[account.id]"  as={`/account/${transaction.id}`}>
+      <div className="border border-solid border-material bg-white max-w-xl sm:max-w-xs rounded-xl flex flex-col w-full mt-4 px-6 py-4 mx-8" style={{textDecoration: 'none', color: 'inherit'}}>
         <div className="flex flex-1">
           <div className="flex-1">
-            <div className="text-3xl">
-              {formatCurrency(transaction.amount, 6)}
+            <div className={"text-headline text-" + cardColour}>
+              {formatCurrency(transaction.amount, 2)}
             </div>
-            <div className="text-sm text-grey">
-              Balance
+            <div className="text-body py-2">
+              {transaction.Description}
+            </div>
+            <div className="text-caption text-right">
+            <TimeNoSSR className="text-right">{time}</TimeNoSSR>
             </div>
           </div>
           <div>
-            {/* <img src={'../../icons/close-24px-white.svg'}/> */}
+            <img className="h-10" src={'/Mono_logo.svg'}/>
           </div>
         </div>
-        <div className="text-grey-dark">
-          {transaction.epoch}
+      </div>
+    // </Link>
+  )
+}
+
+const Time = (props) => {
+  return (
+    <React.Fragment>{props.children}</React.Fragment>
+  )
+}
+
+const Empty: React.FC = () => {
+  return (
+    <div className="border border-solid border-material bg-white  max-w-xl sm:max-w-xs rounded-xl flex flex-col w-full mt-4 px-6 py-4 mx-8" style={{textDecoration: 'none', color: 'inherit'}}>
+      <div className="flex flex-wrap content-center text-center mx-10">
+        <div className="w-full mb-2">
+          <img className="h-40" src={'/icons/undraw_empty_xct9.svg'}/>
+        </div>
+        <div className="w-full text-caption">
+          No transactions found! Create a transaction to get started.
+        </div>
+      </div>
+    </div>
+  )
+}
+
+const AddTransaction: React.FC = () => {
+  return (
+    <Link href={{ pathname: '/create/transaction' }}>
+      <div className="bg-white max-w-xl hover:bg-grey-lightest text-grey-darkest sm:max-w-xs font-semibold rounded-xl elevation-4 flex flex-col w-full my-5 px-6 py-4 mx-8" style={{textDecoration: 'none', color: 'inherit'}}>
+        <div className="flex flex-wrap">
+          <div className="mr-1 ml-auto">
+            <img className="" src={'/icons/add-24px.svg'}/>
+          </div>
+          <div className="ml-1 mr-auto text-button uppercase">
+            create transaction
+          </div>
         </div>
       </div>
     </Link>
+  )
+}
+
+const Balance: React.FC<Totals> = ({ balance, assetScale }) => {
+  return (
+    <div className="border border-solid border-material bg-white max-w-xl sm:max-w-xs rounded-xl flex flex-col w-full mt-12 px-6 py-4 mx-8" style={{textDecoration: 'none', color: 'inherit'}}>
+      <div className="flex flex-wrap text-subheader">
+        <div className="w-1/2">
+          Balance
+        </div>
+        <div className="w-1/2 text-right">
+          {formatCurrency(balance, assetScale)}
+        </div>
+      </div>
+    </div>
   )
 }
 

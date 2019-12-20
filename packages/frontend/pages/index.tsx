@@ -65,8 +65,8 @@ const Empty: React.FC = () => {
         <div className="w-full mb-2">
           <img className="h-40" src={'/icons/undraw_empty_xct9.svg'}/>
         </div>
-        <div className="w-full text-body">
-          No accounts found! Add an account to get started.
+        <div className="w-full text-caption">
+          No accounts found! Create an account to get started.
         </div>
       </div>
     </div>
@@ -82,7 +82,7 @@ const AddAccount: React.FC = () => {
             <img className="" src={'/icons/add-24px.svg'}/>
           </div>
           <div className="ml-1 mr-auto text-button uppercase">
-            Add Account
+            Create Account
           </div>
         </div>
       </div>
@@ -93,7 +93,11 @@ const AddAccount: React.FC = () => {
 const AccountCard: React.FC<AccountCardProps> = ({ account }) => {
   return (
     <Link href="/account/[account.id]"  as={`/account/${account.id}`}>
-      <div className="bg-white max-w-xl sm:max-w-xs rounded-xl elevation-4 flex flex-col w-full mt-8 px-6 py-4 mx-8" style={{textDecoration: 'none', color: 'inherit'}}>
+      <motion.div
+        className="bg-white max-w-xl sm:max-w-xs rounded-xl elevation-4 flex flex-col w-full mt-8 px-6 py-4 mx-8"
+        style={{textDecoration: 'none', color: 'inherit'}}
+        whileTap={{ boxShadow: "0px 5px 5px -3px rgba(0,0,0,0.20), 0px 8px 10px 1px rgba(0,0,0,0.14), 0px 3px 14px 2px rgba(0,0,0,0.12)" }}
+      >
         <div className="flex flex-1">
           <div className="flex-1">
             <div className="text-headline">
@@ -108,10 +112,10 @@ const AccountCard: React.FC<AccountCardProps> = ({ account }) => {
           </div>
         </div>
         <div style={{height: '3rem'}}></div>
-        <div className="text-title font-medium text-grey-dark">
+        <div className="text-title font-medium text-primary">
           {account.name}
         </div>
-      </div>
+      </motion.div>
     </Link>
   )
 }
