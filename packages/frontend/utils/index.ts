@@ -30,3 +30,23 @@ export const checkUser = async (ctx) => {
   }
   return { ...user, token: cookies.token }
 }
+
+export const checkUserOnSignup = async (ctx) => {
+  let user, cookies
+  try {
+    cookies = parseCookies(ctx)
+    if (cookies && cookies.token) {
+      if (typeof window === 'undefined') {
+        ctx.res.writeHead(302, {
+          Location: '/login'
+        })
+        ctx.res.end()
+        return
+      }
+      window.location.href = '/login'
+    }
+  } catch (error) {
+    console.log(error)
+  }
+  return { ...user, token: cookies.token }
+}

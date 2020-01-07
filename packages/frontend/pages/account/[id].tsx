@@ -1,17 +1,25 @@
-import React, { ReactNode } from 'react'
+import React, { useEffect, useState } from 'react'
 import Head from 'next/head'
 import dynamic from 'next/dynamic'
 import { NextPage } from 'next'
 import { TransactionService } from '../../services/transactions'
-import { TransactionCardProps, AccountPageProps, Totals } from "../../types"
-import Link from 'next/link'
+import { OTPService } from '../../services/otp'
+import { TransactionCardProps, AccountPageProps, Totals, OTPCardProps, CreateOTPCardProps, TimerProps } from "../../types"
 import { formatCurrency, checkUser } from "../../utils"
 import { AccountsService } from '../../services/accounts'
+import moment from 'moment'
+import { motion } from 'framer-motion'
 
 const accountsService = AccountsService()
 const transactionService = TransactionService()
+const otpService = OTPService()
 
-const Account: NextPage<AccountPageProps> = ({ account, transactions }) => {
+const Account: NextPage<AccountPageProps> = ({ account, transactions, otp, user }) => {
+  const [otpState, setOTP] = useState({
+    otp: otp,
+    hasOTP: otp && otp.accountId == account.id,
+    disableOTP: otp && otp.accountId != account.id
+  })
   return (
     <div>
       <Head>
@@ -19,15 +27,7 @@ const Account: NextPage<AccountPageProps> = ({ account, transactions }) => {
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <div>
-        <div className="fixed top-0 right-0" style={{ zIndex:1 }}>
-          <Link href={{ pathname: '/' }}>
-            <div className="mr-8 mt-8">
-              <img className="h-10" src={'/icons/close-24px-white.svg'}/>
-            </div>
-          </Link>
-        </div>
-        <div className='flex flex-wrap content-center items-center justify-center  top-0 w-full'>
-        <div className='w-11/12 rounded-2xl fixed top-0 mt-4 mx-auto elevation-8' style={{ height: '16rem', background: 'linear-gradient(#023347, #025C5E, #B1CDAC)', zIndex:0 }}>
+        <div className='w-full rounded-b-2xl fixed top-0' style={{height: '21rem', background: 'linear-gradient(#023347, #025C5E, #B1CDAC)', zIndex:-3000 }}/>
           <div className='' style={{textDecoration: 'none', color: 'inherit', zIndex:0, marginTop: '6rem' }}>
             <div className='w-full mx-auto max-w-lg'>
               <div className="flex">
@@ -35,20 +35,12 @@ const Account: NextPage<AccountPageProps> = ({ account, transactions }) => {
                   {account.name}
                 </div>
               </div>
-              
-              <div className="w-full flex  flex-wrap">
-                <AddTransaction/>
+              <div className="w-full flex my-4 flex-wrap">
+                { otpState.hasOTP ? <OTP otp={otpState.otp} setOTP={setOTP}/> : otpState.disableOTP ? <DisabledOTP/> : <CreateOTP accountId={account.id} token={user.token} setOTP={setOTP}/> }
+                <Balance balance={account.balance} assetScale={2}/>
+                { transactions.length > 0 ? transactions.map(transaction => <TransactionCard key={'transaction_' + transaction.id} transaction={transaction}/>) : <Empty/>}
               </div>
             </div>
-          </div>
-        </div>
-        </div>
-        <div className="w-full flex mt-4 mb-12 flex-wrap" style={{marginTop: '16rem'}}>
-          <Balance balance={account.balance} assetScale={2}/>
-          <div className="mt-4 text-subheader px-6 py-4 mx-8">
-            Transactions
-          </div>
-          { transactions.length > 0 ? transactions.map(transaction => <TransactionCard key={'transaction_' + transaction.id} transaction={transaction}/>) : <Empty/>}
         </div>
       </div>
     </div>
@@ -61,26 +53,24 @@ const TransactionCard: React.FC<TransactionCardProps> = ({ transaction }) => {
   const cardColour = transaction.amount >= 0 ? "success" : "error"
   const TimeNoSSR = dynamic(() => Promise.resolve(Time), { ssr: false })
   return (
-    // <Link href="/account/[account.id]"  as={`/account/${transaction.id}`}>
-      <div className="border border-solid border-material bg-white max-w-xl sm:max-w-xs rounded-xl flex flex-col w-full mt-4 px-6 py-4 mx-8" style={{textDecoration: 'none', color: 'inherit'}}>
-        <div className="flex flex-1">
-          <div className="flex-1">
-            <div className={"text-headline text-" + cardColour}>
-              {formatCurrency(transaction.amount, 2)}
-            </div>
-            <div className="text-body py-2">
-              {transaction.Description}
-            </div>
-            <div className="text-caption text-right">
-            <TimeNoSSR className="text-right">{time}</TimeNoSSR>
-            </div>
+    <div className="bg-white max-w-xl sm:max-w-xs rounded-xl elevation-4 flex flex-col w-full mt-8 px-6 py-4 mx-8" style={{textDecoration: 'none', color: 'inherit'}}>
+      <div className="flex flex-1">
+        <div className="flex-1">
+          <div className={"text-headline text-" + cardColour}>
+            {formatCurrency(transaction.amount, 2)}
           </div>
-          <div>
-            <img className="h-10" src={'/Mono_logo.svg'}/>
+          <div className="text-body py-2">
+            {transaction.Description}
+          </div>
+          <div className="text-caption text-right">
+          <TimeNoSSR className="text-right">{time}</TimeNoSSR>
           </div>
         </div>
+        <div>
+          <img className="h-10" src={'/Mono_logo.svg'}/>
+        </div>
       </div>
-    // </Link>
+    </div>
   )
 }
 
@@ -92,7 +82,7 @@ const Time = (props) => {
 
 const Empty: React.FC = () => {
   return (
-    <div className="border border-solid border-material bg-white  max-w-xl sm:max-w-xs rounded-xl flex flex-col w-full mt-4 px-6 py-4 mx-8" style={{textDecoration: 'none', color: 'inherit'}}>
+    <div className="bg-white  max-w-xl sm:max-w-xs rounded-xl elevation-4 flex flex-col w-full mt-8 px-6 py-4 mx-8" style={{textDecoration: 'none', color: 'inherit'}}>
       <div className="flex flex-wrap content-center text-center mx-10">
         <div className="w-full mb-2">
           <img className="h-40" src={'/icons/undraw_empty_xct9.svg'}/>
@@ -105,26 +95,61 @@ const Empty: React.FC = () => {
   )
 }
 
-const AddTransaction: React.FC = () => {
+
+const CreateOTP: React.FC<CreateOTPCardProps> = ({accountId, token, setOTP}) => {
   return (
-    <Link href={{ pathname: '/create/transaction' }}>
-      <div className="bg-white max-w-xl hover:bg-grey-lightest text-grey-darkest sm:max-w-xs font-semibold rounded-xl elevation-4 flex flex-col w-full my-5 px-6 py-4 mx-8" style={{textDecoration: 'none', color: 'inherit'}}>
-        <div className="flex flex-wrap">
-          <div className="mr-1 ml-auto">
-            <img className="" src={'/icons/add-24px.svg'}/>
-          </div>
-          <div className="ml-1 mr-auto text-button uppercase">
-            create transaction
-          </div>
+    <motion.div
+      className="inline-block max-w-xl sm:max-w-xs flex flex-col w-full mt-8 px-6 py-4 mx-8 rounded-xl elevation-4 bg-white hover:elevation-8 active:bg-dark focus:outline-none"
+      onTap={async () => {
+        let otp = await otpService.createOTP(accountId + '', token)
+        setOTP({
+          otp: otp,
+          hasOTP: true,
+          disableOTP: false
+        })
+      }}
+      whileTap={{ boxShadow: "0px 5px 5px -3px rgba(0,0,0,0.20), 0px 8px 10px 1px rgba(0,0,0,0.14), 0px 3px 14px 2px rgba(0,0,0,0.12)" }}
+    >
+      <div className="flex flex-wrap">
+        <div className="mr-1 ml-auto">
+          <img className="" src={'/icons/add-24px.svg'}/>
+        </div>
+        <div className="ml-1 mr-auto text-button uppercase" style={{ paddingTop: '1px' }}>
+          create otp
         </div>
       </div>
-    </Link>
+    </motion.div>
+  )
+}
+
+const OTP: React.FC<TimerProps> = ({ otp, setOTP }) => {
+  return (
+    <div className="inline-block max-w-xl sm:max-w-xs flex flex-col w-full mt-8 px-6 py-4 mx-8 rounded-xl elevation-4 bg-white hover:elevation-8 active:bg-dark focus:outline-none">
+      <div className="flex flex-wrap">
+        <div className="w-full text-center text-headline tracking-otp text-primary uppercase my-3 ">
+          { otp.otp }
+        </div>
+        <Timer otp={otp} setOTP={setOTP}/>
+      </div>
+    </div>
+  )
+}
+
+const DisabledOTP: React.FC = () => {
+  return (
+    <div className="inline-block max-w-xl sm:max-w-xs flex flex-col w-full mt-8 px-6 py-4 mx-8 rounded-xl elevation-4 bg-white hover:elevation-8 active:bg-dark focus:outline-none">
+      <div className="flex flex-wrap">
+        <div className="mx-auto ">
+          You already have an active OTP on another account.
+        </div>
+      </div>
+    </div>
   )
 }
 
 const Balance: React.FC<Totals> = ({ balance, assetScale }) => {
   return (
-    <div className="border border-solid border-material bg-white max-w-xl sm:max-w-xs rounded-xl flex flex-col w-full mt-12 px-6 py-4 mx-8" style={{textDecoration: 'none', color: 'inherit'}}>
+    <div className="bg-white max-w-xl sm:max-w-xs rounded-xl elevation-4 flex flex-col w-full mt-8 px-6 py-4 mx-8" style={{textDecoration: 'none', color: 'inherit'}}>
       <div className="flex flex-wrap text-subheader">
         <div className="w-1/2">
           Balance
@@ -137,11 +162,46 @@ const Balance: React.FC<Totals> = ({ balance, assetScale }) => {
   )
 }
 
+const Timer: React.FC<TimerProps> = ({otp, setOTP}) => {
+  const expireAt = moment(1000 * (otp.expiresAt) || '')
+  const calculateTimeLeft = () => {
+    if (moment().isSameOrBefore(expireAt)) {
+      return 'Expires ' + moment().to(expireAt)
+    }
+    return false
+  }
+
+  const [timeLeft, setTimeLeft] = useState(calculateTimeLeft())
+  
+  useEffect(() => {
+    let interval = setInterval(async () => {
+      let time = calculateTimeLeft()
+      if (time) {
+        setTimeLeft(time)
+      } else {
+        setOTP({
+          otp: null,
+          hasOTP: false,
+          disableOTP: false
+        })
+      }
+    }, 1000)
+    return () => {
+      clearInterval(interval)
+    }
+  })
+  return (
+    <div className="text-caption">
+      <span>{timeLeft}</span>
+    </div>
+  )
+}
+
 export default Account
 
 Account.getInitialProps = async (ctx) => {
   let id = ctx.query.id
-  let account, transactions
+  let account, transactions, otp
   const user = await checkUser(ctx)
   try {
     account = await accountsService.getAccount(id.toString(), user.token)
@@ -149,5 +209,11 @@ Account.getInitialProps = async (ctx) => {
   } catch(error) {
     console.log(error)
   }
-  return { account: account, transactions: transactions }
+  try {
+    otp = await otpService.getOTP(user.token)
+  } catch (error) {
+    otp = null
+    console.error('Error in getting otp', error)
+  }
+  return { account: account, transactions: transactions, otp: otp, user: user }
 }

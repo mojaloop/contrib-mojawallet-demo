@@ -30,6 +30,9 @@ module.exports = {
       },
       borderColor: {
         material: '#0000001e'
+      },
+      letterSpacing: {
+        otp: '0.5rem'
       }
     }
   },

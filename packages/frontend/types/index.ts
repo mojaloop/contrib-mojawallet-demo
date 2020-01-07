@@ -1,3 +1,5 @@
+import { SetStateAction } from 'react'
+
 export type AccountCardProps = {
   account: AccountDetails
 }
@@ -6,9 +8,26 @@ export type TransactionCardProps = {
   transaction: TransactionsDetails
 }
 
+export type OTPCardProps = {
+  otp: OTPDetails
+}
+
+export type CreateOTPCardProps = {
+  accountId: number,
+  token: string,
+  setOTP: React.Dispatch<SetStateAction<{ otp: OTPDetails; hasOTP: boolean; disableOTP: boolean; }>>
+}
+
+export type TimerProps = {
+  otp: OTPDetails,
+  setOTP: React.Dispatch<SetStateAction<{ otp: OTPDetails; hasOTP: boolean; disableOTP: boolean; }>>
+}
+
 export type AccountPageProps = {
   account: AccountDetails
   transactions: TransactionsDetails[]
+  otp: OTPDetails,
+  user: UserDetails
 }
 
 export type ProfilePageProps = {
@@ -29,6 +48,15 @@ export type AccountDetails = {
   balance: number
   owner: number
   assetScale: number
+}
+
+export type OTPDetails = {
+  id: number
+  userId: string
+  accountId: number
+  otp: string
+  isUsed: number,
+  expiresAt: number
 }
 
 export type UserDetails = {

@@ -1,8 +1,10 @@
 import React from 'react'
 import { NextPage } from "next"
 import Button from '../../components/button'
+import { checkUserOnSignup } from '../../utils'
+import { ProfilePageProps } from '../../types'
 
-const Signup: NextPage = () => {
+const Signup: NextPage<ProfilePageProps> = ({user}) => {
   return (
     <div className="flex flex-wrap content-center items-center justify-center text-center w-full h-screen">
       <img className="h-32" src={'/Logo.svg'}/>
@@ -19,3 +21,8 @@ const Signup: NextPage = () => {
 }
 
 export default Signup
+
+Signup.getInitialProps = async (ctx) => {
+  const user = await checkUserOnSignup(ctx)
+  return { user }
+}
