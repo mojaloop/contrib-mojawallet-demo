@@ -14,6 +14,7 @@ import { authorizeQuote } from '../src/services/authorization-service'
 import Knex = require('knex')
 import uuid from 'uuid'
 import { MojaloopRequests } from "@mojaloop/sdk-standard-components"
+import { KnexOtpService } from '../src/services/otp-service'
 
 jest.mock('../src/services/authorization-service', () => ({
   authorizeQuote: jest.fn()
@@ -29,6 +30,7 @@ describe('Response from switch after a quote is sent', () => {
   let userService: KnexUserService
   let transactionRequestService: KnexTransactionRequestService
   let quoteService: KnexQuoteService
+  let otpService: KnexOtpService
   let hydraApi: HydraApi
   let validQuote: Quote
   let validQuoteResponse: QuoteResponse
@@ -54,6 +56,7 @@ describe('Response from switch after a quote is sent', () => {
     userService = new KnexUserService(knex)
     transactionRequestService = new KnexTransactionRequestService(knex)
     quoteService = new KnexQuoteService(knex)
+    otpService = new KnexOtpService(knex)
     hydraApi = {
       introspectToken: async (token) => {
         if (token === 'user1token') {
@@ -86,7 +89,8 @@ describe('Response from switch after a quote is sent', () => {
       hydraApi,
       userService,
       quoteService,
-      mojaloopRequests
+      mojaloopRequests,
+      otpService
     })
     server = app.listen(0)
     // @ts-ignore

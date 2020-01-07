@@ -13,6 +13,7 @@ import { store as storeLogout } from './controllers/logout'
 import { create as createTransactionRequest } from './controllers/transactionRequest'
 import { show as showConsent, store as storeConsent } from './controllers/consent'
 import { quoteResponse } from './controllers/quoteResponse'
+import { create as createOtp, fetch as fetchOtp } from './controllers/otp'
 import { AccountsAppContext } from './index'
 import { HydraApi } from './apis/hydra'
 import { createAuthMiddleware } from './middleware/auth'
@@ -22,6 +23,7 @@ import { KnexTransactionRequestService } from './services/transaction-request-se
 import { KnexQuoteService } from './services/quote-service'
 import { MojaloopRequests } from '@mojaloop/sdk-standard-components'
 import Knex from 'knex'
+import { KnexOtpService } from './services/otp-service'
 
 export type AppConfig = {
   logger: Logger;
@@ -31,6 +33,7 @@ export type AppConfig = {
   quoteService: KnexQuoteService;
   hydraApi: HydraApi;
   userService: KnexUserService;
+  otpService: KnexOtpService;
   mojaloopRequests: MojaloopRequests;
   knex: Knex
 }
@@ -50,6 +53,7 @@ export function createApp (appConfig: AppConfig): Koa<any, AccountsAppContext> {
     ctx.users = appConfig.userService
     ctx.transactionRequests = appConfig.transactionRequestService
     ctx.quotes = appConfig.quoteService
+    ctx.otp = appConfig.otpService
     ctx.hydraApi = appConfig.hydraApi
     ctx.mojaloopRequests = appConfig.mojaloopRequests
     await next()
@@ -86,6 +90,9 @@ export function createApp (appConfig: AppConfig): Koa<any, AccountsAppContext> {
 
   publicRouter.post('/transactionRequests', createTransactionRequest)
   publicRouter.put('/quotes/:id', quoteResponse)
+
+  privateRouter.post('/otp', createOtp)
+  privateRouter.get('/otp', fetchOtp)
 
   // privateRouter.post('/oauth2/clients', createValidationOauth2, storeOauth2)
 

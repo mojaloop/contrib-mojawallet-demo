@@ -87,10 +87,10 @@ export class KnexQuoteService {
   }
 
   async get (quoteId: string): Promise<MojaQuoteObj | undefined> {
-    const retirevedQuote = await this._knex<MojaQuoteObj>('mojaQuote')
+    const retrievedQuote = await this._knex<MojaQuoteObj>('mojaQuote')
       .where({ quoteId })
       .first()
-    return (retirevedQuote)
+    return (retrievedQuote)
   }
 
   async update (quoteId: string, updatedFields: MojaQuoteProps): Promise<MojaQuoteObj> {

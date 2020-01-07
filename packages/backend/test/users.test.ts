@@ -12,6 +12,7 @@ import { HydraApi, TokenInfo } from '../src/apis/hydra'
 import Knex = require('knex')
 import { KnexQuoteService } from '../src/services/quote-service'
 import { MojaloopRequests } from '@mojaloop/sdk-standard-components'
+import { KnexOtpService } from '../src/services/otp-service'
 jest.mock('@mojaloop/sdk-standard-components');
 
 describe('Users Service', function () {
@@ -24,6 +25,7 @@ describe('Users Service', function () {
   let transactionRequestService: KnexTransactionRequestService
   let quoteService: KnexQuoteService
   let userService: KnexUserService
+  let otpService: KnexOtpService
   let hydraApi: HydraApi
   const mojaloopRequests = new MojaloopRequests({
     dfspId: 'mojawallet',
@@ -50,6 +52,7 @@ describe('Users Service', function () {
     transactionRequestService = new KnexTransactionRequestService(knex)
     userService = new KnexUserService(knex)
     quoteService = new KnexQuoteService(knex)
+    otpService = new KnexOtpService(knex)
     hydraApi = {
       introspectToken: async (token) => {
         if (token === 'user1token') {
@@ -83,7 +86,8 @@ describe('Users Service', function () {
       hydraApi,
       userService,
       quoteService,
-      mojaloopRequests
+      mojaloopRequests,
+      otpService
     })
     server = app.listen(0)
     // eslint-disable-next-line @typescript-eslint/ban-ts-ignore

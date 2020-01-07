@@ -21,6 +21,7 @@ jest.mock('../src/services/mojaResponseService', () => ({
 }))
 import { mojaResponseService } from '../src/services/mojaResponseService'
 import { MojaloopRequests } from "@mojaloop/sdk-standard-components"
+import { KnexOtpService } from '../src/services/otp-service'
 
 
 describe('Trnsaction Request Test', () => {
@@ -33,6 +34,7 @@ describe('Trnsaction Request Test', () => {
   let userService: KnexUserService
   let transactionRequestService: KnexTransactionRequestService
   let quoteService: KnexQuoteService
+  let otpService: KnexOtpService
   let hydraApi: HydraApi
   let validRequest: TransactionRequest
   let invalidRequest: TransactionRequest
@@ -58,6 +60,7 @@ describe('Trnsaction Request Test', () => {
     userService = new KnexUserService(knex)
     transactionRequestService = new KnexTransactionRequestService(knex)
     quoteService = new KnexQuoteService(knex)
+    otpService = new KnexOtpService(knex)
     hydraApi = {
       introspectToken: async (token) => {
         if (token === 'user1token') {
@@ -90,7 +93,8 @@ describe('Trnsaction Request Test', () => {
       hydraApi,
       userService,
       quoteService,
-      mojaloopRequests
+      mojaloopRequests,
+      otpService
     })
     server = app.listen(0)
     // eslint-disable-next-line @typescript-eslint/ban-ts-ignore

@@ -19,7 +19,8 @@ describe('Health API Test', () => {
       userService: {} as any,
       transactionRequestService: {} as any,
       quoteService: {} as any,
-      mojaloopRequests: {} as any
+      mojaloopRequests: {} as any,
+      otpService: {} as any
     })
     server = app.listen(0)
     // eslint-disable-next-line @typescript-eslint/ban-ts-ignore

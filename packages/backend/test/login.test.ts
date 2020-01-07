@@ -68,7 +68,8 @@ describe('Login', function () {
       userService: usersService,
       mojaloopRequests: {} as any,
       quoteService: {} as any,
-      transactionRequestService: {} as any
+      transactionRequestService: {} as any,
+      otpService: {} as any
     })
     server = app.listen(0)
     // eslint-disable-next-line @typescript-eslint/ban-ts-ignore
