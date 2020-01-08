@@ -6,24 +6,17 @@ export async function show (ctx: AccountsAppContext): Promise<void> {
   const { users, mojaloopRequests } = ctx
   const { msisdnNumber } = ctx.params
   const destFspId = ctx.get('fspiop-source')
-
   const user = await users.getByUsername('+' + msisdnNumber)
-
-  try {
-    if (user) {
-      await mojaloopRequests.putParties('MSISDN', msisdnNumber, {
-        party: {
-          partyIdInfo: {
-            partyIdType: 'MSISDN',
-            partyIdentifier: msisdnNumber,
-            fspId: fspId
-          }
+  if (user) {
+    await mojaloopRequests.putParties('MSISDN', msisdnNumber, {
+      party: {
+        partyIdInfo: {
+          partyIdType: 'MSISDN',
+          partyIdentifier: msisdnNumber,
+          fspId: fspId
         }
-      }, destFspId)
-    }
-    ctx.status = 200
-  } catch (error) {
-    console.log(error)
-    ctx.status = 400
+      }
+    }, destFspId)
   }
+  ctx.status = 200
 }
