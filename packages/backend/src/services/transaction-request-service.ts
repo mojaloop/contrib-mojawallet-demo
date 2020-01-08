@@ -1,5 +1,6 @@
 import Joi, { ValidationResult } from 'joi'
 import Knex from 'knex'
+import { TransactionRequestsPostRequest } from '../types/mojaloop'
 
 export type RequestId = string;
 export type Party = {
@@ -48,18 +49,7 @@ export type MojaExtension = {
 }
 export type ExtensionList = MojaExtension[];
 
-export type TransactionRequest = {
-  transactionRequestId: RequestId;
-  payee: Party;
-  payer: Party;
-  amount: Money;
-  transactionType: TransactionType;
-  note?: Note;
-  geoCode?: GeoCode;
-  authenticationType?: AuthenticationType;
-  expiration?: DateTime;
-  extensionList?: ExtensionList;
-}
+export type TransactionRequest = TransactionRequestsPostRequest
 
 export type StoredRequest = {
   id: number;
@@ -71,13 +61,13 @@ export type StoredRequest = {
 
 export class TransactionRequestTools {
   private _valid: boolean
-  private _transactionRequest: TransactionRequest
+  private _transactionRequest: TransactionRequestsPostRequest
 
   constructor (postedObject: object) {
     if (this.isValid(postedObject).error) {
       this._valid = false
     } else {
-      this._transactionRequest = postedObject as TransactionRequest
+      this._transactionRequest = postedObject as TransactionRequestsPostRequest
       this._valid = true
     }
   }
@@ -180,7 +170,7 @@ export class KnexTransactionRequestService {
     this._knex = knex
   }
 
-  async create (transactionRequest: TransactionRequest, userId: number): Promise<StoredRequest> {
+  async create (transactionRequest: TransactionRequestsPostRequest, userId: number): Promise<StoredRequest> {
     const transactionRequestTools = new TransactionRequestTools(transactionRequest)
 
     const insertedRequest = await this._knex<StoredRequest>('mojaTransactionRequest').insert({
