@@ -100,7 +100,7 @@ describe('Transaction Request Tests', () => {
 
     test('Should serialize and write a valid request to mojaTransactionRequest table', async () => {
 
-      await transactionRequestService.create(validRequest)
+      await transactionRequestService.create(validRequest, 1)
       const storedRequest = await knex('mojaTransactionRequest').first()
       let serializedRequest = JSON.stringify(validRequest)
 
@@ -111,13 +111,13 @@ describe('Transaction Request Tests', () => {
 
     test('Should fail to serialize and write an invalid request to mojaTransactionRequest table', async () => {
 
-      const myTest = async () => { await transactionRequestService.create(invalidRequest) }
+      const myTest = async () => { await transactionRequestService.create(invalidRequest, 1) }
 
       expect(myTest).toThrowError
     })
 
     test('Should retrieve an existing request', async () => {
-      await transactionRequestService.create(validRequest)
+      await transactionRequestService.create(validRequest, 1)
       const retrievedRequest = await transactionRequestService.getByRequestId(validRequest.transactionRequestId)
       let serializedRequest = JSON.stringify(validRequest)
 

@@ -167,7 +167,7 @@ describe('Tests for the otp endpoints', () => {
     
   })
 
-  describe('Tests for retrieving valid otps', async () => {
+  describe('Tests for retrieving valid otps', () => {
     test('Should return 404 on no valid otp', async () => {
       const response = await axios.get(
         `http://localhost:${port}/otp`,

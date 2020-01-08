@@ -24,6 +24,7 @@ export interface AccountsAppContext extends Context {
   transactionRequests: KnexTransactionRequestService;
   quotes: KnexQuoteService;
   otp: KnexOtpService;
+  users: KnexUserService;
   logger: Logger;
   mojaloopRequests: MojaloopRequests
   knex: Knex
