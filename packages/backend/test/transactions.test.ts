@@ -24,7 +24,7 @@ describe('Transactions API Test', () => {
   describe('Create a transaction', () => {
     let account: any
     beforeEach(async () => {
-      account = await accountsService.add({
+      account = await appContainer.accountsService.add({
         assetCode: 'XML',
         assetScale: 2,
         limit: 0n,
@@ -51,7 +51,7 @@ describe('Transactions API Test', () => {
   describe('Getting a transaction for account', () => {
     let account: any
     beforeEach(async () => {
-      account = await accountsService.add({
+      account = await appContainer.accountsService.add({
         assetCode: 'XML',
         assetScale: 2,
         limit: 0n,

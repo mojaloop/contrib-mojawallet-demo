@@ -55,7 +55,7 @@ describe('Accounts API Test', () => {
   describe('Updating Account', () => {
     let account: any
     beforeEach(async () => {
-      account = await accountsService.add({
+      account = await appContainer.accountsService.add({
         assetCode: 'XML',
         assetScale: 2,
         limit: 0n,
@@ -98,7 +98,7 @@ describe('Accounts API Test', () => {
   describe('Getting an Account', () => {
     let account: any
     beforeEach(async () => {
-      account = await accountsService.add({
+      account = await appContainer.accountsService.add({
         assetCode: 'XML',
         assetScale: 2,
         limit: 0n,
@@ -134,14 +134,14 @@ describe('Accounts API Test', () => {
 
   describe('Getting all user accounts', () => {
     beforeEach(async () => {
-      await accountsService.add({
+      await appContainer.accountsService.add({
         assetCode: 'XML',
         assetScale: 2,
         limit: 0n,
         name: 'Test',
         userId: '1'
       })
-      await accountsService.add({
+      await appContainer.accountsService.add({
         assetCode: 'XML',
         assetScale: 2,
         limit: 0n,

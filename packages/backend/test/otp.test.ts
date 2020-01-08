@@ -1,4 +1,4 @@
-import axios from "axios"
+import axios from 'axios'
 import { createTestApp, TestAppContainer } from './utils/app'
 
 describe('Tests for the otp endpoints', () => {
@@ -10,8 +10,8 @@ describe('Tests for the otp endpoints', () => {
   })
 
   beforeEach(async () => {
-    await knex.migrate.latest()
-    account = await accountsService.add({
+    await appContainer.knex.migrate.latest()
+    account = await appContainer.accountsService.add({
       assetCode: 'XML',
       assetScale: 2,
       limit: 0n,
@@ -49,12 +49,12 @@ describe('Tests for the otp endpoints', () => {
     })
 
     test('Should fail creating a second otp when an active one is present', async () => {
-      const response1 = await axios.post(
+      await axios.post(
         `http://localhost:${appContainer.port}/otp`,
         { accountId: account.id },
         { headers: { authorization: 'Bearer user1token' } }
       )
-      const response2 = await axios.post(
+      await axios.post(
         `http://localhost:${appContainer.port}/otp`,
         { accountId: account.id },
         { headers: { authorization: 'Bearer user1token' } }
@@ -64,7 +64,7 @@ describe('Tests for the otp endpoints', () => {
     })
 
     test('Should fail if an invalid accountId is used', async () => {
-      const response = await axios.post(
+      await axios.post(
         `http://localhost:${appContainer.port}/otp`,
         { accountId: 11111 },
         { headers: { authorization: 'Bearer user1token' } }
@@ -74,7 +74,7 @@ describe('Tests for the otp endpoints', () => {
     })
 
     test('Should fail if an invalid user is used', async () => {
-      const response = await axios.post(
+      await axios.post(
         `http://localhost:${appContainer.port}/otp`,
         { accountId: account.id },
         { headers: { authorization: 'Bearer user3token' } }
@@ -82,12 +82,11 @@ describe('Tests for the otp endpoints', () => {
         expect(error.response.status).toEqual(401)
       })
     })
-
   })
 
   describe('Tests for retrieving valid otps', () => {
     test('Should return 404 on no valid otp', async () => {
-      const response = await axios.get(
+      await axios.get(
         `http://localhost:${appContainer.port}/otp`,
         { headers: { authorization: 'Bearer user2token' } }
       ).catch(error => {
@@ -118,7 +117,7 @@ describe('Tests for the otp endpoints', () => {
     })
 
     test('Invalid user should return 401', async () => {
-      const response = await axios.get(
+      await axios.get(
         `http://localhost:${appContainer.port}/otp`,
         { headers: { authorization: 'Bearer user3token' } }
       ).catch(error => {
