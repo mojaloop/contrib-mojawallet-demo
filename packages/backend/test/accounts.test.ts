@@ -8,10 +8,10 @@ import { KnexUserService } from '../src/services/user-service'
 import { KnexTransactionRequestService } from '../src/services/transaction-request-service'
 import createLogger from 'pino'
 import { HydraApi, TokenInfo } from '../src/apis/hydra'
-import Knex = require('knex')
 import { KnexQuoteService } from '../src/services/quote-service'
 import { MojaloopRequests } from "@mojaloop/sdk-standard-components"
 import { KnexOtpService } from '../src/services/otp-service'
+import Knex = require('knex')
 
 describe('Accounts API Test', () => {
   let server: Server
@@ -31,7 +31,7 @@ describe('Accounts API Test', () => {
     jwsSigningKey: 'test',
     logger: console,
     peerEndpoint: '',
-    tls: {outbound: {mutualTLS: {enabled: false}}}
+    tls: { outbound: { mutualTLS: { enabled: false } } }
   })
 
   beforeAll(async () => {
@@ -136,8 +136,8 @@ describe('Accounts API Test', () => {
     let account: any
     beforeEach(async () => {
       account = await accountsService.add({
-        assetCode: 'XRP',
-        assetScale: 6,
+        assetCode: 'XML',
+        assetScale: 2,
         limit: 0n,
         name: 'Test',
         userId: '1'
@@ -179,8 +179,8 @@ describe('Accounts API Test', () => {
     let account: any
     beforeEach(async () => {
       account = await accountsService.add({
-        assetCode: 'XRP',
-        assetScale: 6,
+        assetCode: 'XML',
+        assetScale: 2,
         limit: 0n,
         name: 'Test',
         userId: '1'
@@ -215,15 +215,15 @@ describe('Accounts API Test', () => {
   describe('Getting all user accounts', () => {
     beforeEach(async () => {
       await accountsService.add({
-        assetCode: 'XRP',
-        assetScale: 6,
+        assetCode: 'XML',
+        assetScale: 2,
         limit: 0n,
         name: 'Test',
         userId: '1'
       })
       await accountsService.add({
-        assetCode: 'XRP',
-        assetScale: 6,
+        assetCode: 'XML',
+        assetScale: 2,
         limit: 0n,
         name: 'Test 2',
         userId: '1'

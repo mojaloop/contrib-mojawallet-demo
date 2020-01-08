@@ -4,7 +4,6 @@ import { KnexUserService } from "../src/services/user-service"
 import { KnexTransactionRequestService } from "../src/services/transaction-request-service"
 import { KnexQuoteService } from "../src/services/quote-service"
 import { HydraApi, TokenInfo } from "../src/apis/hydra"
-import Knex = require("knex")
 import { MojaloopRequests } from "@mojaloop/sdk-standard-components"
 import { createApp } from "../src/app"
 import createLogger from 'pino'
@@ -13,6 +12,7 @@ import Koa from 'koa'
 import axios from "axios"
 import { KnexOtpService } from "../src/services/otp-service"
 import { accounts } from "../src/services/user-accounts-service"
+import Knex = require("knex")
 
 describe('Tests for the otp endpoints', () => {
   let server: Server
@@ -33,7 +33,7 @@ describe('Tests for the otp endpoints', () => {
     jwsSigningKey: 'test',
     logger: console,
     peerEndpoint: '',
-    tls: {outbound: {mutualTLS: {enabled: false}}}
+    tls: { outbound: { mutualTLS: { enabled: false } } }
   })
 
   beforeAll(async () => {
@@ -92,8 +92,8 @@ describe('Tests for the otp endpoints', () => {
   beforeEach(async () => {
     await knex.migrate.latest()
     account = await accountsService.add({
-      assetCode: 'XRP',
-      assetScale: 6,
+      assetCode: 'XML',
+      assetScale: 2,
       limit: 0n,
       name: 'Test',
       userId: '1'
@@ -110,7 +110,6 @@ describe('Tests for the otp endpoints', () => {
   })
 
   describe('Tests for generating and storing an otp', () => {
-
     test('Should generate a 4 digit otp and store it', async () => {
       const response = await axios.post(
         `http://localhost:${port}/otp`,
@@ -129,25 +128,24 @@ describe('Tests for the otp endpoints', () => {
       }
     })
 
-    test('Should fail creating a second otp when an active one is present', async ()=> {
+    test('Should fail creating a second otp when an active one is present', async () => {
       const response1 = await axios.post(
-        `http://localhost:${port}/otp`, 
+        `http://localhost:${port}/otp`,
         { accountId: account.id },
         { headers: { authorization: 'Bearer user1token' } }
       )
       const response2 = await axios.post(
-        `http://localhost:${port}/otp`, 
+        `http://localhost:${port}/otp`,
         { accountId: account.id },
         { headers: { authorization: 'Bearer user1token' } }
       ).catch(error => {
         expect(error.response.status).toEqual(409)
       })
-
     })
 
     test('Should fail if an invalid accountId is used', async () => {
       const response = await axios.post(
-        `http://localhost:${port}/otp`, 
+        `http://localhost:${port}/otp`,
         { accountId: 11111 },
         { headers: { authorization: 'Bearer user1token' } }
       ).catch(error => {
@@ -155,16 +153,15 @@ describe('Tests for the otp endpoints', () => {
       })
     })
 
-    test("Should fail if an invalid user is used", async () => {
+    test('Should fail if an invalid user is used', async () => {
       const response = await axios.post(
-        `http://localhost:${port}/otp`, 
+        `http://localhost:${port}/otp`,
         { accountId: account.id },
         { headers: { authorization: 'Bearer user3token' } }
       ).catch(error => {
         expect(error.response.status).toEqual(401)
       })
     })
-    
   })
 
   describe('Tests for retrieving valid otps', () => {
@@ -175,12 +172,11 @@ describe('Tests for the otp endpoints', () => {
       ).catch(error => {
         expect(error.response.status).toEqual(404)
       })
-
     })
 
     test('Should return otp object on with valid otp', async () => {
       await axios.post(
-        `http://localhost:${port}/otp`, 
+        `http://localhost:${port}/otp`,
         { accountId: account.id },
         { headers: { authorization: 'Bearer user1token' } }
       )
@@ -198,7 +194,6 @@ describe('Tests for the otp endpoints', () => {
       } else {
         expect(true).toEqual(false)
       }
-
     })
 
     test('Invalid user should return 401', async () => {
@@ -208,7 +203,6 @@ describe('Tests for the otp endpoints', () => {
       ).catch(error => {
         expect(error.response.status).toEqual(401)
       })
-
     })
   })
 })
