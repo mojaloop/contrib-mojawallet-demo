@@ -56,8 +56,8 @@ describe('Accounts API Test', () => {
     let account: any
     beforeEach(async () => {
       account = await appContainer.accountsService.add({
-        assetCode: 'XRP',
-        assetScale: 6,
+        assetCode: 'XML',
+        assetScale: 2,
         limit: 0n,
         name: 'Test',
         userId: '1'
@@ -99,8 +99,8 @@ describe('Accounts API Test', () => {
     let account: any
     beforeEach(async () => {
       account = await appContainer.accountsService.add({
-        assetCode: 'XRP',
-        assetScale: 6,
+        assetCode: 'XML',
+        assetScale: 2,
         limit: 0n,
         name: 'Test',
         userId: '1'
@@ -135,15 +135,15 @@ describe('Accounts API Test', () => {
   describe('Getting all user accounts', () => {
     beforeEach(async () => {
       await appContainer.accountsService.add({
-        assetCode: 'XRP',
-        assetScale: 6,
+        assetCode: 'XML',
+        assetScale: 2,
         limit: 0n,
         name: 'Test',
         userId: '1'
       })
       await appContainer.accountsService.add({
-        assetCode: 'XRP',
-        assetScale: 6,
+        assetCode: 'XML',
+        assetScale: 2,
         limit: 0n,
         name: 'Test 2',
         userId: '1'

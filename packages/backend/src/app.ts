@@ -10,6 +10,7 @@ import { create as createAccount, update as updateAccount, show as showAccount, 
 import { show as showUser, store as storeUser, update as updateUser } from './controllers/user'
 import { show as showLogin, store as storeLogin } from './controllers/login'
 import { store as storeLogout } from './controllers/logout'
+import { show as showParty } from './controllers/parties'
 import { create as createTransactionRequest } from './controllers/transactionRequest'
 import { show as showConsent, store as storeConsent } from './controllers/consent'
 import { quoteResponse } from './controllers/quoteResponse'
@@ -97,6 +98,8 @@ export function createApp (appConfig: AppConfig): Koa<any, AccountsAppContext> {
 
   privateRouter.post('/otp', createOtp)
   privateRouter.get('/otp', fetchOtp)
+
+  publicRouter.get('/parties/msisdn/:msisdnNumber', showParty)
 
   // privateRouter.post('/oauth2/clients', createValidationOauth2, storeOauth2)
   publicRouter.put('/authorizations/:id', authorizations)

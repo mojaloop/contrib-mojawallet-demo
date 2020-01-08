@@ -25,8 +25,8 @@ describe('Transactions API Test', () => {
     let account: any
     beforeEach(async () => {
       account = await appContainer.accountsService.add({
-        assetCode: 'XRP',
-        assetScale: 6,
+        assetCode: 'XML',
+        assetScale: 2,
         limit: 0n,
         name: 'Test',
         userId: '1'
@@ -52,8 +52,8 @@ describe('Transactions API Test', () => {
     let account: any
     beforeEach(async () => {
       account = await appContainer.accountsService.add({
-        assetCode: 'XRP',
-        assetScale: 6,
+        assetCode: 'XML',
+        assetScale: 2,
         limit: 0n,
         name: 'Test',
         userId: '1'

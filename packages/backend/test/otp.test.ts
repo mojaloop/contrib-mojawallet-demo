@@ -1,4 +1,4 @@
-import axios from "axios"
+import axios from 'axios'
 import { createTestApp, TestAppContainer } from './utils/app'
 
 describe('Tests for the otp endpoints', () => {
@@ -12,8 +12,8 @@ describe('Tests for the otp endpoints', () => {
   beforeEach(async () => {
     await appContainer.knex.migrate.latest()
     account = await appContainer.accountsService.add({
-      assetCode: 'XRP',
-      assetScale: 6,
+      assetCode: 'XML',
+      assetScale: 2,
       limit: 0n,
       name: 'Test',
       userId: '1'
@@ -30,7 +30,6 @@ describe('Tests for the otp endpoints', () => {
   })
 
   describe('Tests for generating and storing an otp', () => {
-
     test('Should generate a 4 digit otp and store it', async () => {
       const response = await axios.post(
         `http://localhost:${appContainer.port}/otp`,
@@ -49,24 +48,23 @@ describe('Tests for the otp endpoints', () => {
       }
     })
 
-    test('Should fail creating a second otp when an active one is present', async ()=> {
-      const response1 = await axios.post(
+    test('Should fail creating a second otp when an active one is present', async () => {
+      await axios.post(
         `http://localhost:${appContainer.port}/otp`,
         { accountId: account.id },
         { headers: { authorization: 'Bearer user1token' } }
       )
-      const response2 = await axios.post(
+      await axios.post(
         `http://localhost:${appContainer.port}/otp`,
         { accountId: account.id },
         { headers: { authorization: 'Bearer user1token' } }
       ).catch(error => {
         expect(error.response.status).toEqual(409)
       })
-
     })
 
     test('Should fail if an invalid accountId is used', async () => {
-      const response = await axios.post(
+      await axios.post(
         `http://localhost:${appContainer.port}/otp`,
         { accountId: 11111 },
         { headers: { authorization: 'Bearer user1token' } }
@@ -75,8 +73,8 @@ describe('Tests for the otp endpoints', () => {
       })
     })
 
-    test("Should fail if an invalid user is used", async () => {
-      const response = await axios.post(
+    test('Should fail if an invalid user is used', async () => {
+      await axios.post(
         `http://localhost:${appContainer.port}/otp`,
         { accountId: account.id },
         { headers: { authorization: 'Bearer user3token' } }
@@ -84,18 +82,16 @@ describe('Tests for the otp endpoints', () => {
         expect(error.response.status).toEqual(401)
       })
     })
-
   })
 
   describe('Tests for retrieving valid otps', () => {
     test('Should return 404 on no valid otp', async () => {
-      const response = await axios.get(
+      await axios.get(
         `http://localhost:${appContainer.port}/otp`,
         { headers: { authorization: 'Bearer user2token' } }
       ).catch(error => {
         expect(error.response.status).toEqual(404)
       })
-
     })
 
     test('Should return otp object on with valid otp', async () => {
@@ -118,17 +114,15 @@ describe('Tests for the otp endpoints', () => {
       } else {
         expect(true).toEqual(false)
       }
-
     })
 
     test('Invalid user should return 401', async () => {
-      const response = await axios.get(
+      await axios.get(
         `http://localhost:${appContainer.port}/otp`,
         { headers: { authorization: 'Bearer user3token' } }
       ).catch(error => {
         expect(error.response.status).toEqual(401)
       })
-
     })
   })
 })
