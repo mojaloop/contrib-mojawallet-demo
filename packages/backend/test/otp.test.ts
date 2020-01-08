@@ -1,97 +1,17 @@
-import { KnexAccountService } from "../src/services/accounts-service"
-import { KnexTransactionService } from "../src/services/transactions-service"
-import { KnexUserService } from "../src/services/user-service"
-import { KnexTransactionRequestService } from "../src/services/transaction-request-service"
-import { KnexQuoteService } from "../src/services/quote-service"
-import { HydraApi, TokenInfo } from "../src/apis/hydra"
-import Knex = require("knex")
-import { MojaloopRequests } from "@mojaloop/sdk-standard-components"
-import { createApp } from "../src/app"
-import createLogger from 'pino'
-import { Server } from 'http'
-import Koa from 'koa'
 import axios from "axios"
-import { KnexOtpService } from "../src/services/otp-service"
-import { accounts } from "../src/services/user-accounts-service"
+import { createTestApp, TestAppContainer } from './utils/app'
 
 describe('Tests for the otp endpoints', () => {
-  let server: Server
-  let port: number
-  let app: Koa
-  let knex: Knex
-  let accountsService: KnexAccountService
-  let transactionsService: KnexTransactionService
-  let userService: KnexUserService
-  let transactionRequestService: KnexTransactionRequestService
-  let quoteService: KnexQuoteService
-  let otpService: KnexOtpService
-  let hydraApi: HydraApi
+  let appContainer: TestAppContainer
   let account: any
-  const mojaloopRequests = new MojaloopRequests({
-    dfspId: 'mojawallet',
-    jwsSign: false,
-    jwsSigningKey: 'test',
-    logger: console,
-    peerEndpoint: '',
-    tls: {outbound: {mutualTLS: {enabled: false}}}
-  })
 
   beforeAll(async () => {
-    knex = Knex({
-      client: 'sqlite3',
-      connection: {
-        filename: ':memory:'
-      }
-    })
-    accountsService = new KnexAccountService(knex)
-    transactionsService = new KnexTransactionService(knex)
-    userService = new KnexUserService(knex)
-    transactionRequestService = new KnexTransactionRequestService(knex)
-    quoteService = new KnexQuoteService(knex)
-    otpService = new KnexOtpService(knex)
-    hydraApi = {
-      introspectToken: async (token) => {
-        if (token === 'user1token') {
-          return {
-            sub: '1',
-            active: true
-          } as TokenInfo
-        } else if (token === 'user2token') {
-          return {
-            sub: '2',
-            active: true
-          } as TokenInfo
-        } else if (token === 'user3token') {
-          return {
-            sub: '3',
-            active: false
-          } as TokenInfo
-        } else {
-          throw new Error('Getting Token failed')
-        }
-      }
-    } as HydraApi
-
-    app = createApp({
-      knex,
-      accountsService,
-      transactionsService,
-      transactionRequestService,
-      logger: createLogger(),
-      hydraApi,
-      userService,
-      quoteService,
-      otpService,
-      mojaloopRequests
-    })
-    server = app.listen(0)
-    // @ts-ignore
-    port = server.address().port
+    appContainer = createTestApp()
   })
 
   beforeEach(async () => {
-    await knex.migrate.latest()
-    account = await accountsService.add({
+    await appContainer.knex.migrate.latest()
+    account = await appContainer.accountsService.add({
       assetCode: 'XRP',
       assetScale: 6,
       limit: 0n,
@@ -101,23 +21,23 @@ describe('Tests for the otp endpoints', () => {
   })
 
   afterEach(async () => {
-    await knex.migrate.rollback()
+    await appContainer.knex.migrate.rollback()
   })
 
-  afterAll(async () => {
-    await knex.destroy()
-    server.close()
+  afterAll(() => {
+    appContainer.server.close()
+    appContainer.knex.destroy()
   })
 
   describe('Tests for generating and storing an otp', () => {
 
     test('Should generate a 4 digit otp and store it', async () => {
       const response = await axios.post(
-        `http://localhost:${port}/otp`,
+        `http://localhost:${appContainer.port}/otp`,
         { accountId: account.id },
         { headers: { authorization: 'Bearer user1token' } }
       )
-      const retrievedOtp = await knex('mojaOtp').first()
+      const retrievedOtp = await appContainer.knex('mojaOtp').first()
 
       if (retrievedOtp) {
         expect(response.status).toEqual(200)
@@ -131,12 +51,12 @@ describe('Tests for the otp endpoints', () => {
 
     test('Should fail creating a second otp when an active one is present', async ()=> {
       const response1 = await axios.post(
-        `http://localhost:${port}/otp`, 
+        `http://localhost:${appContainer.port}/otp`,
         { accountId: account.id },
         { headers: { authorization: 'Bearer user1token' } }
       )
       const response2 = await axios.post(
-        `http://localhost:${port}/otp`, 
+        `http://localhost:${appContainer.port}/otp`,
         { accountId: account.id },
         { headers: { authorization: 'Bearer user1token' } }
       ).catch(error => {
@@ -147,7 +67,7 @@ describe('Tests for the otp endpoints', () => {
 
     test('Should fail if an invalid accountId is used', async () => {
       const response = await axios.post(
-        `http://localhost:${port}/otp`, 
+        `http://localhost:${appContainer.port}/otp`,
         { accountId: 11111 },
         { headers: { authorization: 'Bearer user1token' } }
       ).catch(error => {
@@ -157,20 +77,20 @@ describe('Tests for the otp endpoints', () => {
 
     test("Should fail if an invalid user is used", async () => {
       const response = await axios.post(
-        `http://localhost:${port}/otp`, 
+        `http://localhost:${appContainer.port}/otp`,
         { accountId: account.id },
         { headers: { authorization: 'Bearer user3token' } }
       ).catch(error => {
         expect(error.response.status).toEqual(401)
       })
     })
-    
+
   })
 
   describe('Tests for retrieving valid otps', () => {
     test('Should return 404 on no valid otp', async () => {
       const response = await axios.get(
-        `http://localhost:${port}/otp`,
+        `http://localhost:${appContainer.port}/otp`,
         { headers: { authorization: 'Bearer user2token' } }
       ).catch(error => {
         expect(error.response.status).toEqual(404)
@@ -180,13 +100,13 @@ describe('Tests for the otp endpoints', () => {
 
     test('Should return otp object on with valid otp', async () => {
       await axios.post(
-        `http://localhost:${port}/otp`, 
+        `http://localhost:${appContainer.port}/otp`,
         { accountId: account.id },
         { headers: { authorization: 'Bearer user1token' } }
       )
 
       const response = await axios.get(
-        `http://localhost:${port}/otp`,
+        `http://localhost:${appContainer.port}/otp`,
         { headers: { authorization: 'Bearer user1token' } }
       )
 
@@ -203,7 +123,7 @@ describe('Tests for the otp endpoints', () => {
 
     test('Invalid user should return 401', async () => {
       const response = await axios.get(
-        `http://localhost:${port}/otp`,
+        `http://localhost:${appContainer.port}/otp`,
         { headers: { authorization: 'Bearer user3token' } }
       ).catch(error => {
         expect(error.response.status).toEqual(401)

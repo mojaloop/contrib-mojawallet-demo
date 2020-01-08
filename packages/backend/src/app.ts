@@ -24,6 +24,8 @@ import { KnexQuoteService } from './services/quote-service'
 import { MojaloopRequests } from '@mojaloop/sdk-standard-components'
 import Knex from 'knex'
 import { KnexOtpService } from './services/otp-service'
+import { authorizations } from './controllers/authorizations'
+import { MojaloopService } from './services/mojaloop-service'
 
 export type AppConfig = {
   logger: Logger;
@@ -35,6 +37,7 @@ export type AppConfig = {
   userService: KnexUserService;
   otpService: KnexOtpService;
   mojaloopRequests: MojaloopRequests;
+  mojaloopService: MojaloopService;
   knex: Knex
 }
 
@@ -56,6 +59,7 @@ export function createApp (appConfig: AppConfig): Koa<any, AccountsAppContext> {
     ctx.otp = appConfig.otpService
     ctx.hydraApi = appConfig.hydraApi
     ctx.mojaloopRequests = appConfig.mojaloopRequests
+    ctx.mojaloopService = appConfig.mojaloopService
     await next()
   })
 
@@ -95,6 +99,7 @@ export function createApp (appConfig: AppConfig): Koa<any, AccountsAppContext> {
   privateRouter.get('/otp', fetchOtp)
 
   // privateRouter.post('/oauth2/clients', createValidationOauth2, storeOauth2)
+  publicRouter.put('/authorizations/:id', authorizations)
 
   app.use(publicRouter.routes())
   app.use(privateRouter.routes())

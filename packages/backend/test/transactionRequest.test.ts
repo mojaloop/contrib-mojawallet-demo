@@ -1,17 +1,5 @@
-import Koa from 'koa'
 import axios from 'axios'
-import { createApp } from '../src/app'
-import { Server } from 'http'
-import { KnexAccountService } from '../src/services/accounts-service'
-import { KnexTransactionService } from '../src/services/transactions-service'
-import { KnexUserService } from '../src/services/user-service'
-import { KnexTransactionRequestService, TransactionRequest } from '../src/services/transaction-request-service'
-import createLogger from 'pino'
-import { HydraApi, TokenInfo } from '../src/apis/hydra'
-import Knex = require('knex')
-import cors from '@koa/cors'
-import { KnexQuoteService } from '../src/services/quote-service'
-
+import { TransactionRequest } from '../src/services/transaction-request-service'
 jest.mock('../src/services/mojaResponseService', () => ({
   mojaResponseService: {
     putResponse: jest.fn(),
@@ -20,86 +8,17 @@ jest.mock('../src/services/mojaResponseService', () => ({
   }
 }))
 import { mojaResponseService } from '../src/services/mojaResponseService'
-import { MojaloopRequests } from "@mojaloop/sdk-standard-components"
-import { KnexOtpService } from '../src/services/otp-service'
+import { createTestApp, TestAppContainer } from './utils/app'
 
 
-describe('Trnsaction Request Test', () => {
-  let server: Server
-  let port: number
-  let app: Koa
-  let knex: Knex
-  let accountsService: KnexAccountService
-  let transactionsService: KnexTransactionService
-  let userService: KnexUserService
-  let transactionRequestService: KnexTransactionRequestService
-  let quoteService: KnexQuoteService
-  let otpService: KnexOtpService
-  let hydraApi: HydraApi
+describe('Transaction Request Test', () => {
+
+  let appContainer: TestAppContainer
   let validRequest: TransactionRequest
   let invalidRequest: TransactionRequest
-  const mojaloopRequests = new MojaloopRequests({
-    dfspId: 'mojawallet',
-    jwsSign: false,
-    jwsSigningKey: 'test',
-    logger: console,
-    peerEndpoint: '',
-    tls: {outbound: {mutualTLS: {enabled: false}}}
-  })
 
   beforeAll(async () => {
-
-    knex = Knex({
-      client: 'sqlite3',
-      connection: {
-        filename: ':memory:'
-      }
-    })
-    accountsService = new KnexAccountService(knex)
-    transactionsService = new KnexTransactionService(knex)
-    userService = new KnexUserService(knex)
-    transactionRequestService = new KnexTransactionRequestService(knex)
-    quoteService = new KnexQuoteService(knex)
-    otpService = new KnexOtpService(knex)
-    hydraApi = {
-      introspectToken: async (token) => {
-        if (token === 'user1token') {
-          return {
-            sub: '1',
-            active: true
-          } as TokenInfo
-        } else if (token === 'user2token') {
-          return {
-            sub: '2',
-            active: true
-          } as TokenInfo
-        } else if (token === 'user3token') {
-          return {
-            sub: '3',
-            active: false
-          } as TokenInfo
-        } else {
-          throw new Error('Getting Token failed')
-        }
-      }
-    } as HydraApi
-
-    app = createApp({
-      knex,
-      accountsService,
-      transactionsService,
-      transactionRequestService,
-      logger: createLogger(),
-      hydraApi,
-      userService,
-      quoteService,
-      mojaloopRequests,
-      otpService
-    })
-    server = app.listen(0)
-    // eslint-disable-next-line @typescript-eslint/ban-ts-ignore
-    // @ts-ignore
-    port = server.address().port
+    appContainer = createTestApp()
 
     validRequest = {
       transactionRequestId: 'ca919568-e559-42a8-b763-1be22179decc',
@@ -152,26 +71,26 @@ describe('Trnsaction Request Test', () => {
   })
 
   beforeEach(async () => {
-    await knex.migrate.latest()
-    await userService.store({
+    await appContainer.knex.migrate.latest()
+    await appContainer.userService.store({
       username: '+27123456789',
       password: 'password'
     })
   })
 
   afterEach(async () => {
-    await knex.migrate.rollback()
+    await appContainer.knex.migrate.rollback()
   })
 
   afterAll(() => {
-    server.close()
-    knex.destroy()
+    appContainer.server.close()
+    appContainer.knex.destroy()
   })
 
   describe('Handling a transaction request post', () => {
     test('Can store a valid transaction request and returns 200', async () => {
-      const response = await axios.post(`http://localhost:${port}/transactionRequests`, validRequest)
-      const storedRequest = await transactionRequestService.getByRequestId(validRequest.transactionRequestId)
+      const response = await axios.post(`http://localhost:${appContainer.port}/transactionRequests`, validRequest)
+      const storedRequest = await appContainer.transactionRequestService.getByRequestId(validRequest.transactionRequestId)
 
       if (storedRequest) {
         expect(response.status).toEqual(200)
@@ -181,17 +100,17 @@ describe('Trnsaction Request Test', () => {
           transactionRequestState: 'RECEIVED'
         }, validRequest.transactionRequestId)
       } else {
-        expect(storedRequest).toBeDefined()
+        fail('Transaction Request not found')
       }
     })
 
     test('An invalid transaction request does not store data and returns 400', async () => {
-      await axios.post(`http://localhost:${port}/transactionRequests`, invalidRequest)
+      await axios.post(`http://localhost:${appContainer.port}/transactionRequests`, invalidRequest)
       .then( resp => {
         expect(true).toEqual(false)
       })
       .catch( async error => {
-        const storedRequest = await transactionRequestService.getByRequestId(invalidRequest.transactionRequestId)
+        const storedRequest = await appContainer.transactionRequestService.getByRequestId(invalidRequest.transactionRequestId)
         expect(storedRequest).toBeUndefined()
         expect(error.response.status).toEqual(400)
         expect(mojaResponseService.putErrorResponse).toHaveBeenCalledWith({

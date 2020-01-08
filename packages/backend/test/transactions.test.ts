@@ -1,110 +1,30 @@
-import Koa from 'koa'
 import axios from 'axios'
-import { createApp } from '../src/app'
-import { Server } from 'http'
-import { KnexAccountService } from '../src/services/accounts-service'
-import { KnexTransactionService } from '../src/services/transactions-service'
-import { KnexUserService } from '../src/services/user-service'
-import { KnexTransactionRequestService } from '../src/services/transaction-request-service'
-import createLogger from 'pino'
-import { HydraApi, TokenInfo } from '../src/apis/hydra'
-import Knex = require('knex')
-import { KnexQuoteService } from '../src/services/quote-service'
-import { MojaloopRequests } from "@mojaloop/sdk-standard-components"
-import { KnexOtpService } from '../src/services/otp-service'
+import { createTestApp, TestAppContainer } from './utils/app'
 
 describe('Transactions API Test', () => {
-  let server: Server
-  let port: number
-  let app: Koa
-  let knex: Knex
-  let accountsService: KnexAccountService
-  let transactionsService: KnexTransactionService
-  let transactionRequestService: KnexTransactionRequestService
-  let quoteService: KnexQuoteService
-  let userService: KnexUserService
-  let otpService: KnexOtpService
-  let hydraApi: HydraApi
-  const mojaloopRequests = new MojaloopRequests({
-    dfspId: 'mojawallet',
-    jwsSign: false,
-    jwsSigningKey: 'test',
-    logger: console,
-    peerEndpoint: '',
-    tls: {outbound: {mutualTLS: {enabled: false}}}
-  })
+  let appContainer: TestAppContainer
 
   beforeAll(async () => {
-    knex = Knex({
-      client: 'sqlite3',
-      connection: {
-        filename: ':memory:'
-      }
-    })
-    accountsService = new KnexAccountService(knex)
-    transactionsService = new KnexTransactionService(knex)
-    transactionRequestService = new KnexTransactionRequestService(knex)
-    userService = new KnexUserService(knex)
-    quoteService = new KnexQuoteService(knex)
-    otpService = new KnexOtpService(knex)
-    hydraApi = {
-      introspectToken: async (token) => {
-        if (token === 'user1token') {
-          return {
-            sub: '1',
-            active: true
-          } as TokenInfo
-        } else if (token === 'user2token') {
-          return {
-            sub: '2',
-            active: true
-          } as TokenInfo
-        } else if (token === 'usersServiceToken') {
-          return {
-            sub: 'users-service',
-            active: true
-          } as TokenInfo
-        } else {
-          throw new Error('Getting Token failed')
-        }
-      }
-    } as HydraApi
-
-    app = createApp({
-      knex,
-      accountsService,
-      transactionsService,
-      transactionRequestService,
-      logger: createLogger(),
-      hydraApi,
-      userService,
-      quoteService,
-      mojaloopRequests,
-      otpService
-    })
-    server = app.listen(0)
-    // eslint-disable-next-line @typescript-eslint/ban-ts-ignore
-    // @ts-ignore
-    port = server.address().port
+    appContainer = createTestApp()
   })
 
   beforeEach(async () => {
-    await knex.migrate.latest()
+    await appContainer.knex.migrate.latest()
   })
 
   afterEach(async () => {
-    await knex.migrate.rollback()
+    await appContainer.knex.migrate.rollback()
   })
 
   afterAll(() => {
-    server.close()
-    knex.destroy()
+    appContainer.server.close()
+    appContainer.knex.destroy()
   })
 
   describe('Create a transaction', () => {
     let account: any
     beforeEach(async () => {
-      account = await accountsService.add({
+      account = await appContainer.accountsService.add({
         assetCode: 'XRP',
         assetScale: 6,
         limit: 0n,
@@ -113,26 +33,8 @@ describe('Transactions API Test', () => {
       })
     })
 
-    it('Allowed Service can add a transaction to an account', async () => {
-      const response = await axios.post(`http://localhost:${port}/transactions`, {
-        accountId: account.id,
-        amount: '100'
-      }
-      , {
-        headers: {
-          authorization: 'Bearer usersServiceToken'
-        }
-      }).then(resp => {
-        expect(resp.status).toBe(201)
-        return resp.data
-      })
-
-      const acc = await accountsService.get(account.id)
-      expect(acc.balance.toString()).toBe('100')
-    })
-
     it('User cant add a transaction for an account', async () => {
-      const response = axios.post(`http://localhost:${port}/transactions`, {
+      const response = axios.post(`http://localhost:${appContainer.port}/transactions`, {
         accountId: account.id,
         amount: '100'
       }
@@ -149,34 +51,18 @@ describe('Transactions API Test', () => {
   describe('Getting a transaction for account', () => {
     let account: any
     beforeEach(async () => {
-      account = await accountsService.add({
+      account = await appContainer.accountsService.add({
         assetCode: 'XRP',
         assetScale: 6,
         limit: 0n,
         name: 'Test',
         userId: '1'
       })
-      await transactionsService.create(account.id, 100n)
-    })
-
-    it('Allowed Service can get accounts transactions', async () => {
-      const response = await axios.get(`http://localhost:${port}/transactions?accountId=${account.id}`
-        , {
-          headers: {
-            authorization: 'Bearer usersServiceToken'
-          }
-        }).then(resp => {
-        expect(resp.status).toBe(200)
-        return resp.data
-      })
-
-      expect(response.length).toBe(1)
-      expect(response[0].amount).toBe('100')
-      expect(response[0].accountId).toBe(account.id.toString())
+      await appContainer.transactionsService.create(account.id, 100n)
     })
 
     it('User can get own accounts transactions', async () => {
-      const response = await axios.get(`http://localhost:${port}/transactions?accountId=${account.id}`
+      const response = await axios.get(`http://localhost:${appContainer.port}/transactions?accountId=${account.id}`
         , {
           headers: {
             authorization: 'Bearer user1token'
@@ -192,7 +78,7 @@ describe('Transactions API Test', () => {
     })
 
     it('User cant get someone elses accounts transactions', async () => {
-      const response = axios.get(`http://localhost:${port}/transactions?accountId=${account.id}`
+      const response = axios.get(`http://localhost:${appContainer.port}/transactions?accountId=${account.id}`
         , {
           headers: {
             authorization: 'Bearer user2token'

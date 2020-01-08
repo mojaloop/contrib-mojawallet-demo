@@ -1,130 +1,62 @@
-import Koa from 'koa'
-import Knex from 'knex'
 import axios from 'axios'
 import bcrypt from 'bcrypt'
-import createLogger from 'pino'
-import { Server } from 'http'
-import { createApp } from '../src/app'
-import { HydraApi, TokenInfo } from '../src/apis/hydra'
-import { KnexAccountService } from '../src/services/accounts-service'
-import { KnexTransactionService } from '../src/services/transactions-service'
-import { KnexUserService } from '../src/services/user-service'
+import { createTestApp, TestAppContainer } from './utils/app'
 
 describe('Login', function () {
-  let server: Server
-  let port: number
-  let app: Koa
-  let accountsService: KnexAccountService
-  let usersService: KnexUserService
-  let transactionsService: KnexTransactionService
-  let hydraApi: HydraApi
-  let knex: Knex
-
-  describe('Mock test', () => {
-    test('Nothing', () => {
-      expect(1)
-    })
-  })
+  let appContainer: TestAppContainer
 
   beforeAll(async () => {
-    knex = Knex({
-      client: 'sqlite3',
-      connection: {
-        filename: ':memory:'
-      }
-    })
-    usersService = new KnexUserService(knex)
-    accountsService = new KnexAccountService(knex)
-    transactionsService = new KnexTransactionService(knex)
-    hydraApi = {
-      introspectToken: async (token) => {
-        if (token === 'user1token') {
-          return {
-            sub: '1',
-            active: true
-          } as TokenInfo
-        } else if (token === 'user2token') {
-          return {
-            sub: '2',
-            active: true
-          } as TokenInfo
-        } else if (token === 'usersServiceToken') {
-          return {
-            sub: 'users-service',
-            active: true
-          } as TokenInfo
-        } else {
-          throw new Error('Getting Token failed')
-        }
-      }
-    } as HydraApi
-
-    app = createApp({
-      knex,
-      accountsService,
-      transactionsService,
-      logger: createLogger(),
-      hydraApi,
-      userService: usersService,
-      mojaloopRequests: {} as any,
-      quoteService: {} as any,
-      transactionRequestService: {} as any,
-      otpService: {} as any
-    })
-    server = app.listen(0)
-    // eslint-disable-next-line @typescript-eslint/ban-ts-ignore
-    // @ts-ignore
-    port = server.address().port
+    appContainer = createTestApp()
   })
 
   beforeEach(async () => {
-    await knex.migrate.latest()
+    await appContainer.knex.migrate.latest()
   })
 
   afterEach(async () => {
-    await knex.migrate.rollback()
+    await appContainer.knex.migrate.rollback()
   })
 
   afterAll(() => {
-    server.close()
-    knex.destroy()
+    appContainer.server.close()
+    appContainer.knex.destroy()
   })
 
   describe('Get login request', function () {
     test('does not accept hydra login if user is not currently logged in', async () => {
-      hydraApi.getLoginRequest = jest.fn().mockResolvedValue({
+      appContainer.hydraApi.getLoginRequest = jest.fn().mockResolvedValue({
         skip: false,
         request_url: 'http://auth.localhost'
       })
-      hydraApi.acceptLoginRequest = jest.fn()
+      appContainer.hydraApi.acceptLoginRequest = jest.fn()
 
-      const { status } = await axios.get(`http://localhost:${port}/login?login_challenge=test`)
+      const { status } = await axios.get(`http://localhost:${appContainer.port}/login?login_challenge=test`)
 
       expect(status).toEqual(200)
-      expect(hydraApi.getLoginRequest).toBeCalledWith('test')
-      expect(hydraApi.acceptLoginRequest).not.toBeCalled()
+      expect(appContainer.hydraApi.getLoginRequest).toBeCalledWith('test')
+      expect(appContainer.hydraApi.acceptLoginRequest).not.toBeCalled()
     })
 
     test('accepts hydra login and returns a redirect url if user is logged in already', async () => {
-      hydraApi.getLoginRequest = jest.fn().mockResolvedValue({
+      appContainer.hydraApi.getLoginRequest = jest.fn().mockResolvedValue({
         skip: true,
         subject: '2',
         request_url: 'http://auth.localhost'
       })
-      hydraApi.acceptLoginRequest = jest.fn().mockResolvedValue({
-        redirect_to: `http://localhost:${port}/redirect`
+      appContainer.hydraApi.acceptLoginRequest = jest.fn().mockResolvedValue({
+        redirect_to: `http://localhost:${appContainer.port}/redirect`
       })
 
-      const { status, data } = await axios.get(`http://localhost:${port}/login?login_challenge=test`)
+      const { status, data } = await axios.get(`http://localhost:${appContainer.port}/login?login_challenge=test`)
 
-      expect(hydraApi.acceptLoginRequest).toHaveBeenCalledWith('test', { subject: '2', remember: true, remember_for: 604800 })
-      expect(data.redirectTo).toEqual(`http://localhost:${port}/redirect`)
+      expect(appContainer.hydraApi.acceptLoginRequest).toHaveBeenCalledWith('test', { subject: '2', remember: true, remember_for: 604800 })
+      expect(data.redirectTo).toEqual(`http://localhost:${appContainer.port}/redirect`)
       expect(status).toEqual(200)
     })
 
     test('login_challenge query parameter is required', async () => {
       try {
-        await axios.get(`http://localhost:${port}/login`)
+        await axios.get(`http://localhost:${appContainer.port}/login`)
       } catch (error) {
         expect(error.response.status).toEqual(422)
 
@@ -141,7 +73,7 @@ describe('Login', function () {
 
     test('No password gives an error', async () => {
       try {
-        await axios.post(`http://localhost:${port}/login?login_challenge=testChallenge`, {
+        await axios.post(`http://localhost:${appContainer.port}/login?login_challenge=testChallenge`, {
           username: 'alice',
         })
       } catch (error) {
@@ -159,7 +91,7 @@ describe('Login', function () {
 
     test('No login_challenge gives an error', async () => {
       try {
-        await axios.post(`http://localhost:${port}/login`, {
+        await axios.post(`http://localhost:${appContainer.port}/login`, {
           username: 'alice',
           password: 'alice'
         })
@@ -177,7 +109,7 @@ describe('Login', function () {
 
     test('No username gives an error', async () => {
       try {
-        await axios.post(`http://localhost:${port}/login?login_challenge=testChallenge`, {
+        await axios.post(`http://localhost:${appContainer.port}/login?login_challenge=testChallenge`, {
           password: 'alice',
         })
       } catch (error) {
@@ -194,7 +126,7 @@ describe('Login', function () {
 
     test('Username doesnt exist gives an error', async () => {
       try {
-        await axios.post(`http://localhost:${port}/login?login_challenge=testChallenge`, {
+        await axios.post(`http://localhost:${appContainer.port}/login?login_challenge=testChallenge`, {
           username: 'matt',
           password: 'matt',
         })
@@ -211,13 +143,13 @@ describe('Login', function () {
     })
 
     test('Incorrect password gives an error', async () => {
-      await usersService.store({
+      await appContainer.userService.store({
         username: 'matt',
         password: 'notmypassword'
       })
 
       try {
-        await axios.post(`http://localhost:${port}/login?login_challenge=testChallenge`, {
+        await axios.post(`http://localhost:${appContainer.port}/login?login_challenge=testChallenge`, {
           username: 'matt',
           password: 'matt',
         })
@@ -237,14 +169,14 @@ describe('Login', function () {
 
     describe('valid user credentials', function () {
       test('accepts hydra login', async () => {
-        hydraApi.acceptLoginRequest = jest.fn().mockResolvedValue({
-          redirect_to: `http://localhost:${port}/redirect`
+        appContainer.hydraApi.acceptLoginRequest = jest.fn().mockResolvedValue({
+          redirect_to: `http://localhost:${appContainer.port}/redirect`
         })
-        const user = await usersService.store({ username: 'alice', password: await bcrypt.hash('test', await bcrypt.genSalt()) })
+        const user = await appContainer.userService.store({ username: 'alice', password: await bcrypt.hash('test', await bcrypt.genSalt()) })
 
-        await axios.post(`http://localhost:${port}/login?login_challenge=testChallenge`, { username: 'alice', password: 'test' })
+        await axios.post(`http://localhost:${appContainer.port}/login?login_challenge=testChallenge`, { username: 'alice', password: 'test' })
 
-        expect(hydraApi.acceptLoginRequest).toHaveBeenCalledWith('testChallenge', { subject: user.id.toString(), remember: true,
+        expect(appContainer.hydraApi.acceptLoginRequest).toHaveBeenCalledWith('testChallenge', { subject: user.id.toString(), remember: true,
           remember_for: 604800})
       })
     })
