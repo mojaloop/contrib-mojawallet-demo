@@ -10,6 +10,7 @@ import { createApp } from './app'
 import { KnexQuoteService } from './services/quote-service'
 import { MojaloopRequests } from '@mojaloop/sdk-standard-components'
 import { KnexOtpService } from './services/otp-service'
+import { KnexMojaloopService, MojaloopService } from './services/mojaloop-service'
 import Knex = require('knex')
 const logger = createLogger()
 logger.level = process.env.LOG_LEVEL || 'info'
@@ -27,6 +28,7 @@ export interface AccountsAppContext extends Context {
   users: KnexUserService;
   logger: Logger;
   mojaloopRequests: MojaloopRequests
+  mojaloopService: MojaloopService
   knex: Knex
 }
 
@@ -51,7 +53,6 @@ const userService = new KnexUserService(knex)
 const transactionRequestService = new KnexTransactionRequestService(knex)
 const quoteService = new KnexQuoteService(knex)
 const otpService = new KnexOtpService(knex)
-
 const mojaloopRequests = new MojaloopRequests({
   dfspId: DFSP_ID,
   jwsSign: false,
@@ -60,6 +61,7 @@ const mojaloopRequests = new MojaloopRequests({
   peerEndpoint: '',
   tls: { outbound: { mutualTLS: { enabled: false } } }
 })
+const mojaloopService = new KnexMojaloopService(knex, mojaloopRequests, otpService)
 
 const app = createApp({
   knex,
@@ -71,7 +73,8 @@ const app = createApp({
   transactionRequestService,
   quoteService,
   otpService,
-  mojaloopRequests
+  mojaloopRequests,
+  mojaloopService
 })
 
 let server: Server

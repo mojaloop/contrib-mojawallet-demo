@@ -1,109 +1,29 @@
-import Koa from 'koa'
 import axios from 'axios'
-import { createApp } from '../src/app'
-import { Server } from 'http'
-import { KnexAccountService } from '../src/services/accounts-service'
-import { KnexTransactionService } from '../src/services/transactions-service'
-import { KnexUserService } from '../src/services/user-service'
-import { KnexTransactionRequestService } from '../src/services/transaction-request-service'
-import createLogger from 'pino'
-import { HydraApi, TokenInfo } from '../src/apis/hydra'
-import { KnexQuoteService } from '../src/services/quote-service'
-import { MojaloopRequests } from "@mojaloop/sdk-standard-components"
-import { KnexOtpService } from '../src/services/otp-service'
-import Knex = require('knex')
+import { createTestApp, TestAppContainer } from './utils/app'
 
 describe('Accounts API Test', () => {
-  let server: Server
-  let port: number
-  let app: Koa
-  let knex: Knex
-  let accountsService: KnexAccountService
-  let transactionsService: KnexTransactionService
-  let transactionRequestService: KnexTransactionRequestService
-  let quoteService: KnexQuoteService
-  let userService: KnexUserService
-  let otpService: KnexOtpService
-  let hydraApi: HydraApi
-  const mojaloopRequests = new MojaloopRequests({
-    dfspId: 'mojawallet',
-    jwsSign: false,
-    jwsSigningKey: 'test',
-    logger: console,
-    peerEndpoint: '',
-    tls: { outbound: { mutualTLS: { enabled: false } } }
-  })
+  let appContainer: TestAppContainer
 
-  beforeAll(async () => {
-    knex = Knex({
-      client: 'sqlite3',
-      connection: {
-        filename: ':memory:'
-      }
-    })
-    accountsService = new KnexAccountService(knex)
-    transactionsService = new KnexTransactionService(knex)
-    transactionRequestService = new KnexTransactionRequestService(knex)
-    userService = new KnexUserService(knex)
-    quoteService = new KnexQuoteService(knex)
-    otpService = new KnexOtpService(knex)
-    hydraApi = {
-      introspectToken: async (token) => {
-        if (token === 'user1token') {
-          return {
-            sub: '1',
-            active: true
-          } as TokenInfo
-        } else if (token === 'user2token') {
-          return {
-            sub: '2',
-            active: true
-          } as TokenInfo
-        } else if (token === 'user3token') {
-          return {
-            sub: '3',
-            active: false
-          } as TokenInfo
-        } else {
-          throw new Error('Getting Token failed')
-        }
-      }
-    } as HydraApi
-
-    app = createApp({
-      knex,
-      accountsService,
-      transactionsService,
-      transactionRequestService,
-      logger: createLogger(),
-      hydraApi,
-      userService,
-      quoteService,
-      mojaloopRequests,
-      otpService
-    })
-    server = app.listen(0)
-    // eslint-disable-next-line @typescript-eslint/ban-ts-ignore
-    // @ts-ignore
-    port = server.address().port
+  beforeAll(() => {
+    appContainer = createTestApp()
   })
 
   beforeEach(async () => {
-    await knex.migrate.latest()
+    await appContainer.knex.migrate.latest()
   })
 
   afterEach(async () => {
-    await knex.migrate.rollback()
+    await appContainer.knex.migrate.rollback()
   })
 
   afterAll(() => {
-    server.close()
-    knex.destroy()
+    appContainer.server.close()
+    appContainer.knex.destroy()
   })
 
   describe('Creating Account', () => {
     test('Can create an account if valid user', async () => {
-      const response = await axios.post(`http://localhost:${port}/accounts`, {
+      const response = await axios.post(`http://localhost:${appContainer.port}/accounts`, {
         name: 'test'
       }, {
         headers: {
@@ -118,7 +38,7 @@ describe('Accounts API Test', () => {
     })
 
     test('Cant create an account if invalid user', async () => {
-      const response = axios.post(`http://localhost:${port}/accounts`, {
+      const response = axios.post(`http://localhost:${appContainer.port}/accounts`, {
         name: 'test'
       }, {
         headers: {
@@ -145,7 +65,7 @@ describe('Accounts API Test', () => {
     })
 
     it('User can update their own account', async () => {
-      await axios.patch(`http://localhost:${port}/accounts/${account.id}`, {
+      await axios.patch(`http://localhost:${appContainer.port}/accounts/${account.id}`, {
         name: 'new test'
       }, {
         headers: {
@@ -155,13 +75,13 @@ describe('Accounts API Test', () => {
         return resp.data
       })
 
-      const edittedAccount = await accountsService.get(account.id)
+      const edittedAccount = await appContainer.accountsService.get(account.id)
 
       expect(edittedAccount.name).toBe('new test')
     })
 
     it('User cant update another users account', async () => {
-      const response = axios.patch(`http://localhost:${port}/accounts/${account.id}`, {
+      const response = axios.patch(`http://localhost:${appContainer.port}/accounts/${account.id}`, {
         name: 'new test'
       }, {
         headers: {
@@ -188,7 +108,7 @@ describe('Accounts API Test', () => {
     })
 
     it('User can get their own account', async () => {
-      const response = await axios.get(`http://localhost:${port}/accounts/${account.id}`, {
+      const response = await axios.get(`http://localhost:${appContainer.port}/accounts/${account.id}`, {
         headers: {
           authorization: 'Bearer user1token'
         }
@@ -200,7 +120,7 @@ describe('Accounts API Test', () => {
     })
 
     it('User cant get someone elses account', async () => {
-      const response = axios.get(`http://localhost:${port}/accounts/${account.id}`, {
+      const response = axios.get(`http://localhost:${appContainer.port}/accounts/${account.id}`, {
         headers: {
           authorization: 'Bearer user2token'
         }
@@ -231,7 +151,7 @@ describe('Accounts API Test', () => {
     })
 
     it('User can get their own accounts', async () => {
-      const response = await axios.get(`http://localhost:${port}/accounts?userId=1`, {
+      const response = await axios.get(`http://localhost:${appContainer.port}/accounts?userId=1`, {
         headers: {
           authorization: 'Bearer user1token'
         }
@@ -246,7 +166,7 @@ describe('Accounts API Test', () => {
     })
 
     it('User cant get someone elses account', async () => {
-      const response = axios.get(`http://localhost:${port}/accounts?userId=1`, {
+      const response = axios.get(`http://localhost:${appContainer.port}/accounts?userId=1`, {
         headers: {
           authorization: 'Bearer user2token'
         }

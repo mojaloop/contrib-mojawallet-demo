@@ -16,6 +16,21 @@ declare module '@mojaloop/sdk-standard-components' {
     currency?: string
   }
 
+  type Money = {
+    currency: string,
+    amount: string
+  }
+
+  type PostTransferBody = {
+    transferId: string,
+    payeeFsp: string,
+    payerFsp: string
+    amount: Money,
+    ilpPacket: string,
+    condition: string,
+    expiration: string,
+  }
+
   type Config = {
     logger: any;
     dfspId: string;
@@ -51,7 +66,7 @@ declare module '@mojaloop/sdk-standard-components' {
     putQuotes(quoteId: string, quoteResponse: object, destFspId: string): Promise<object>
     putQuotesError(quoteId: string, error: object, destFspId: string): Promise<object>
 
-    postTransfers(prepare: object, destFspId: string): Promise<object>
+    postTransfers(prepare: PostTransferBody, destFspId: string): Promise<object>
     putTransfers(transferId: string, fulfilment: object, destFspId: string): Promise<object>
     putTransfersError(transferId: string, error: object, destFspId: string): Promise<object>
   }
