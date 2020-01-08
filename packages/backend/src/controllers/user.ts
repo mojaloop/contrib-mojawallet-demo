@@ -31,7 +31,7 @@ export const createUserSchema = Joi.object({
 })
 
 export async function store (ctx: AccountsAppContext): Promise<void> {
-  const { users, mojaloopRequests } = ctx
+  const { users, mojaloopRequests, logger } = ctx
   const { username, password } = ctx.request.body
 
   ctx.logger.debug(`Creating user ${username}`)
@@ -49,6 +49,7 @@ export async function store (ctx: AccountsAppContext): Promise<void> {
         }
       })
     }
+    logger.info('Unable to store user', ctx)
     ctx.status = 422
     return
   }
@@ -63,6 +64,7 @@ export async function store (ctx: AccountsAppContext): Promise<void> {
         }
       ]
     }
+    logger.info('Invalid username', ctx)
     ctx.status = 422
     return
   }
@@ -82,7 +84,7 @@ export async function store (ctx: AccountsAppContext): Promise<void> {
       return
     }
   } catch (error) {
-    ctx.logger.info('Tried creating user that already exists')
+    logger.info('Tried creating user that already exists')
   }
 
   const salt = await bcrypt.genSalt()
@@ -96,7 +98,7 @@ export async function store (ctx: AccountsAppContext): Promise<void> {
   try {
     const user = await users.store(userProps)
 
-    ctx.logger.debug(`Creating user ${user}`)
+    logger.debug(`Creating user ${user}`)
 
     const signupSessionId = v4()
     await ctx.knex('signupSessions').insert({
@@ -107,13 +109,13 @@ export async function store (ctx: AccountsAppContext): Promise<void> {
 
     await mojaloopRequests.postParticipants({
       requestId: v4(),
-      partyList: [ {
+      partyList: [{
         partyIdentifier: username,
         partyIdType: 'MSISDN',
         fspId: DFSP_ID
       }]
     }).catch(error => {
-      ctx.logger.error('Error adding participant to ALS', error)
+      logger.error('Error adding participant to ALS', error)
     })
 
     ctx.body = {
@@ -121,6 +123,7 @@ export async function store (ctx: AccountsAppContext): Promise<void> {
       username: user.username,
       signupSessionId
     }
+    logger.info('User submitted to Mojawallet and to ALS')
   } catch (error) {
     console.log(error)
     ctx.throw(400, error)
