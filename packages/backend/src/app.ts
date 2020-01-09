@@ -49,10 +49,7 @@ export function createApp (appConfig: AppConfig): Koa<any, AccountsAppContext> {
 
   app.use(cors())
   app.use(bodyParser({
-    detectJSON: () => true,
-    extendTypes: {
-      json: ['application/vnd.interoperability.transactionRequests+json;version=1.0']
-    }
+    detectJSON: () => true
   }))
   app.use(async (ctx, next) => {
     ctx.knex = appConfig.knex
