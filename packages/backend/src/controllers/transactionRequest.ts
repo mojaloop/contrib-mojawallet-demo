@@ -9,14 +9,14 @@ export async function create (ctx: AccountsAppContext): Promise<void> {
   const { body } = ctx.request
   const payerUserName = (body as TransactionRequestsPostRequest).payer.partyIdentifier
 
-  ctx.logger.debug(body, 'transactionRequests received body')
+  ctx.logger.info(body, 'transactionRequests received body')
 
   const user = await users.getByUsername(payerUserName)
-  ctx.logger.debug(user, 'transactionRequests user')
+  ctx.logger.info(user, 'transactionRequests user')
 
   try {
     const response = await transactionRequests.create(body, user.id)
-    ctx.logger.debug(response, 'transactionRequests called')
+    ctx.logger.info(response, 'transactionRequests called')
 
     // potentially change to a queing system for asynchronous responses to avoid unhandled promises
     mojaResponseService.putResponse(
@@ -31,6 +31,7 @@ export async function create (ctx: AccountsAppContext): Promise<void> {
     await quotes.add(quoteTools.getQuote())
     mojaResponseService.quoteResponse(quoteTools.getQuote())
   } catch (error) {
+    ctx.logger.error(error, 'Error in transactionRequests')
     mojaResponseService.putErrorResponse(
       {
         errorInformation: {
