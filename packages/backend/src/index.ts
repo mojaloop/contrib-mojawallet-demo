@@ -59,7 +59,7 @@ const mojaloopRequests = new MojaloopRequests({
   jwsSign: false,
   jwsSigningKey: 'dummykey',
   logger: console,
-  peerEndpoint: '',
+  peerEndpoint: ALS_ENDPOINT,
   alsEndpoint: ALS_ENDPOINT,
   tls: { outbound: { mutualTLS: { enabled: false } } }
 })
