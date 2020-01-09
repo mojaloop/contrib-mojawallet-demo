@@ -3,7 +3,7 @@ exports.up = function (knex) {
     .createTable('mojaTransactionRequest', function (table) {
       table.increments('id').primary()
       table.uuid('transactionRequestId')
-      table.string('serializedRequest')
+      table.text('serializedRequest')
       table.string('transactionId')
       table.json('transactionType')
       table.json('payee')

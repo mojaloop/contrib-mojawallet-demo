@@ -5,7 +5,7 @@ exports.up = function(knex) {
        table.increments('id').primary()
        table.uuid('quoteId')
        table.uuid('transactionId')
-       table.string('serializedQuote')
+       table.text('serializedQuote')
     })
 };
 

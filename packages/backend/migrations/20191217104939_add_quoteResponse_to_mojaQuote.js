@@ -1,7 +1,7 @@
 
 exports.up = function(knex) {
   return knex.schema.table('mojaQuote', function (table) {
-    table.string('quoteResponse')
+    table.text('quoteResponse')
   })
 }
 
