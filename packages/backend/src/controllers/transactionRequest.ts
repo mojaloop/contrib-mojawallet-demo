@@ -7,6 +7,7 @@ export async function create (ctx: AccountsAppContext): Promise<void> {
   ctx.logger.info('Create transaction request called')
   const { transactionRequests, quotes, users } = ctx
   const { body } = ctx.request
+  const destFspId = ctx.get('fspiop-source')
   const payerUserName = (body as TransactionRequestsPostRequest).payer.partyIdentifier
 
   ctx.logger.info('transactionRequests received body', body)
@@ -16,20 +17,22 @@ export async function create (ctx: AccountsAppContext): Promise<void> {
 
   try {
     const response = await transactionRequests.create(body, user.id)
-    ctx.logger.info(response, 'transactionRequests called')
+    ctx.logger.info('transactionRequests called', response)
 
     // potentially change to a queing system for asynchronous responses to avoid unhandled promises
-    mojaResponseService.putResponse(
+    const resp = await mojaResponseService.putResponse(
       {
         transactionRequestState: 'RECEIVED'
       },
-      body.transactionRequestId
+      body.transactionRequestId,
+      destFspId
     )
+    ctx.logger.info('mojaResponseService putResponse', resp)
     ctx.status = 200
 
     const quoteTools = new QuoteTools(body)
     await quotes.add(quoteTools.getQuote())
-    mojaResponseService.quoteResponse(quoteTools.getQuote())
+    mojaResponseService.quoteResponse(quoteTools.getQuote(), destFspId)
   } catch (error) {
     ctx.logger.error(error, 'Error in transactionRequests')
     mojaResponseService.putErrorResponse(
@@ -40,7 +43,8 @@ export async function create (ctx: AccountsAppContext): Promise<void> {
           extensionList: []
         }
       },
-      body.transactionRequestId
+      body.transactionRequestId,
+      destFspId
     )
     ctx.status = 400
   }

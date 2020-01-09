@@ -19,22 +19,40 @@ export type TransactionRequestError = {
 }
 
 export interface MojaResponseService {
-  putResponse: (responseObj: TransactionMojaResponse, transactionRequestId: string) => Promise<Response>;
-  putErrorResponse: (responseObj: TransactionRequestError, transactionRequestId: string) => Promise<Response>;
-  quoteResponse: (responseObj: Quote) => Promise<Response>;
+  putResponse: (responseObj: TransactionMojaResponse, transactionRequestId: string, destFspId: string) => Promise<Response>;
+  putErrorResponse: (responseObj: TransactionRequestError, transactionRequestId: string, destFspId: string) => Promise<Response>;
+  quoteResponse: (responseObj: Quote, destFspId: string) => Promise<Response>;
 }
 
 export const mojaResponseService: MojaResponseService = {
-  putResponse: async function (responseObj: TransactionMojaResponse, transactionRequestId: string) {
+  putResponse: async function (responseObj: TransactionMojaResponse, transactionRequestId: string, destFspId: string) {
     const putUri = new URL('/transactionRequests/' + transactionRequestId, baseMojaUrl)
-    return got.put(putUri.href, { json: responseObj })
+    return got.put(putUri.href, { json: responseObj,
+      headers: {
+        'Content-Type': 'application/vnd.interoperability.resource+json;version=1.0',
+        'FSPIOP-Source': 'mojawallet',
+        'FSPIOP-Destination': destFspId
+      }
+    })
   },
-  putErrorResponse: function (responseObj: TransactionRequestError, transactionRequestId: string) {
+  putErrorResponse: function (responseObj: TransactionRequestError, transactionRequestId: string, destFspId: string) {
     const putUri = new URL('/transactionRequests/' + transactionRequestId + '/error', baseMojaUrl)
-    return got.put(putUri.href, { json: responseObj })
+    return got.put(putUri.href, { json: responseObj,
+      headers: {
+        'Content-Type': 'application/vnd.interoperability.resource+json;version=1.0',
+        'FSPIOP-Source': 'mojawallet',
+        'FSPIOP-Destination': destFspId
+      }
+    })
   },
-  quoteResponse: function (responseObj: Quote) {
+  quoteResponse: function (responseObj: Quote, destFspId: string) {
     const quoteUri = new URL('/quotes', baseMojaUrl)
-    return got.post(quoteUri.href, { json: responseObj })
+    return got.post(quoteUri.href, { json: responseObj,
+      headers: {
+        'Content-Type': 'application/vnd.interoperability.resource+json;version=1.0',
+        'FSPIOP-Source': 'mojawallet',
+        'FSPIOP-Destination': destFspId
+      }
+    })
   }
 }
