@@ -1,7 +1,7 @@
-import Knex = require("knex")
 import { QuoteResponse, QuoteResponseTool } from '../../src/services/quoteResponse-service'
 import { KnexQuoteService, Quote } from '../../src/services/quote-service'
 import { authorizeQuote } from '../../src/services/authorization-service'
+import Knex = require('knex')
 
 jest.mock('../../src/services/authorization-service', () => ({
   authorizeQuote: jest.fn()
@@ -14,7 +14,7 @@ describe('Quote response service tests', () => {
   let validQuoteResponse: QuoteResponse
   let invalidQuoteResponse: QuoteResponse
 
-  beforeAll(async ()=> {
+  beforeAll(async () => {
     knex = Knex({
       client: 'sqlite3',
       connection: {
@@ -32,10 +32,8 @@ describe('Quote response service tests', () => {
         }
       },
       payer: {
-        partyIdInfo: {
-          partyIdType: 'MSISDN',
-          partyIdentifier: 'party2'
-        }
+        partyIdType: 'MSISDN',
+        partyIdentifier: 'party2'
       },
       amountType: 'RECEIVE',
       amount: {
@@ -43,13 +41,13 @@ describe('Quote response service tests', () => {
         amount: '20'
       },
       transactionType: {
-        scenario: 'DEPOSIT' ,
+        scenario: 'DEPOSIT',
         initiator: 'PAYER',
         initiatorType: 'CONSUMER'
       }
     }
     validQuoteResponse = {
-      transferAmount:{
+      transferAmount: {
         currency: 'USD',
         amount: '20'
       },
@@ -58,7 +56,7 @@ describe('Quote response service tests', () => {
       condition: '1234567890123456789012345678901234567890123'
     }
     invalidQuoteResponse = {
-      transferAmount:{
+      transferAmount: {
         currency: 'USD',
         amount: '20'
       },
@@ -77,7 +75,7 @@ describe('Quote response service tests', () => {
     jest.clearAllMocks()
   })
 
-  afterAll(async ()=> {
+  afterAll(async () => {
     knex.destroy()
   })
 
@@ -106,5 +104,4 @@ describe('Quote response service tests', () => {
       expect(authorizeQuote).toBeCalledTimes(0)
     })
   })
-
 })

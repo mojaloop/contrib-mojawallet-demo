@@ -9,7 +9,7 @@ describe('Moja response services test', () => {
   let switchServer: Server
 
   beforeAll(async () => {
-    let testSwitch = new Koa()
+    const testSwitch = new Koa()
     testSwitch.use(cors())
     const router = new Router()
     router.put('/transactionRequests/:id', ctx => {
@@ -34,11 +34,11 @@ describe('Moja response services test', () => {
   })
 
   describe('Sending responses to endpoints', () => {
-  const sleep = (ms: number, ftDone: any) => new Promise((resolve) => setTimeout(() => {
-    ftDone()
-    resolve()
-  } , ms))
-    
+    const sleep = (ms: number, ftDone: any) => new Promise((resolve) => setTimeout(() => {
+      ftDone()
+      resolve()
+    }, ms))
+
     test('Should respond to a successful transaction request', async (done) => {
       mojaResponseService
         .putResponse(
@@ -93,10 +93,8 @@ describe('Moja response services test', () => {
           }
         },
         payer: {
-          partyIdInfo: {
-            partyIdType: 'MSISDN',
-            partyIdentifier: 'party2'
-          }
+          partyIdType: 'MSISDN',
+          partyIdentifier: 'party2'
         },
         amount: {
           currency: 'USD',
