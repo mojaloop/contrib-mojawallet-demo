@@ -88,21 +88,24 @@ describe('Transaction Request Test', () => {
     })
   })
 
-  // describe('Handling a transaction request post', () => {
-  //   test('Can store a valid transaction request and returns 200', async () => {
-  //     const response = await axios.post(`http://localhost:${appContainer.port}/transactionRequests`, validRequest)
-  //     const storedRequest = await appContainer.transactionRequestService.getByRequestId(validRequest.transactionRequestId)
-  //     if (storedRequest) {
-  //       expect(response.status).toEqual(200)
-  //       expect(storedRequest.transactionRequestId).toEqual(validRequest.transactionRequestId)
-  //       expect(storedRequest.userId).toEqual(1)
-  //       expect(mojaResponseService.putResponse).toHaveBeenCalledWith({
-  //         transactionRequestState: 'RECEIVED'
-  //       }, validRequest.transactionRequestId)
-  //     } else {
-  //       fail('Transaction Request not found')
-  //     }
-  //   })
+  describe('Handling a transaction request post', () => {
+    test('Can store a valid transaction request and returns 200', async () => {
+      const response = await axios.post(`http://localhost:${appContainer.port}/transactionRequests`, validRequest, {
+        headers: { 'Content-Type': 'application/vnd.interoperability.transactionRequests+json;version=1.0' }
+      })
+      // console.log(response)
+      // const storedRequest = await appContainer.transactionRequestService.getByRequestId(validRequest.transactionRequestId)
+      // if (storedRequest) {
+      //   expect(response.status).toEqual(200)
+      //   expect(storedRequest.transactionRequestId).toEqual(validRequest.transactionRequestId)
+      //   expect(storedRequest.userId).toEqual(1)
+      //   expect(mojaResponseService.putResponse).toHaveBeenCalledWith({
+      //     transactionRequestState: 'RECEIVED'
+      //   }, validRequest.transactionRequestId)
+      // } else {
+      //   fail('Transaction Request not found')
+      // }
+    })
 
   //   test('An invalid transaction request does not store data and returns 400', async () => {
   //     await axios.post(`http://localhost:${appContainer.port}/transactionRequests`, invalidRequest)
@@ -122,5 +125,5 @@ describe('Transaction Request Test', () => {
   //         }, invalidRequest.transactionRequestId)
   //       })
   //   })
-  // })
+  })
 })
