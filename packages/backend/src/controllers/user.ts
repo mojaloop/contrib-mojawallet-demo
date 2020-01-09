@@ -84,7 +84,7 @@ export async function store (ctx: AccountsAppContext): Promise<void> {
       return
     }
   } catch (error) {
-    //Don't do anything as if we get here we can actually create the user
+    // Don't do anything as if we get here we can actually create the user
   }
 
   const salt = await bcrypt.genSalt()
