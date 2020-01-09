@@ -48,7 +48,12 @@ export function createApp (appConfig: AppConfig): Koa<any, AccountsAppContext> {
   const publicRouter = new Router<any, AccountsAppContext>()
 
   app.use(cors())
-  app.use(bodyParser())
+  app.use(bodyParser({
+    detectJSON: () => true,
+    extendTypes: {
+      json: ['application/vnd.interoperability.transactionRequests+json;version=1.0']
+    }
+  }))
   app.use(async (ctx, next) => {
     ctx.knex = appConfig.knex
     ctx.accounts = appConfig.accountsService
