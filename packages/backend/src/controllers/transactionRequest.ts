@@ -46,6 +46,6 @@ export async function create (ctx: AccountsAppContext): Promise<void> {
       body.transactionRequestId,
       destFspId
     )
-    ctx.status = 400
+    ctx.status = 200
   }
 }
