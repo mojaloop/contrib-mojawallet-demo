@@ -117,7 +117,7 @@ export async function store (ctx: AccountsAppContext): Promise<void> {
     }).then(() => {
       logger.info('User submitted to Mojawallet and to ALS')
     }).catch(error => {
-      logger.error('Error adding participant to ALS', error.requestError.name, error.reqestError.message)
+      logger.error('Error adding participant to ALS', error.response)
     })
 
     ctx.body = {
