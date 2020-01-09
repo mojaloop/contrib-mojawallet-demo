@@ -2,7 +2,7 @@ import { KnexAccountService } from '../../src/services/accounts-service'
 import { KnexTransactionService, Transaction } from '../../src/services/transactions-service'
 import Knex = require('knex')
 
-describe('Accounts Services', () => {
+describe('Transaction Services', () => {
   let knex: Knex
   let accountService: KnexAccountService
   let transactionsService: KnexTransactionService

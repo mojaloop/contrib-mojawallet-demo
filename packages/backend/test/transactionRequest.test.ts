@@ -83,7 +83,9 @@ describe('Transaction Request Test', () => {
 
   describe('Handling a transaction request post', () => {
     test('Can store a valid transaction request and returns 200', async () => {
-      const response = await axios.post(`http://localhost:${appContainer.port}/transactionRequests`, validRequest)
+      const response = await axios.post(`http://localhost:${appContainer.port}/transactionRequests`, validRequest, {
+        headers: { 'Content-Type': 'application/vnd.interoperability.transactionRequests+json;version=1.0', 'FSPIOP-Source': 'mojawallet' }
+      })
       const storedRequest = await appContainer.transactionRequestService.getByRequestId(validRequest.transactionRequestId)
       if (storedRequest) {
         expect(response.status).toEqual(200)
@@ -91,29 +93,29 @@ describe('Transaction Request Test', () => {
         expect(storedRequest.userId).toEqual(1)
         expect(mojaResponseService.putResponse).toHaveBeenCalledWith({
           transactionRequestState: 'RECEIVED'
-        }, validRequest.transactionRequestId)
+        }, validRequest.transactionRequestId,
+        'mojawallet')
       } else {
         fail('Transaction Request not found')
       }
     })
 
     test('An invalid transaction request does not store data and returns 400', async () => {
-      await axios.post(`http://localhost:${appContainer.port}/transactionRequests`, invalidRequest)
-        .then(resp => {
-          expect(true).toEqual(false)
-        })
-        .catch(async error => {
-          const storedRequest = await appContainer.transactionRequestService.getByRequestId(invalidRequest.transactionRequestId)
-          expect(storedRequest).toBeUndefined()
-          expect(error.response.status).toEqual(400)
-          expect(mojaResponseService.putErrorResponse).toHaveBeenCalledWith({
-            errorInformation: {
-              errorCode: '3100',
-              errorDescription: 'Invalid transaction request',
-              extensionList: []
-            }
-          }, invalidRequest.transactionRequestId)
-        })
+      await axios.post(`http://localhost:${appContainer.port}/transactionRequests`, invalidRequest, {
+        headers: { 'Content-Type': 'application/vnd.interoperability.transactionRequests+json;version=1.0', 'FSPIOP-Source': 'mojawallet' }
+      }).catch(async error => {
+        const storedRequest = await appContainer.transactionRequestService.getByRequestId(invalidRequest.transactionRequestId)
+        expect(storedRequest).toBeUndefined()
+        expect(error.response.status).toEqual(400)
+        expect(mojaResponseService.putErrorResponse).toHaveBeenCalledWith({
+          errorInformation: {
+            errorCode: '3100',
+            errorDescription: 'Invalid transaction request',
+            extensionList: []
+          }
+        }, invalidRequest.transactionRequestId,
+        'mojawallet')
+      })
     })
   })
 })

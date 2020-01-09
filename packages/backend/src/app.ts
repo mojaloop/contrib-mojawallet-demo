@@ -48,7 +48,12 @@ export function createApp (appConfig: AppConfig): Koa<any, AccountsAppContext> {
   const publicRouter = new Router<any, AccountsAppContext>()
 
   app.use(cors())
-  app.use(bodyParser())
+  app.use(bodyParser({
+    detectJSON: () => true,
+    extendTypes: {
+      json: ['application/vnd.interoperability.transactionRequests+json;version=1.0']
+    }
+  }))
   app.use(async (ctx, next) => {
     ctx.knex = appConfig.knex
     ctx.accounts = appConfig.accountsService
@@ -61,6 +66,11 @@ export function createApp (appConfig: AppConfig): Koa<any, AccountsAppContext> {
     ctx.hydraApi = appConfig.hydraApi
     ctx.mojaloopRequests = appConfig.mojaloopRequests
     ctx.mojaloopService = appConfig.mojaloopService
+    await next()
+  })
+
+  app.use(async (ctx, next) => {
+    ctx.logger.info(ctx.request.method + ' ' + ctx.request.url, { body: ctx.request.body, header: ctx.request.header })
     await next()
   })
 

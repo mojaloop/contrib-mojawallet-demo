@@ -45,7 +45,8 @@ describe('Moja response services test', () => {
           {
             transactionRequestState: 'RECEIVED'
           },
-          'transactionRequest-id here'
+          'transactionRequest-id here',
+          'mojaloop'
         )
         .then(response => {
           expect(response.statusCode).toEqual(200)
@@ -69,7 +70,8 @@ describe('Moja response services test', () => {
               extensionList: []
             }
           },
-          'transactionRequest-id here'
+          'transactionRequest-id here',
+          'mojaloop'
         )
         .then(response => {
           expect(response.statusCode).toEqual(200)
@@ -107,7 +109,7 @@ describe('Moja response services test', () => {
         }
       })
       mojaResponseService
-        .quoteResponse(quoteTools.getQuote())
+        .quoteResponse(quoteTools.getQuote(), 'mojaloop')
         .then(response => {
           expect(response.statusCode).toEqual(200)
         })
