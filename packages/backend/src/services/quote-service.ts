@@ -1,4 +1,4 @@
-import { Party, Money, TransactionType, GeoCode, Note, DateTime, ExtensionList, TransactionRequest } from './transaction-request-service'
+import { TransactionRequestsPostRequest, PartyIdInfo, Party, Money, TransactionType, GeoCode, ExtensionList } from '../types/mojaloop'
 import Knex = require('knex')
 import uuidv4 = require('uuid/v4')
 
@@ -7,14 +7,14 @@ export type Quote = {
   transactionId: string;
   transactionRequestId?: string;
   payee: Party;
-  payer: Party;
+  payer: PartyIdInfo;
   amountType: 'SEND' | 'RECEIVE';
   amount: Money;
   fees?: Money;
   transactionType: TransactionType;
   geoCode?: GeoCode;
-  note?: Note;
-  expiration?: DateTime;
+  note?: string;
+  expiration?: string;
   extensionList?: ExtensionList;
 }
 
@@ -38,7 +38,7 @@ export class QuoteTools {
   private _quote: Quote
   private _serializedQuote: string
 
-  constructor (transactionReq: TransactionRequest) {
+  constructor (transactionReq: TransactionRequestsPostRequest) {
     this._quote = {
       quoteId: uuidv4(),
       transactionId: uuidv4(),

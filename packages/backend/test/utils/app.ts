@@ -1,4 +1,4 @@
-import { Server } from "http"
+import { Server } from 'http'
 import Koa from 'koa'
 import { KnexAccountService } from '../../src/services/accounts-service'
 import { KnexMojaloopService, MojaloopService } from '../../src/services/mojaloop-service'
@@ -7,8 +7,8 @@ import { KnexUserService } from '../../src/services/user-service'
 import { KnexTransactionRequestService } from '../../src/services/transaction-request-service'
 import { KnexQuoteService } from '../../src/services/quote-service'
 import { HydraApi, TokenInfo } from '../../src/apis/hydra'
-import { MojaloopRequests } from "@mojaloop/sdk-standard-components"
-import Knex from "knex"
+import { MojaloopRequests } from '@mojaloop/sdk-standard-components'
+import Knex from 'knex'
 import { createApp } from '../../src/app'
 import createLogger from 'pino'
 import { KnexOtpService } from '../../src/services/otp-service'
@@ -29,7 +29,6 @@ export type TestAppContainer = {
   otpService: KnexOtpService
 }
 
-
 export const createTestApp = (): TestAppContainer => {
   const knex = Knex({
     client: 'sqlite3',
@@ -43,7 +42,7 @@ export const createTestApp = (): TestAppContainer => {
     jwsSigningKey: 'test',
     logger: console,
     peerEndpoint: '',
-    tls: {outbound: {mutualTLS: {enabled: false}}}
+    tls: { outbound: { mutualTLS: { enabled: false } } }
   })
   const accountsService = new KnexAccountService(knex)
   const transactionsService = new KnexTransactionService(knex)

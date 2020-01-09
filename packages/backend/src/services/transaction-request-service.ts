@@ -3,53 +3,12 @@ import Knex from 'knex'
 import { TransactionRequestsPostRequest } from '../types/mojaloop'
 
 export type RequestId = string;
-export type Party = {
-  partyIdInfo: {
-    partyIdType: 'MSISDN' | 'EMAIL' | 'PERSONAL_ID' | 'BUSINESS' | 'DEVICE' | 'ACCOUNT_ID' | 'IBAN' | 'ALIAS';
-    partyIdentifier: string;
-    partySubIdOrType?: string;
-    fspId?: string;
-  };
-  merchantClassificationCode?: string;
-  name?: string;
-  personalInfo?: {
-    complexName?: {
-      firstName?: string;
-      middleName?: string;
-      lastName?: string;
-    };
-    dateOfBirth?: string;
-  };
-}
-export type Money = {
-  currency: string;
-  amount: string;
-}
-export type TransactionType = {
-  scenario: 'DEPOSIT' | 'WITHDRAWAL' | 'TRANSFER' | 'PAYMENT' | 'REFUND';
-  subScenario?: string | number;
-  initiator: 'PAYER' | 'PAYEE';
-  initiatorType: 'CONSUMER' | 'AGENT' | 'BUSINESS' | 'DEVICE';
-  refundInfo?: {
-    originalTransactionId: string;
-    refundReason?: string;
-  };
-  balanceOfPayments?: string;
-}
-export type Note = string;
-export type GeoCode = {
-  latitude: string;
-  longitude: string;
-}
 export type AuthenticationType = 'OTP' | 'QRCODE';
-export type DateTime = string;
 export type MojaExtension = {
   extensionKey: string;
   extensionValue: string;
 }
 export type ExtensionList = MojaExtension[];
-
-export type TransactionRequest = TransactionRequestsPostRequest
 
 export type StoredRequest = {
   id: number;
@@ -65,6 +24,7 @@ export class TransactionRequestTools {
 
   constructor (postedObject: object) {
     if (this.isValid(postedObject).error) {
+      console.log(this.isValid(postedObject).error)
       this._valid = false
     } else {
       this._transactionRequest = postedObject as TransactionRequestsPostRequest
@@ -75,13 +35,15 @@ export class TransactionRequestTools {
   private isValid (untestedOb: object): ValidationResult<object> {
     const uuidSchema = Joi.string().regex(/^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/)
 
+    const partyIdInfoSchema = Joi.object({
+      partyIdType: Joi.string().valid('MSISDN', 'EMAIL', 'PERSONAL_ID', 'BUSINESS', 'DEVICE', 'ACCOUNT_ID', 'IBAN', 'ALIAS').required(),
+      partyIdentifier: Joi.string().min(1).max(128).required(),
+      partySubIdOrType: Joi.string().min(1).max(128),
+      fspId: Joi.string().min(1).max(32)
+    }).required()
+
     const partySchema = Joi.object({
-      partyIdInfo: Joi.object({
-        partyIdType: Joi.string().valid('MSISDN', 'EMAIL', 'PERSONAL_ID', 'BUSINESS', 'DEVICE', 'ACCOUNT_ID', 'IBAN', 'ALIAS').required(),
-        partyIdentifier: Joi.string().min(1).max(128).required(),
-        partySubIdOrType: Joi.string().min(1).max(128),
-        fspId: Joi.string().min(1).max(32)
-      }).required(),
+      partyIdInfo: partyIdInfoSchema,
       merchantClassificationCode: Joi.string().regex(/^[\d]{1,4}$/),
       name: Joi.string().regex(/^(?!\s*$)[\w .,'-]{1,128}$/),
       personalInfo: {
@@ -130,7 +92,7 @@ export class TransactionRequestTools {
     const requestSchema = Joi.object({
       transactionRequestId: Joi.string().regex(/^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/).required(),
       payee: partySchema.required(),
-      payer: partySchema.required(),
+      payer: partyIdInfoSchema.required(),
       amount: moneySchema.required(),
       transactionType: transactionTypeSchema.required(),
       note: noteSchema,
