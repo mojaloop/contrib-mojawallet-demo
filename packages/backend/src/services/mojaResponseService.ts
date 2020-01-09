@@ -49,7 +49,7 @@ export const mojaResponseService: MojaResponseService = {
     const quoteUri = new URL('/quotes', baseMojaUrl)
     return got.post(quoteUri.href, { json: responseObj,
       headers: {
-        'Content-Type': 'application/vnd.interoperability.transactionRequests+json;version=1.0',
+        'Content-Type': 'application/vnd.interoperability.quotes+json;version=1.0',
         'FSPIOP-Source': 'mojawallet',
         'FSPIOP-Destination': destFspId
       }
