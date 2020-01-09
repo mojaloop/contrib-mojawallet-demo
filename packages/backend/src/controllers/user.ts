@@ -114,6 +114,8 @@ export async function store (ctx: AccountsAppContext): Promise<void> {
         partyIdType: 'MSISDN',
         fspId: DFSP_ID
       }]
+    }).then(() => {
+      logger.info('User submitted to Mojawallet and to ALS')
     }).catch(error => {
       logger.error('Error adding participant to ALS', error)
     })
@@ -123,7 +125,6 @@ export async function store (ctx: AccountsAppContext): Promise<void> {
       username: user.username,
       signupSessionId
     }
-    logger.info('User submitted to Mojawallet and to ALS')
   } catch (error) {
     console.log(error)
     ctx.throw(400, error)
