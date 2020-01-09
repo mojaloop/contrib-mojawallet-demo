@@ -1,19 +1,19 @@
 import { AccountsAppContext } from '../index'
 // import { QuoteTools } from '../services/quote-service'
 // import { mojaResponseService } from '../services/mojaResponseService'
-import { TransactionRequestsPostRequest } from '../types/mojaloop'
+// import { TransactionRequestsPostRequest } from '../types/mojaloop'
 
 export async function create (ctx: AccountsAppContext): Promise<void> {
   ctx.logger.info('Create transaction request called')
-  const { users } = ctx
+  // const { users } = ctx
   // const { transactionRequests, quotes, users } = ctx
   const { body } = ctx.request
-  const payerUserName = (body as TransactionRequestsPostRequest).payer.partyIdentifier
+  // const payerUserName = (body as TransactionRequestsPostRequest).payer.partyIdentifier
 
   ctx.logger.info(body, 'transactionRequests received body')
 
-  const user = await users.getByUsername(payerUserName)
-  ctx.logger.info(user, 'transactionRequests user')
+  // const user = await users.getByUsername(payerUserName)
+  // ctx.logger.info(users, 'transactionRequests user')
 
   // try {
   //   const response = await transactionRequests.create(body, user.id)
