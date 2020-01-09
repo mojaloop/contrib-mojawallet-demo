@@ -3,7 +3,6 @@ import { TestAppContainer, createTestApp } from './utils/app'
 import { OtpTools } from '../src/services/otp-service'
 
 describe('Authorization Response', () => {
-
   let appContainer: TestAppContainer
   let user: any
   let account: any
@@ -42,9 +41,7 @@ describe('Authorization Response', () => {
   })
 
   describe('Handling PUT to "/authorizations/{ID}"', () => {
-
     test('Can handle getting an authorization PUT request', async () => {
-
       const response = await axios.put(`http://localhost:${appContainer.port}/authorizations/${123}`, {
         authenticationInfo: {
           authentication: 'OTP',
@@ -68,17 +65,15 @@ describe('Authorization Response', () => {
           }
         },
         payer: {
-          partyIdInfo: {
-            partyIdType: 'MSISDN',
-            partyIdentifier: '271337'
-          }
+          partyIdType: 'MSISDN',
+          partyIdentifier: '271337'
         },
         amount: {
           currency: 'XML',
           amount: '20'
         },
         transactionType: {
-          scenario: 'DEPOSIT' ,
+          scenario: 'DEPOSIT',
           initiator: 'PAYER',
           initiatorType: 'CONSUMER'
         }
@@ -108,17 +103,15 @@ describe('Authorization Response', () => {
           }
         },
         payer: {
-          partyIdInfo: {
-            partyIdType: 'MSISDN',
-            partyIdentifier: '271337'
-          }
+          partyIdType: 'MSISDN',
+          partyIdentifier: '271337'
         },
         amount: {
           currency: 'XML',
           amount: '20'
         },
         transactionType: {
-          scenario: 'DEPOSIT' ,
+          scenario: 'DEPOSIT',
           initiator: 'PAYER',
           initiatorType: 'CONSUMER'
         }

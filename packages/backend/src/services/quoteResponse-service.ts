@@ -1,4 +1,5 @@
-import { Money, DateTime, GeoCode, ExtensionList } from './transaction-request-service'
+import { ExtensionList } from './transaction-request-service'
+import { Money, GeoCode } from '../types/mojaloop'
 import Joi from 'joi'
 import { authorizeQuote } from './authorization-service'
 
@@ -7,7 +8,7 @@ export type QuoteResponse = {
   payeeReceiveAmount?: Money;
   payeeFspFee?: Money;
   payeeFspComission?: Money;
-  expiration: DateTime;
+  expiration: string;
   geoCode?: GeoCode;
   ilpPacket: string;
   condition: string;

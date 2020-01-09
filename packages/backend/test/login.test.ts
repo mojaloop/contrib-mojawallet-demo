@@ -61,7 +61,7 @@ describe('Login', function () {
         expect(error.response.status).toEqual(422)
 
         const data = error.response.data
-        expect(data.errors[0].field).toBe("login_challenge")
+        expect(data.errors[0].field).toBe('login_challenge')
         expect(data.errors[0].message).toBe('"login_challenge" is required')
         return
       }
@@ -70,24 +70,22 @@ describe('Login', function () {
   })
 
   describe('Post login', function () {
-
     test('No password gives an error', async () => {
       try {
         await axios.post(`http://localhost:${appContainer.port}/login?login_challenge=testChallenge`, {
-          username: 'alice',
+          username: 'alice'
         })
       } catch (error) {
         expect(error.response.status).toEqual(422)
 
         const data = error.response.data
-        expect(data.message).toBe("Validation Failed")
-        expect(data.errors[0].field).toBe("password")
+        expect(data.message).toBe('Validation Failed')
+        expect(data.errors[0].field).toBe('password')
         expect(data.errors[0].message).toBe('"password" is required')
         return
       }
       fail()
     })
-
 
     test('No login_challenge gives an error', async () => {
       try {
@@ -99,8 +97,8 @@ describe('Login', function () {
         expect(error.response.status).toEqual(422)
 
         const data = error.response.data
-        expect(data.message).toBe("Validation Failed")
-        expect(data.errors[0].field).toBe("login_challenge")
+        expect(data.message).toBe('Validation Failed')
+        expect(data.errors[0].field).toBe('login_challenge')
         expect(data.errors[0].message).toBe('"login_challenge" is required')
         return
       }
@@ -110,14 +108,14 @@ describe('Login', function () {
     test('No username gives an error', async () => {
       try {
         await axios.post(`http://localhost:${appContainer.port}/login?login_challenge=testChallenge`, {
-          password: 'alice',
+          password: 'alice'
         })
       } catch (error) {
         expect(error.response.status).toEqual(422)
 
         const data = error.response.data
-        expect(data.message).toBe("Validation Failed")
-        expect(data.errors[0].field).toBe("username")
+        expect(data.message).toBe('Validation Failed')
+        expect(data.errors[0].field).toBe('username')
         expect(data.errors[0].message).toBe('"username" is required')
         return
       }
@@ -128,14 +126,14 @@ describe('Login', function () {
       try {
         await axios.post(`http://localhost:${appContainer.port}/login?login_challenge=testChallenge`, {
           username: 'matt',
-          password: 'matt',
+          password: 'matt'
         })
       } catch (error) {
         expect(error.response.status).toEqual(422)
 
         const data = error.response.data
-        expect(data.message).toBe("Validation Failed")
-        expect(data.errors[0].field).toBe("username")
+        expect(data.message).toBe('Validation Failed')
+        expect(data.errors[0].field).toBe('username')
         expect(data.errors[0].message).toBe('User does not exist')
         return
       }
@@ -151,33 +149,33 @@ describe('Login', function () {
       try {
         await axios.post(`http://localhost:${appContainer.port}/login?login_challenge=testChallenge`, {
           username: 'matt',
-          password: 'matt',
+          password: 'matt'
         })
       } catch (error) {
         expect(error.response.status).toEqual(422)
 
         const data = error.response.data
-        expect(data.message).toBe("Validation Failed")
-        expect(data.errors[0].field).toBe("password")
+        expect(data.message).toBe('Validation Failed')
+        expect(data.errors[0].field).toBe('password')
         expect(data.errors[0].message).toBe('Invalid password')
         return
       }
       fail()
     })
-
   })
 
-    describe('valid user credentials', function () {
-      test('accepts hydra login', async () => {
-        appContainer.hydraApi.acceptLoginRequest = jest.fn().mockResolvedValue({
-          redirect_to: `http://localhost:${appContainer.port}/redirect`
-        })
-        const user = await appContainer.userService.store({ username: 'alice', password: await bcrypt.hash('test', await bcrypt.genSalt()) })
-
-        await axios.post(`http://localhost:${appContainer.port}/login?login_challenge=testChallenge`, { username: 'alice', password: 'test' })
-
-        expect(appContainer.hydraApi.acceptLoginRequest).toHaveBeenCalledWith('testChallenge', { subject: user.id.toString(), remember: true,
-          remember_for: 604800})
+  describe('valid user credentials', function () {
+    test('accepts hydra login', async () => {
+      appContainer.hydraApi.acceptLoginRequest = jest.fn().mockResolvedValue({
+        redirect_to: `http://localhost:${appContainer.port}/redirect`
       })
+      const user = await appContainer.userService.store({ username: 'alice', password: await bcrypt.hash('test', await bcrypt.genSalt()) })
+
+      await axios.post(`http://localhost:${appContainer.port}/login?login_challenge=testChallenge`, { username: 'alice', password: 'test' })
+
+      expect(appContainer.hydraApi.acceptLoginRequest).toHaveBeenCalledWith('testChallenge', { subject: user.id.toString(),
+remember: true,
+        remember_for: 604800 })
     })
+  })
 })

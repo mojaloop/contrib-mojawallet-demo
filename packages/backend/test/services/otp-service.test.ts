@@ -87,7 +87,7 @@ describe('Otp Service', () => {
   })
 
   describe('Tests handling otp tools', () => {
-    test('Should generate a valid otp object', async ()=> {
+    test('Should generate a valid otp object', async () => {
       const userId = '0123456789'
       const accountId = 'accountId'
       const otpTools = new OtpTools(userId, accountId)

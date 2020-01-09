@@ -1,10 +1,10 @@
 import axios from 'axios'
 import { createTestApp, TestAppContainer } from './utils/app'
-jest.mock('@mojaloop/sdk-standard-components');
+jest.mock('@mojaloop/sdk-standard-components')
 
 describe('Users Service', function () {
   let appContainer: TestAppContainer
-  const postParticipantsMock =  jest.fn().mockImplementation(() => {
+  const postParticipantsMock = jest.fn().mockImplementation(() => {
     return Promise.resolve()
   })
 
@@ -40,7 +40,6 @@ describe('Users Service', function () {
     })
 
     test('creating a user registers the number at the ALS', async () => {
-
       const response = await axios.post(`http://localhost:${appContainer.port}/users`, {
         username: '+27844444444',
         password: 'test'
@@ -58,7 +57,6 @@ describe('Users Service', function () {
     })
 
     test('creating a user creates a signup session', async () => {
-
       const response = await axios.post(`http://localhost:${appContainer.port}/users`, {
         username: '+27844444444',
         password: 'test'
@@ -80,7 +78,7 @@ describe('Users Service', function () {
       }).catch(error => {
         const { data } = error.response
         expect(error.response.status).toEqual(422)
-        expect(data.errors[0].field).toBe("username")
+        expect(data.errors[0].field).toBe('username')
         expect(data.errors[0].message).toBe('Invalid phone number entered')
         return error
       })
@@ -105,7 +103,7 @@ describe('Users Service', function () {
       }).catch(error => {
         const { data } = error.response
         expect(error.response.status).toEqual(422)
-        expect(data.errors[0].field).toBe("username")
+        expect(data.errors[0].field).toBe('username')
         expect(data.errors[0].message).toBe('"username" is required')
         return error
       })
@@ -120,7 +118,7 @@ describe('Users Service', function () {
       }).catch(error => {
         const { data } = error.response
         expect(error.response.status).toEqual(422)
-        expect(data.errors[0].field).toBe("password")
+        expect(data.errors[0].field).toBe('password')
         expect(data.errors[0].message).toBe('"password" is required')
         return error
       })
@@ -145,7 +143,7 @@ describe('Users Service', function () {
       } catch (error) {
         const { data } = error.response
         expect(error.response.status).toEqual(422)
-        expect(data.errors[0].field).toBe("username")
+        expect(data.errors[0].field).toBe('username')
         expect(data.errors[0].message).toBe('Username already exists')
         return error
       }

@@ -1,6 +1,6 @@
 import Knex from 'knex'
 import { Quote, KnexQuoteService, QuoteTools } from '../../src/services/quote-service'
-import { TransactionRequest, KnexTransactionRequestService } from '../../src/services/transaction-request-service'
+import { TransactionRequestsPostRequest } from '../../src/types/mojaloop'
 import { QuoteResponse } from 'packages/backend/src/services/quoteResponse-service'
 
 describe('Quotes service', () => {
@@ -29,10 +29,8 @@ describe('Quotes service', () => {
           }
         },
         payer: {
-          partyIdInfo: {
-            partyIdType: 'MSISDN',
-            partyIdentifier: 'party2'
-          }
+          partyIdType: 'MSISDN',
+          partyIdentifier: 'party2'
         },
         amountType: 'RECEIVE',
         amount: {
@@ -40,13 +38,13 @@ describe('Quotes service', () => {
           amount: '20'
         },
         transactionType: {
-          scenario: 'DEPOSIT' ,
+          scenario: 'DEPOSIT',
           initiator: 'PAYER',
           initiatorType: 'CONSUMER'
         }
       }
       validQuoteResponse = {
-        transferAmount:{
+        transferAmount: {
           currency: 'USD',
           amount: '20'
         },
@@ -73,8 +71,7 @@ describe('Quotes service', () => {
     test('Should write a quote object to mojaQuote', async () => {
       await quoteService.add(quote)
       const storedQuote = await knex('mojaQuote').first()
-      let serializedQuote = JSON.stringify(quote)
-      
+      const serializedQuote = JSON.stringify(quote)
       expect(storedQuote).toBeDefined()
       expect(storedQuote.serializedQuote).toEqual(serializedQuote)
     })
@@ -104,7 +101,6 @@ describe('Quotes service', () => {
       })
 
       const storedQuote = await knex('mojaQuote').first()
-      
       expect(storedQuote).toBeDefined()
       expect(storedQuote.quoteResponse).toEqual(JSON.stringify(validQuoteResponse))
       expect(updatedQuote.quoteResponse).toEqual(JSON.stringify(validQuoteResponse))
@@ -112,9 +108,9 @@ describe('Quotes service', () => {
   })
 
   describe('Quote service tools', () => {
-    let validRequest: TransactionRequest
+    let validRequest: TransactionRequestsPostRequest
 
-    beforeAll(async () => {      
+    beforeAll(async () => {
       validRequest = {
         transactionRequestId: 'ca919568-e559-42a8-b763-1be22179decc',
         payee: {
@@ -124,17 +120,15 @@ describe('Quotes service', () => {
           }
         },
         payer: {
-          partyIdInfo: {
-            partyIdType: 'MSISDN',
-            partyIdentifier: 'party2'
-          }
+          partyIdType: 'MSISDN',
+          partyIdentifier: 'party2'
         },
         amount: {
           currency: 'USD',
           amount: '20'
         },
         transactionType: {
-          scenario: 'DEPOSIT' ,
+          scenario: 'DEPOSIT',
           initiator: 'PAYER',
           initiatorType: 'CONSUMER'
         }
@@ -146,7 +140,7 @@ describe('Quotes service', () => {
     afterEach(async () => {})
 
     afterAll(async () => {})
-    
+
     test('should generate a quote object from a valid transaction request id', async () => {
       const quoteTools = new QuoteTools(validRequest)
 

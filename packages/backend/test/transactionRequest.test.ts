@@ -1,5 +1,7 @@
 import axios from 'axios'
-import { TransactionRequest } from '../src/services/transaction-request-service'
+import { mojaResponseService } from '../src/services/mojaResponseService'
+import { createTestApp, TestAppContainer } from './utils/app'
+import { TransactionRequestsPostRequest } from '../src/types/mojaloop'
 jest.mock('../src/services/mojaResponseService', () => ({
   mojaResponseService: {
     putResponse: jest.fn(),
@@ -7,15 +9,11 @@ jest.mock('../src/services/mojaResponseService', () => ({
     quoteResponse: jest.fn()
   }
 }))
-import { mojaResponseService } from '../src/services/mojaResponseService'
-import { createTestApp, TestAppContainer } from './utils/app'
-
 
 describe('Transaction Request Test', () => {
-
   let appContainer: TestAppContainer
-  let validRequest: TransactionRequest
-  let invalidRequest: TransactionRequest
+  let validRequest: TransactionRequestsPostRequest
+  let invalidRequest: TransactionRequestsPostRequest
 
   beforeAll(async () => {
     appContainer = createTestApp()
@@ -29,17 +27,15 @@ describe('Transaction Request Test', () => {
         }
       },
       payer: {
-        partyIdInfo: {
-          partyIdType: 'MSISDN',
-          partyIdentifier: '+27123456789'
-        }
+        partyIdType: 'MSISDN',
+        partyIdentifier: '+27123456789'
       },
       amount: {
         currency: 'USD',
         amount: '20'
       },
       transactionType: {
-        scenario: 'DEPOSIT' ,
+        scenario: 'DEPOSIT',
         initiator: 'PAYER',
         initiatorType: 'CONSUMER'
       }
@@ -53,17 +49,15 @@ describe('Transaction Request Test', () => {
         }
       },
       payer: {
-        partyIdInfo: {
-          partyIdType: 'MSISDN',
-          partyIdentifier: '+27123456789'
-        }
+        partyIdType: 'MSISDN',
+        partyIdentifier: '+27123456789'
       },
       amount: {
         currency: 'USD',
         amount: '20'
       },
       transactionType: {
-        scenario: 'DEPOSIT' ,
+        scenario: 'DEPOSIT',
         initiator: 'PAYER',
         initiatorType: 'CONSUMER'
       }
@@ -91,7 +85,6 @@ describe('Transaction Request Test', () => {
     test('Can store a valid transaction request and returns 200', async () => {
       const response = await axios.post(`http://localhost:${appContainer.port}/transactionRequests`, validRequest)
       const storedRequest = await appContainer.transactionRequestService.getByRequestId(validRequest.transactionRequestId)
-
       if (storedRequest) {
         expect(response.status).toEqual(200)
         expect(storedRequest.transactionRequestId).toEqual(validRequest.transactionRequestId)
@@ -106,22 +99,21 @@ describe('Transaction Request Test', () => {
 
     test('An invalid transaction request does not store data and returns 400', async () => {
       await axios.post(`http://localhost:${appContainer.port}/transactionRequests`, invalidRequest)
-      .then( resp => {
-        expect(true).toEqual(false)
-      })
-      .catch( async error => {
-        const storedRequest = await appContainer.transactionRequestService.getByRequestId(invalidRequest.transactionRequestId)
-        expect(storedRequest).toBeUndefined()
-        expect(error.response.status).toEqual(400)
-        expect(mojaResponseService.putErrorResponse).toHaveBeenCalledWith({
-          errorInformation: {
-            errorCode: '3100',
-            errorDescription: 'Invalid transaction request',
-            extensionList: []
-          }
-        }, invalidRequest.transactionRequestId)
-      })
+        .then(resp => {
+          expect(true).toEqual(false)
+        })
+        .catch(async error => {
+          const storedRequest = await appContainer.transactionRequestService.getByRequestId(invalidRequest.transactionRequestId)
+          expect(storedRequest).toBeUndefined()
+          expect(error.response.status).toEqual(400)
+          expect(mojaResponseService.putErrorResponse).toHaveBeenCalledWith({
+            errorInformation: {
+              errorCode: '3100',
+              errorDescription: 'Invalid transaction request',
+              extensionList: []
+            }
+          }, invalidRequest.transactionRequestId)
+        })
     })
   })
-
 })

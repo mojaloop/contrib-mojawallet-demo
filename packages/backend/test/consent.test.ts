@@ -14,7 +14,6 @@ describe('Consent', function () {
   let port: number
   let hydraApi: HydraApi
 
-
   describe('Mock test', () => {
     test('Nothing', () => {
       expect(1)
