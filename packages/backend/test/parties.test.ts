@@ -36,7 +36,7 @@ describe('Parties Request Test', () => {
         }
       })
       expect(response.status).toEqual(200)
-      expect(mock).toHaveBeenCalledWith('MSISDN', '27123456789', {
+      expect(mock).toHaveBeenCalledWith('MSISDN', '27123456789', null, {
         party: {
           partyIdInfo: {
             partyIdType: 'MSISDN',

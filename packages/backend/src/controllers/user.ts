@@ -110,7 +110,7 @@ export async function store (ctx: AccountsAppContext): Promise<void> {
     await mojaloopRequests.postParticipants({
       requestId: v4(),
       partyList: [{
-        partyIdentifier: username,
+        partyIdentifier: username.replace('+', ''),
         partyIdType: 'MSISDN',
         fspId: DFSP_ID
       }]

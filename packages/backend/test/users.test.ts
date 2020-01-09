@@ -50,7 +50,7 @@ describe('Users Service', function () {
 
       expect(postParticipantsMock.mock.calls.length).toBe(1)
       expect(postParticipantsMock.mock.calls[0][0].partyList).toStrictEqual([{
-        partyIdentifier: '+27844444444',
+        partyIdentifier: '27844444444',
         partyIdType: 'MSISDN',
         fspId: 'mojawallet'
       }])
