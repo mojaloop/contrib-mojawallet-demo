@@ -10,7 +10,7 @@ export async function create (ctx: AccountsAppContext): Promise<void> {
   const { body } = ctx.request
   // const payerUserName = (body as TransactionRequestsPostRequest).payer.partyIdentifier
 
-  ctx.logger.info(body, 'transactionRequests received body')
+  ctx.logger.info('transactionRequests received body', body)
 
   // const user = await users.getByUsername(payerUserName)
   // ctx.logger.info(users, 'transactionRequests user')
