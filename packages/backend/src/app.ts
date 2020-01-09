@@ -61,7 +61,11 @@ export function createApp (appConfig: AppConfig): Koa<any, AccountsAppContext> {
     ctx.hydraApi = appConfig.hydraApi
     ctx.mojaloopRequests = appConfig.mojaloopRequests
     ctx.mojaloopService = appConfig.mojaloopService
-    ctx.logger.info(ctx.request.method + ' ' + ctx.request.url, ctx.request.header)
+    await next()
+  })
+
+  app.use(async (ctx, next) => {
+    ctx.logger.info(ctx.request.method + ' ' + ctx.request.url, { body: ctx.request.body, header: ctx.request.header })
     await next()
   })
 
