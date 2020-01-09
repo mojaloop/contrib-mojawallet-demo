@@ -5,22 +5,18 @@ import { TransactionRequestsPostRequest } from '../types/mojaloop'
 
 export async function create (ctx: AccountsAppContext): Promise<void> {
   ctx.logger.info('Create transaction request called')
-  console.log('Create transaction request called')
   const { transactionRequests, quotes, users } = ctx
   const { body } = ctx.request
   const payerUserName = (body as TransactionRequestsPostRequest).payer.partyIdentifier
 
-  ctx.logger.debug('transactionRequests received body', body)
-  console.log('transactionRequests received body', body)
+  ctx.logger.debug(body, 'transactionRequests received body')
 
   const user = await users.getByUsername(payerUserName)
-  ctx.logger.debug('transactionRequests user', user)
-  console.log('transactionRequests user', user)
+  ctx.logger.debug(user, 'transactionRequests user')
 
   try {
     const response = await transactionRequests.create(body, user.id)
-    ctx.logger.debug('transactionRequests called', response)
-    console.log('transactionRequests called', response)
+    ctx.logger.debug(response, 'transactionRequests called')
 
     // potentially change to a queing system for asynchronous responses to avoid unhandled promises
     mojaResponseService.putResponse(
