@@ -15,6 +15,7 @@ import { errorCallback as errorParticipantsCallback, successCallback as successP
 import { create as createTransactionRequest } from './controllers/transactionRequest'
 import { show as showConsent, store as storeConsent } from './controllers/consent'
 import { quoteResponse } from './controllers/quoteResponse'
+import { store as quoteErrorStore } from './controllers/quoteErrors'
 import { create as createOtp, fetch as fetchOtp } from './controllers/otp'
 import { AccountsAppContext } from './index'
 import { HydraApi } from './apis/hydra'
@@ -102,7 +103,9 @@ export function createApp (appConfig: AppConfig): Koa<any, AccountsAppContext> {
   publicRouter.post('/consent', storeConsent)
 
   publicRouter.post('/transactionRequests', createTransactionRequest)
+
   publicRouter.put('/quotes/:id', quoteResponse)
+  publicRouter.put('/quotes/:id/error', quoteErrorStore)
 
   privateRouter.post('/otp', createOtp)
   privateRouter.get('/otp', fetchOtp)

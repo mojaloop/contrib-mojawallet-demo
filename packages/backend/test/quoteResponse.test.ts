@@ -123,3 +123,37 @@ describe('Response from switch after a quote is sent', () => {
     })
   })
 })
+
+describe('Quote Error Endpoint', () => {
+  let appContainer: TestAppContainer
+  let validQuote: QuotesPostRequest
+  let validQuoteResponse: QuoteResponse
+  let invalidQuoteResponse: QuoteResponse
+
+  beforeAll(async () => {
+    appContainer = createTestApp()
+  })
+
+  beforeEach(async () => {
+    await appContainer.knex.migrate.latest()
+  })
+
+  afterEach(async () => {
+    jest.clearAllMocks()
+    await appContainer.knex.migrate.rollback()
+  })
+
+  afterAll(async () => {
+    await appContainer.knex.destroy()
+    appContainer.server.close()
+  })
+
+  test('Should return 200 status for quote error', async () => {
+    const response = await axios.put(`http://localhost:${appContainer.port}/quotes/randomId/error`, {
+      error: {}
+    })
+
+    expect(response.status).toBe(200)
+  })
+
+})
