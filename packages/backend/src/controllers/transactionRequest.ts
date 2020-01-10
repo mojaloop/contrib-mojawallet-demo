@@ -28,7 +28,7 @@ export async function create (ctx: AccountsAppContext): Promise<void> {
     const quoteTools = new QuoteTools(body)
     const quoteResponse = await quotes.add(quoteTools.getQuote())
     ctx.logger.info('quoteResponse received body', quoteResponse)
-    const serviceResponse = mojaResponseService.quoteResponse(quoteTools.getQuote(), destFspId)
+    const serviceResponse = await mojaResponseService.quoteResponse(quoteTools.getQuote(), destFspId)
     ctx.logger.info('serviceResponse received body', serviceResponse)
   } catch (error) {
     ctx.logger.error(error, 'Error in transactionRequests')
