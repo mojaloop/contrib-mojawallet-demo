@@ -3,6 +3,10 @@ import { QuoteTools } from '../services/quote-service'
 import { mojaResponseService } from '../services/mojaResponseService'
 import { TransactionRequestsPostRequest } from '../types/mojaloop'
 
+const sleep = (ms: number): Promise<void> => {
+  return new Promise(resolve => setTimeout(resolve, ms))
+}
+
 export async function create (ctx: AccountsAppContext): Promise<void> {
   const { transactionRequests, quotes, users, mojaloopRequests } = ctx
   const { body } = ctx.request
@@ -25,7 +29,7 @@ export async function create (ctx: AccountsAppContext): Promise<void> {
     )
   } catch (error) {
     ctx.logger.error(error, 'Error in transactionRequests')
-    mojaResponseService.putErrorResponse(
+    await mojaResponseService.putErrorResponse(
       {
         errorInformation: {
           errorCode: '3100',
@@ -40,6 +44,7 @@ export async function create (ctx: AccountsAppContext): Promise<void> {
   if (transactionId) {
     try {
       ctx.logger.info('Quote flow started.')
+      await sleep(100)
       const quoteTools = new QuoteTools(body, transactionId.transactionId)
       const quoteResponse = await quotes.add(quoteTools.getQuote())
       ctx.logger.info('quoteResponse received body', quoteResponse)
