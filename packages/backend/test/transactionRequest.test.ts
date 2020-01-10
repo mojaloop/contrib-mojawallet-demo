@@ -28,7 +28,7 @@ describe('Transaction Request Test', () => {
       },
       payer: {
         partyIdType: 'MSISDN',
-        partyIdentifier: '+27123456789'
+        partyIdentifier: '27123456789'
       },
       amount: {
         currency: 'USD',
@@ -50,7 +50,7 @@ describe('Transaction Request Test', () => {
       },
       payer: {
         partyIdType: 'MSISDN',
-        partyIdentifier: '+27123456789'
+        partyIdentifier: '27123456789'
       },
       amount: {
         currency: 'USD',

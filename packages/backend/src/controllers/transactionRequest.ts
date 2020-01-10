@@ -9,7 +9,7 @@ export async function create (ctx: AccountsAppContext): Promise<void> {
   const destFspId = ctx.get('fspiop-source')
   const payerUserName = (body as TransactionRequestsPostRequest).payer.partyIdentifier
 
-  const user = await users.getByUsername(payerUserName)
+  const user = await users.getByUsername('+' + payerUserName)
   ctx.status = 200
   let transactionId
   try {
