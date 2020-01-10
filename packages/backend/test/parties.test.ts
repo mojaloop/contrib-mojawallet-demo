@@ -47,4 +47,16 @@ describe('Parties Request Test', () => {
       }, 'MobileMoney')
     })
   })
+
+  describe('Handling a parties put response', () => {
+    test('Handling a success response', async () => {
+      const response = await axios.put(`http://localhost:${appContainer.port}/parties/msisdn/27123456789`)
+      expect(response.status).toEqual(200)
+    })
+    
+    test('Handling a failed response', async () => {
+      const response = await axios.put(`http://localhost:${appContainer.port}/parties/msisdn/27123456789/error`)
+      expect(response.status).toEqual(200)
+    })
+  })
 })
