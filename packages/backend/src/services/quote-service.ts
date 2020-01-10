@@ -1,22 +1,6 @@
-import { TransactionRequestsPostRequest, PartyIdInfo, Party, Money, TransactionType, GeoCode, ExtensionList } from '../types/mojaloop'
+import { TransactionRequestsPostRequest, QuotesPostRequest } from '../types/mojaloop'
 import Knex = require('knex')
 import uuidv4 = require('uuid/v4')
-
-export type Quote = {
-  quoteId: string;
-  transactionId: string;
-  transactionRequestId?: string;
-  payee: Party;
-  payer: PartyIdInfo;
-  amountType: 'SEND' | 'RECEIVE';
-  amount: Money;
-  fees?: Money;
-  transactionType: TransactionType;
-  geoCode?: GeoCode;
-  note?: string;
-  expiration?: string;
-  extensionList?: ExtensionList;
-}
 
 export type MojaQuoteObj = {
   id: number;
@@ -35,7 +19,7 @@ type MojaQuoteProps = {
 }
 
 export class QuoteTools {
-  private _quote: Quote
+  private _quote: QuotesPostRequest
   private _serializedQuote: string
 
   constructor (transactionReq: TransactionRequestsPostRequest) {
@@ -44,7 +28,7 @@ export class QuoteTools {
       transactionId: uuidv4(),
       transactionRequestId: transactionReq.transactionRequestId,
       payee: transactionReq.payee,
-      payer: transactionReq.payer,
+      payer: { partyIdInfo: transactionReq.payer },
       amountType: 'RECEIVE', // RECEIVE or SEND
       amount: transactionReq.amount,
       transactionType: transactionReq.transactionType,
@@ -62,7 +46,7 @@ export class QuoteTools {
     return (expiry.toISOString())
   }
 
-  getQuote (): Quote {
+  getQuote (): QuotesPostRequest {
     return (this._quote)
   }
 
@@ -77,7 +61,7 @@ export class KnexQuoteService {
     this._knex = knex
   }
 
-  async add (quote: Quote): Promise<MojaQuoteObj> {
+  async add (quote: QuotesPostRequest): Promise<MojaQuoteObj> {
     const insertedQuote = await this._knex<MojaQuoteObj>('mojaQuote').insert({
       quoteId: quote.quoteId,
       transactionId: quote.transactionId,
