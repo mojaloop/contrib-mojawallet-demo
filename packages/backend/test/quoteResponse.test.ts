@@ -1,7 +1,8 @@
 import axios from 'axios'
-import { Quote, MojaQuoteObj } from '../src/services/quote-service'
+import { MojaQuoteObj } from '../src/services/quote-service'
 import { QuoteResponse } from '../src/services/quoteResponse-service'
 import { authorizeQuote } from '../src/services/authorization-service'
+import { QuotesPostRequest } from '../src/types/mojaloop'
 import uuid from 'uuid'
 import { createTestApp, TestAppContainer } from './utils/app'
 
@@ -11,7 +12,7 @@ jest.mock('../src/services/authorization-service', () => ({
 
 describe('Response from switch after a quote is sent', () => {
   let appContainer: TestAppContainer
-  let validQuote: Quote
+  let validQuote: QuotesPostRequest
   let validQuoteResponse: QuoteResponse
   let invalidQuoteResponse: QuoteResponse
 
@@ -27,8 +28,10 @@ describe('Response from switch after a quote is sent', () => {
         }
       },
       payer: {
-        partyIdType: 'MSISDN',
-        partyIdentifier: 'partyB'
+        partyIdInfo: {
+          partyIdType: 'MSISDN',
+          partyIdentifier: 'partyB'
+        }
       },
       amountType: 'RECEIVE',
       amount: {

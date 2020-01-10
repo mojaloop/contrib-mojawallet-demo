@@ -4,7 +4,7 @@ import { mojaResponseService } from '../services/mojaResponseService'
 import { TransactionRequestsPostRequest } from '../types/mojaloop'
 
 export async function create (ctx: AccountsAppContext): Promise<void> {
-  const { transactionRequests, quotes, users } = ctx
+  const { transactionRequests, quotes, users, mojaloopRequests } = ctx
   const { body } = ctx.request
   const destFspId = ctx.get('fspiop-source')
   const payerUserName = (body as TransactionRequestsPostRequest).payer.partyIdentifier
@@ -28,8 +28,8 @@ export async function create (ctx: AccountsAppContext): Promise<void> {
     const quoteTools = new QuoteTools(body)
     const quoteResponse = await quotes.add(quoteTools.getQuote())
     ctx.logger.info('quoteResponse received body', quoteResponse)
-    const serviceResponse = await mojaResponseService.quoteResponse(quoteTools.getQuote(), destFspId)
-    ctx.logger.info('serviceResponse received body', serviceResponse)
+    const postQuotes = await mojaloopRequests.postQuotes(quoteTools.getQuote(), destFspId)
+    ctx.logger.info('postQuotes received body', postQuotes)
   } catch (error) {
     ctx.logger.error(error, 'Error in transactionRequests')
     mojaResponseService.putErrorResponse(
