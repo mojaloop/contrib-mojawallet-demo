@@ -144,14 +144,13 @@ describe('Quotes service', () => {
     afterAll(async () => {})
 
     test('should generate a quote object from a valid transaction request id', async () => {
-      const quoteTools = new QuoteTools(validRequest)
-
+      const quoteTools = new QuoteTools(validRequest, 'transactionId')
       expect(quoteTools).toBeDefined()
       expect(quoteTools.getQuote().quoteId.match(/^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/)).toBeDefined()
     })
 
     test('should return a serialized quote object', async () => {
-      const quoteTools = new QuoteTools(validRequest)
+      const quoteTools = new QuoteTools(validRequest, 'transactionId')
 
       expect(quoteTools.getSerializedQuote()).toBeDefined()
       expect(quoteTools.getSerializedQuote()).toEqual(JSON.stringify(quoteTools.getQuote()))
