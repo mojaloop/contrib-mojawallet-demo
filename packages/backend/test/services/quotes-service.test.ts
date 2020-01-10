@@ -1,11 +1,11 @@
 import Knex from 'knex'
-import { Quote, KnexQuoteService, QuoteTools } from '../../src/services/quote-service'
-import { TransactionRequestsPostRequest } from '../../src/types/mojaloop'
+import { KnexQuoteService, QuoteTools } from '../../src/services/quote-service'
+import { TransactionRequestsPostRequest, QuotesPostRequest } from '../../src/types/mojaloop'
 import { QuoteResponse } from 'packages/backend/src/services/quoteResponse-service'
 
 describe('Quotes service', () => {
   let knex: Knex
-  let quote: Quote
+  let quote: QuotesPostRequest
   let quoteService: KnexQuoteService
   let validQuoteResponse: QuoteResponse
 
@@ -29,8 +29,10 @@ describe('Quotes service', () => {
           }
         },
         payer: {
-          partyIdType: 'MSISDN',
-          partyIdentifier: 'party2'
+          partyIdInfo: {
+            partyIdType: 'MSISDN',
+            partyIdentifier: 'party2'
+          }
         },
         amountType: 'RECEIVE',
         amount: {

@@ -1,5 +1,6 @@
 import { QuoteResponse, QuoteResponseTool } from '../../src/services/quoteResponse-service'
-import { KnexQuoteService, Quote } from '../../src/services/quote-service'
+import { KnexQuoteService } from '../../src/services/quote-service'
+import { QuotesPostRequest } from '../../src/types/mojaloop'
 import { authorizeQuote } from '../../src/services/authorization-service'
 import Knex = require('knex')
 
@@ -10,7 +11,7 @@ jest.mock('../../src/services/authorization-service', () => ({
 describe('Quote response service tests', () => {
   let knex: Knex
   let knexQuoteService: KnexQuoteService
-  let validQuote: Quote
+  let validQuote: QuotesPostRequest
   let validQuoteResponse: QuoteResponse
   let invalidQuoteResponse: QuoteResponse
 
@@ -32,8 +33,10 @@ describe('Quote response service tests', () => {
         }
       },
       payer: {
-        partyIdType: 'MSISDN',
-        partyIdentifier: 'party2'
+        partyIdInfo: {
+          partyIdType: 'MSISDN',
+          partyIdentifier: 'party2'
+        }
       },
       amountType: 'RECEIVE',
       amount: {
