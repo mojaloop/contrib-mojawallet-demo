@@ -1,6 +1,5 @@
 import got, { Response } from 'got'
 import { ExtensionList } from './transaction-request-service'
-import { Quote } from './quote-service'
 
 const baseMojaUrl: string = process.env.PUT_BASE_URI || 'http://localhost:8008' // base uri for testing
 
@@ -21,7 +20,6 @@ export type TransactionRequestError = {
 export interface MojaResponseService {
   putResponse: (responseObj: TransactionMojaResponse, transactionRequestId: string, destFspId: string) => Promise<Response>;
   putErrorResponse: (responseObj: TransactionRequestError, transactionRequestId: string, destFspId: string) => Promise<Response>;
-  quoteResponse: (responseObj: Quote, destFspId: string) => Promise<Response>;
 }
 
 export const mojaResponseService: MojaResponseService = {
@@ -40,16 +38,6 @@ export const mojaResponseService: MojaResponseService = {
     return got.put(putUri.href, { json: responseObj,
       headers: {
         'Content-Type': 'application/vnd.interoperability.transactionRequests+json;version=1.0',
-        'FSPIOP-Source': 'mojawallet',
-        'FSPIOP-Destination': destFspId
-      }
-    })
-  },
-  quoteResponse: function (responseObj: Quote, destFspId: string) {
-    const quoteUri = new URL('/quotes', baseMojaUrl)
-    return got.post(quoteUri.href, { json: responseObj,
-      headers: {
-        'Content-Type': 'application/vnd.interoperability.quotes+json;version=1.0',
         'FSPIOP-Source': 'mojawallet',
         'FSPIOP-Destination': destFspId
       }

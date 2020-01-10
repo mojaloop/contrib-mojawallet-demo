@@ -3,7 +3,6 @@ import Router from '@koa/router'
 import { Server } from 'http'
 import cors from '@koa/cors'
 import { mojaResponseService } from '../../src/services/mojaResponseService'
-import { QuoteTools } from '../../src/services/quote-service'
 
 describe('Moja response services test', () => {
   let switchServer: Server
@@ -73,43 +72,6 @@ describe('Moja response services test', () => {
           'transactionRequest-id here',
           'mojaloop'
         )
-        .then(response => {
-          expect(response.statusCode).toEqual(200)
-        })
-        .catch(() => {
-          expect(true).toEqual(false)
-        })
-        // setTimeout(() => {
-        //   done()
-        // }, 1000);
-      await sleep(300, done)
-    })
-
-    test('Should submit a quote', async (done) => {
-      const quoteTools = new QuoteTools({
-        transactionRequestId: 'ca919568-e559-42a8-b763-1be22179decc',
-        payee: {
-          partyIdInfo: {
-            partyIdType: 'MSISDN',
-            partyIdentifier: 'party1'
-          }
-        },
-        payer: {
-          partyIdType: 'MSISDN',
-          partyIdentifier: 'party2'
-        },
-        amount: {
-          currency: 'USD',
-          amount: '20'
-        },
-        transactionType: {
-          scenario: 'DEPOSIT',
-          initiator: 'PAYER',
-          initiatorType: 'CONSUMER'
-        }
-      })
-      mojaResponseService
-        .quoteResponse(quoteTools.getQuote(), 'mojaloop')
         .then(response => {
           expect(response.statusCode).toEqual(200)
         })
