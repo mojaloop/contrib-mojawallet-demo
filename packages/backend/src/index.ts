@@ -19,6 +19,7 @@ const PORT = process.env.PORT || 3001
 const KNEX_CLIENT = process.env.KNEX_CLIENT || 'sqlite3'
 const DFSP_ID = process.env.DFSP_ID || 'mojawallet'
 const ALS_ENDPOINT = process.env.ALS_ENDPOINT || 'account-lookup-service.iso-demo.openafrica.network'
+const QUOTES_ENDPOINT = process.env.ALS_ENDPOINT || 'quoting-service.iso-demo.openafrica.network'
 
 export interface AccountsAppContext extends Context {
   accounts: KnexAccountService;
@@ -60,6 +61,7 @@ const mojaloopRequests = new MojaloopRequests({
   jwsSigningKey: 'dummykey',
   logger: console,
   peerEndpoint: ALS_ENDPOINT,
+  quotesEndpoint: QUOTES_ENDPOINT,
   alsEndpoint: ALS_ENDPOINT,
   tls: { outbound: { mutualTLS: { enabled: false } } },
   // TODO: Hack until fix is pushed
