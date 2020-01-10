@@ -110,14 +110,14 @@ export async function store (ctx: AccountsAppContext): Promise<void> {
     await mojaloopRequests.postParticipants({
       requestId: v4(),
       partyList: [{
-        partyIdentifier: username,
+        partyIdentifier: username.replace('+', ''),
         partyIdType: 'MSISDN',
         fspId: DFSP_ID
       }]
     }).then(() => {
       logger.info('User submitted to Mojawallet and to ALS')
     }).catch(error => {
-      logger.error('Error adding participant to ALS', error.requestError.name, error.reqestError.message)
+      logger.error('Error adding participant to ALS', error.response)
     })
 
     ctx.body = {

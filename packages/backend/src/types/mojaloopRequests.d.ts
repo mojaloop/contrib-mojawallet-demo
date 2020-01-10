@@ -54,13 +54,13 @@ declare module '@mojaloop/sdk-standard-components' {
   class MojaloopRequests {
     constructor(config: Config)
 
-    getParties(idType: string, idValue: string): Promise<object>
-    putParties(idType: string, idValue: string, body: object, destFspId: string): Promise<object>
-    putPartiesError(idType: string, idValue: string, error: object, destFspId: string): Promise<object>
+    getParties(idType: string, idValue: string, idSubValue: string | null): Promise<object>
+    putParties(idType: string, idValue: string, idSubValue: string | null, body: object, destFspId: string): Promise<object>
+    putPartiesError(idType: string, idValue: string, idSubValue: string | null, error: object, destFspId: string): Promise<object>
 
     postParticipants(request: BulkParticipantsRequest, destFspId?: string): Promise<object>
-    putParticipants(idType: string, idValue: string, body: object, destFspId: string): Promise<object>
-    putParticipantsError(idType: string, idValue: string, error: object, destFspId: string): Promise<object>
+    putParticipants(idType: string, idValue: string, idSubValue: string | null, body: object, destFspId: string): Promise<object>
+    putParticipantsError(idType: string, idValue: string, idSubValue: string | null, error: object, destFspId: string): Promise<object>
 
     postQuotes(quoteRequest: object, destFspId: string): Promise<object>
     putQuotes(quoteId: string, quoteResponse: object, destFspId: string): Promise<object>

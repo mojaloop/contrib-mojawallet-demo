@@ -8,7 +8,7 @@ export async function show (ctx: AccountsAppContext): Promise<void> {
   const destFspId = ctx.get('fspiop-source')
   const user = await users.getByUsername('+' + msisdnNumber)
   if (user) {
-    await mojaloopRequests.putParties('MSISDN', msisdnNumber, {
+    await mojaloopRequests.putParties('MSISDN', msisdnNumber, null, {
       party: {
         partyIdInfo: {
           partyIdType: 'MSISDN',
