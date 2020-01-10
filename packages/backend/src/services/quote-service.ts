@@ -22,10 +22,10 @@ export class QuoteTools {
   private _quote: QuotesPostRequest
   private _serializedQuote: string
 
-  constructor (transactionReq: TransactionRequestsPostRequest) {
+  constructor (transactionReq: TransactionRequestsPostRequest, transactionId: string) {
     this._quote = {
       quoteId: uuidv4(),
-      transactionId: uuidv4(),
+      transactionId: transactionId,
       transactionRequestId: transactionReq.transactionRequestId,
       payee: transactionReq.payee,
       payer: { partyIdInfo: transactionReq.payer },

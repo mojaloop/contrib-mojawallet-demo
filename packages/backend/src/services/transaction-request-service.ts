@@ -1,6 +1,7 @@
 import Joi, { ValidationResult } from 'joi'
 import Knex from 'knex'
 import { TransactionRequestsPostRequest } from '../types/mojaloop'
+import uuidv4 = require('uuid/v4')
 
 export type RequestId = string;
 export type AuthenticationType = 'OTP' | 'QRCODE';
@@ -12,6 +13,7 @@ export type ExtensionList = MojaExtension[];
 
 export type StoredRequest = {
   id: number;
+  transactionId: string;
   transactionRequestId: string;
   serializedRequest: string;
   valid: boolean;
@@ -136,17 +138,19 @@ export class KnexTransactionRequestService {
     const transactionRequestTools = new TransactionRequestTools(transactionRequest)
 
     const insertedRequest = await this._knex<StoredRequest>('mojaTransactionRequest').insert({
+      transactionId: uuidv4(),
       transactionRequestId: transactionRequestTools.getRequestId(),
       serializedRequest: transactionRequestTools.getSerializedRequest(),
       valid: transactionRequestTools.getValidStatus(),
       userId
-    }).returning(['id', 'transactionRequestId', 'serializedRequest', 'valid', 'userId']) // returning not supported by sqlite3
+    }).then((ids) => {
+      return this._knex<StoredRequest>('mojaTransactionRequest').where('id', ids[0]).first()
+    }) // returning not supported by sqlite3
 
     if (!insertedRequest) {
       throw new Error('Inserted request returned null')
     }
-
-    return (insertedRequest[0])
+    return (insertedRequest)
   }
 
   async getByRequestId (requestId: string): Promise<StoredRequest | undefined> {

@@ -11,13 +11,14 @@ export async function create (ctx: AccountsAppContext): Promise<void> {
 
   const user = await users.getByUsername(payerUserName)
   ctx.status = 200
-
+  let transactionId
   try {
-    await transactionRequests.create(body, user.id)
+    transactionId = await transactionRequests.create(body, user.id)
     // potentially change to a queing system for asynchronous responses to avoid unhandled promises
     await mojaResponseService.putResponse(
       {
-        transactionRequestState: 'RECEIVED'
+        transactionRequestState: 'RECEIVED',
+        transactionId: transactionId.transactionId
       },
       body.transactionRequestId,
       destFspId
@@ -36,14 +37,16 @@ export async function create (ctx: AccountsAppContext): Promise<void> {
       destFspId
     )
   }
-  try {
-    ctx.logger.info('Quote flow started.')
-    const quoteTools = new QuoteTools(body)
-    const quoteResponse = await quotes.add(quoteTools.getQuote())
-    ctx.logger.info('quoteResponse received body', quoteResponse)
-    const postQuotes = await mojaloopRequests.postQuotes(quoteTools.getQuote(), destFspId)
-    ctx.logger.info('postQuotes received body', postQuotes)
-  } catch (error) {
-    ctx.logger.error(error, 'Error in transactionRequests')
+  if (transactionId) {
+    try {
+      ctx.logger.info('Quote flow started.')
+      const quoteTools = new QuoteTools(body, transactionId.transactionId)
+      const quoteResponse = await quotes.add(quoteTools.getQuote())
+      ctx.logger.info('quoteResponse received body', quoteResponse)
+      const postQuotes = await mojaloopRequests.postQuotes(quoteTools.getQuote(), destFspId)
+      ctx.logger.info('postQuotes received body', postQuotes)
+    } catch (error) {
+      ctx.logger.error(error, 'Error in transactionRequests')
+    }
   }
 }

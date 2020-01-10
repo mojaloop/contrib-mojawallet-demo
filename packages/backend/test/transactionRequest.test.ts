@@ -87,11 +87,13 @@ describe('Transaction Request Test', () => {
         headers: { 'Content-Type': 'application/vnd.interoperability.transactionRequests+json;version=1.0', 'FSPIOP-Source': 'mojawallet' }
       })
       const storedRequest = await appContainer.transactionRequestService.getByRequestId(validRequest.transactionRequestId)
+      // console.log(storedRequest)
       if (storedRequest) {
         expect(response.status).toEqual(200)
         expect(storedRequest.transactionRequestId).toEqual(validRequest.transactionRequestId)
         expect(storedRequest.userId).toEqual(1)
         expect(mojaResponseService.putResponse).toHaveBeenCalledWith({
+          transactionId: storedRequest.transactionId,
           transactionRequestState: 'RECEIVED'
         }, validRequest.transactionRequestId,
         'mojawallet')
