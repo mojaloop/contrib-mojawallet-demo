@@ -14,7 +14,7 @@ describe('Response from switch after a quote is sent', () => {
   let appContainer: TestAppContainer
   let validQuote: QuotesPostRequest
   let validQuoteResponse: QuoteResponse
-  let invalidQuoteResponse: QuoteResponse
+  // let invalidQuoteResponse: QuoteResponse
 
   beforeAll(async () => {
     appContainer = createTestApp()
@@ -53,15 +53,15 @@ describe('Response from switch after a quote is sent', () => {
       ilpPacket: 'abc123',
       condition: '1234567890123456789012345678901234567890123'
     }
-    invalidQuoteResponse = {
-      transferAmount: {
-        currency: 'USD',
-        amount: '20'
-      },
-      expiration: 'asd',
-      ilpPacket: 'abc123',
-      condition: '1234567890123456789012345678901234567890123'
-    }
+    // invalidQuoteResponse = {
+    //   transferAmount: {
+    //     currency: 'USD',
+    //     amount: '20'
+    //   },
+    //   expiration: 'asd',
+    //   ilpPacket: 'abc123',
+    //   condition: '1234567890123456789012345678901234567890123'
+    // }
   })
 
   beforeEach(async () => {
@@ -93,23 +93,23 @@ describe('Response from switch after a quote is sent', () => {
       }
     })
 
-    test('Should return 400 status and not initiate Authorization on invalid quote response', async () => {
-      await appContainer.quoteService.add(validQuote)
-      axios.put(`http://localhost:${appContainer.port}/quotes/${validQuote.quoteId}`, invalidQuoteResponse)
-        .then(response => {
-          expect(true).toEqual(false)
-        })
-        .catch(async error => {
-          expect(error.response.status).toEqual(400)
-          const retrievedQuote = await appContainer.knex<MojaQuoteObj>('mojaQuote').where({ quoteId: validQuote.quoteId }).first()
-          if (retrievedQuote) {
-            expect(retrievedQuote.quoteResponse).toEqual(null)
-            expect(authorizeQuote).toBeCalledTimes(0)
-          } else {
-            expect(true).toEqual(false)
-          }
-        })
-    })
+    // test('Should return 400 status and not initiate Authorization on invalid quote response', async () => {
+    //   await appContainer.quoteService.add(validQuote)
+    //   axios.put(`http://localhost:${appContainer.port}/quotes/${validQuote.quoteId}`, invalidQuoteResponse)
+    //     .then(response => {
+    //       expect(true).toEqual(false)
+    //     })
+    //     .catch(async error => {
+    //       expect(error.response.status).toEqual(400)
+    //       const retrievedQuote = await appContainer.knex<MojaQuoteObj>('mojaQuote').where({ quoteId: validQuote.quoteId }).first()
+    //       if (retrievedQuote) {
+    //         expect(retrievedQuote.quoteResponse).toEqual(null)
+    //         expect(authorizeQuote).toBeCalledTimes(0)
+    //       } else {
+    //         expect(true).toEqual(false)
+    //       }
+    //     })
+    // })
 
     test('Should return 404 status and not initiate Authorization on unknown quote id', async () => {
       axios.put(`http://localhost:${appContainer.port}/quotes/${uuid.v4}`, validQuoteResponse)
@@ -126,9 +126,9 @@ describe('Response from switch after a quote is sent', () => {
 
 describe('Quote Error Endpoint', () => {
   let appContainer: TestAppContainer
-  let validQuote: QuotesPostRequest
-  let validQuoteResponse: QuoteResponse
-  let invalidQuoteResponse: QuoteResponse
+  // let validQuote: QuotesPostRequest
+  // let validQuoteResponse: QuoteResponse
+  // let invalidQuoteResponse: QuoteResponse
 
   beforeAll(async () => {
     appContainer = createTestApp()
@@ -155,5 +155,4 @@ describe('Quote Error Endpoint', () => {
 
     expect(response.status).toBe(200)
   })
-
 })
