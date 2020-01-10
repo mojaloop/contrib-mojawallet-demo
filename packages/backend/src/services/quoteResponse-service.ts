@@ -1,6 +1,6 @@
 import { ExtensionList } from './transaction-request-service'
 import { Money, GeoCode } from '../types/mojaloop'
-import Joi from 'joi'
+import Joi, { ValidationResult } from 'joi'
 import { authorizeQuote } from './authorization-service'
 
 export type QuoteResponse = {
@@ -22,12 +22,13 @@ export class QuoteResponseTool {
   constructor (quoteResponse: QuoteResponse, quoteId: string) {
     this._quoteResponse = quoteResponse
     this._quoteId = quoteId
-    if (!this.isValidQuoteResponse(quoteResponse)) {
-      throw new Error('Bad quote response')
+    if (this.isValidQuoteResponse(quoteResponse).error) {
+      console.log(this.isValidQuoteResponse(quoteResponse).error)
+      throw new Error('Bad quote response:' + this.isValidQuoteResponse(quoteResponse).error.toString())
     }
   }
 
-  private isValidQuoteResponse (quoteResponse: QuoteResponse): boolean {
+  private isValidQuoteResponse (quoteResponse: QuoteResponse): ValidationResult<object> {
     const moneySchema = Joi.object({
       currency: Joi.string().regex(/^[A-Z]{3}/).required(),
       amount: Joi.string().regex(/^([0]|([1-9][0-9]{0,17}))([.][0-9]{0,3}[1-9])?$/).required()
@@ -61,11 +62,7 @@ export class QuoteResponseTool {
       extensionList: extensionListSchema
     })
 
-    if (Joi.validate(quoteResponse, quoteResponseSchema).error) {
-      return false
-    } else {
-      return true
-    }
+    return Joi.validate(quoteResponse, quoteResponseSchema)
   }
 
   initAuthorization () {
