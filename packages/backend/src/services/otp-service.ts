@@ -1,5 +1,11 @@
 import Knex = require('knex')
 
+export type OtpProps = {
+  userId: string,
+  expiresAt: number,
+  isUsed: boolean
+}
+
 export type Otp = {
   userId: string,
   accountId: string;
@@ -64,5 +70,14 @@ export class KnexOtpService {
       .andWhere('expiresAt', '>', Math.floor(Date.now() / 1000))
       .first()
     return (retrievedOtp)
+  }
+
+  async update (otpProps: OtpProps): Promise<void> {
+    await this._knex<Otp>('mojaOtp')
+      .where({ userId: otpProps.userId })
+      .update({
+        isUsed: otpProps.isUsed,
+        expiresAt: otpProps.expiresAt
+      })
   }
 }
