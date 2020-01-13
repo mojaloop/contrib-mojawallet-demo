@@ -28,9 +28,11 @@ export class KnexMojaloopService implements MojaloopService {
   async getAuthorization (transactionRequestId: string, transferAmount: Money): Promise<AxiosResponse> {
     const url = new URL(`/authorizations/${transactionRequestId}?authenticationType=OTP&retriesLeft=1&amount=${transferAmount.amount}&currency=${transferAmount.currency}`, baseMojaUrl)
     return axios.get(url.toString(), {
-      // headers: {
-      //   authorization: 'Bearer ' + token
-      // },
+      headers: {
+        'fspiop-source': 'mojawallet',
+        'fspiop-destination': 'adaptor',
+        'Content-Type': 'application/vnd.interoperability.authorizations+json;version=1.0'
+      },
       timeout: 5000
     }).then(resp => resp.data)
   }
