@@ -2,9 +2,13 @@ import Knex from 'knex'
 import { MojaloopRequests, PostTransferBody } from '@mojaloop/sdk-standard-components'
 import { KnexOtpService } from './otp-service'
 import { StoredRequest } from './transaction-request-service'
+import axios, { AxiosResponse } from 'axios'
+import { Money } from '../types/mojaloop'
+
+const baseMojaUrl: string = process.env.PUT_BASE_URI || 'http://localhost:8008'
 
 export interface MojaloopService {
-  getAuthorization: (transactionRequestId: string) => Promise<void>
+  getAuthorization: (transactionRequestId: string, transferAmount: Money) => Promise<AxiosResponse>
   validateTransactionOTP: (transactionRequestId: string, OTP: string) => Promise<boolean>
   initiateTransfer: (transactionRequestId: string) => Promise<void>
 }
@@ -21,8 +25,14 @@ export class KnexMojaloopService implements MojaloopService {
   }
 
   // Initiate the GET request to the Mojaloop Switch
-  async getAuthorization (transactionRequestId: string): Promise<void> {
-    return Promise.resolve()
+  async getAuthorization (transactionRequestId: string, transferAmount: Money): Promise<AxiosResponse> {
+    const url = new URL(`/authorizations/${transactionRequestId}?authenticationType=OTP&retriesLeft=1&amount=${transferAmount.amount}&currency=${transferAmount.currency}`, baseMojaUrl)
+    return axios.get(url.toString(), {
+      // headers: {
+      //   authorization: 'Bearer ' + token
+      // },
+      timeout: 5000
+    }).then(resp => resp.data)
   }
 
   async validateTransactionOTP (transactionRequestId: string, OTP: string): Promise<boolean> {
