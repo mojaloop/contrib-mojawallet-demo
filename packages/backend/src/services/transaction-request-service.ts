@@ -159,4 +159,11 @@ export class KnexTransactionRequestService {
       .first()
     return (retrievedRequest)
   }
+
+  async getByTransactionId (id: string): Promise<StoredRequest | undefined> {
+    const retrievedRequest = await this._knex<StoredRequest>('mojaTransactionRequest')
+      .where({ transactionId: id })
+      .first()
+    return (retrievedRequest)
+  }
 }
