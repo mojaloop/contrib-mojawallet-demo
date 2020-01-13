@@ -35,7 +35,7 @@ describe('Parties Request Test', () => {
           'fspiop-destination': 'mojawallet'
         }
       })
-      expect(response.status).toEqual(200)
+      expect(response.status).toEqual(202)
       expect(mock).toHaveBeenCalledWith('MSISDN', '27123456789', null, {
         party: {
           partyIdInfo: {
@@ -53,7 +53,7 @@ describe('Parties Request Test', () => {
       const response = await axios.put(`http://localhost:${appContainer.port}/parties/msisdn/27123456789`)
       expect(response.status).toEqual(200)
     })
-    
+
     test('Handling a failed response', async () => {
       const response = await axios.put(`http://localhost:${appContainer.port}/parties/msisdn/27123456789/error`)
       expect(response.status).toEqual(200)
