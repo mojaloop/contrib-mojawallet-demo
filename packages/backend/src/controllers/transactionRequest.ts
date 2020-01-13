@@ -14,7 +14,7 @@ export async function create (ctx: AccountsAppContext): Promise<void> {
   const payerUserName = (body as TransactionRequestsPostRequest).payer.partyIdentifier
 
   const user = await users.getByUsername('+' + payerUserName)
-  ctx.status = 200
+  ctx.status = 202
   let transactionId
   try {
     transactionId = await transactionRequests.create(body, user.id)

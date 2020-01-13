@@ -18,7 +18,7 @@ export async function show (ctx: AccountsAppContext): Promise<void> {
       }
     }, destFspId)
   }
-  ctx.status = 200
+  ctx.status = 202
 }
 
 export async function successCallback (ctx: AccountsAppContext): Promise<void> {

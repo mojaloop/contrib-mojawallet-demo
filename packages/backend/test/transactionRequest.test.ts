@@ -89,7 +89,7 @@ describe('Transaction Request Test', () => {
       const storedRequest = await appContainer.transactionRequestService.getByRequestId(validRequest.transactionRequestId)
       // console.log(storedRequest)
       if (storedRequest) {
-        expect(response.status).toEqual(200)
+        expect(response.status).toEqual(202)
         expect(storedRequest.transactionRequestId).toEqual(validRequest.transactionRequestId)
         expect(storedRequest.userId).toEqual(1)
         expect(mojaResponseService.putResponse).toHaveBeenCalledWith({
