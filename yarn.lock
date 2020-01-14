@@ -1091,10 +1091,10 @@
     npmlog "^4.1.2"
     write-file-atomic "^2.3.0"
 
-"@mojaloop/sdk-standard-components@^8.6.2":
-  version "8.6.2"
-  resolved "https://registry.yarnpkg.com/@mojaloop/sdk-standard-components/-/sdk-standard-components-8.6.2.tgz#bcb3f5035cd3026119807e72c2fa2087e8375baa"
-  integrity sha512-SBZu3Bp2Dfdj2AMynZCcceu4J7k/w7Wox8HZEIFmN5sGrouVKIHAnK4sFjFttOAsWxG8NFSUMG55KBiD8quh6w==
+"@mojaloop/sdk-standard-components@8.6.8":
+  version "8.6.8"
+  resolved "https://registry.yarnpkg.com/@mojaloop/sdk-standard-components/-/sdk-standard-components-8.6.8.tgz#4ed6e49accb238e38538ebe9f3debd52b6f3b073"
+  integrity sha512-8fp+lEfXM3H4AXA6jGHyzb60ctRVtRQ34JgALW265ecfxBdkL2uxJ70lw3tiI9aPXx5IvSgMYLZjfSpHAgajKw==
   dependencies:
     base64url "^3.0.1"
     ilp-packet "2.2.0"

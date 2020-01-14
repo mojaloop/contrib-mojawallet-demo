@@ -65,4 +65,18 @@ export class KnexOtpService {
       .first()
     return (retrievedOtp)
   }
+
+  async markUsed (userId: string): Promise<number> {
+    const retrievedOtp = await this._knex<Otp>('mojaOtp')
+      .where({
+        userId,
+        isUsed: false
+      })
+      .andWhere('expiresAt', '>', Math.floor(Date.now() / 1000))
+      .first()
+      .update({
+        isUsed: true
+      })
+    return (retrievedOtp)
+  }
 }
