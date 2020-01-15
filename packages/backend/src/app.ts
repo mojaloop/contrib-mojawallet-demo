@@ -30,6 +30,7 @@ import Knex from 'knex'
 import { KnexOtpService } from './services/otp-service'
 import { authorizations } from './controllers/authorizations'
 import { MojaloopService } from './services/mojaloop-service'
+import { KnexQuotesResponse } from './services/quoteResponse-service'
 
 export type AppConfig = {
   logger: Logger;
@@ -37,6 +38,7 @@ export type AppConfig = {
   transactionsService: KnexTransactionService;
   transactionRequestService: KnexTransactionRequestService;
   quoteService: KnexQuoteService;
+  quotesResponseService: KnexQuotesResponse;
   hydraApi: HydraApi;
   userService: KnexUserService;
   otpService: KnexOtpService;
@@ -62,6 +64,7 @@ export function createApp (appConfig: AppConfig): Koa<any, AccountsAppContext> {
     ctx.users = appConfig.userService
     ctx.transactionRequests = appConfig.transactionRequestService
     ctx.quotes = appConfig.quoteService
+    ctx.quotesResponse = appConfig.quotesResponseService
     ctx.otp = appConfig.otpService
     ctx.hydraApi = appConfig.hydraApi
     ctx.mojaloopRequests = appConfig.mojaloopRequests

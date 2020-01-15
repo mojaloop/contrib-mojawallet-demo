@@ -1,8 +1,9 @@
-import { QuoteResponse, QuoteResponseTool } from '../../src/services/quoteResponse-service'
+import { QuoteResponse, QuoteResponseTool, KnexQuotesResponse, QuoteResponseProps, ErrorQuoteResponseTool, ErrorQuoteResponse } from '../../src/services/quoteResponse-service'
 import { KnexQuoteService } from '../../src/services/quote-service'
 import { QuotesPostRequest } from '../../src/types/mojaloop'
 import { authorizeQuote } from '../../src/services/authorization-service'
 import Knex = require('knex')
+import { Money } from '@mojaloop/sdk-standard-components'
 
 jest.mock('../../src/services/authorization-service', () => ({
   authorizeQuote: jest.fn()
@@ -11,9 +12,12 @@ jest.mock('../../src/services/authorization-service', () => ({
 describe('Quote response service tests', () => {
   let knex: Knex
   let knexQuoteService: KnexQuoteService
+  let knexQuotesResponse: KnexQuotesResponse
   let validQuote: QuotesPostRequest
   let validQuoteResponse: QuoteResponse
-  let invalidQuoteResponse: QuoteResponse
+  let validErrorQuoteResponse: ErrorQuoteResponse
+  let quoteResponseProps: QuoteResponseProps
+  let errorQuoteResponseProps: QuoteResponseProps
 
   beforeAll(async () => {
     knex = Knex({
@@ -22,7 +26,10 @@ describe('Quote response service tests', () => {
         filename: ':memory:'
       }
     })
+
     knexQuoteService = new KnexQuoteService(knex)
+    knexQuotesResponse = new KnexQuotesResponse(knex)
+
     validQuote = {
       quoteId: 'aa602839-6acb-49b8-9bed-3dc0ca3e09ab',
       transactionId: '2c6af2fd-f0cb-43f5-98be-8abf539ee2c2',
@@ -49,23 +56,46 @@ describe('Quote response service tests', () => {
         initiatorType: 'CONSUMER'
       }
     }
+
     validQuoteResponse = {
       transferAmount: {
         currency: 'USD',
         amount: '20'
       },
-      expiration: new Date().toISOString(),
+      expiration: '2020-01-14T08:50:28.745Z',
       ilpPacket: 'abc123',
       condition: '1234567890123456789012345678901234567890123'
     }
-    invalidQuoteResponse = {
+
+    validErrorQuoteResponse = {
+      errorInformation: {
+        errorCode: '1001',
+        errorDescription: 'Connection error'
+      }
+    }
+
+    quoteResponseProps = {
+      quoteId: 'aa602839-6acb-49b8-9bed-3dc0ca3e09ab',
       transferAmount: {
         currency: 'USD',
         amount: '20'
       },
-      expiration: 'asd',
+      expiration: '2020-01-14T08:50:28.745Z',
       ilpPacket: 'abc123',
-      condition: '1234567890123456789012345678901234567890123'
+      condition: '1234567890123456789012345678901234567890123',
+      error: null
+    }
+
+    errorQuoteResponseProps = {
+      quoteId: 'aa602839-6acb-49b8-9bed-3dc0ca3e09ab',
+      transferAmount: null,
+      expiration: null,
+      ilpPacket: null,
+      condition: null,
+      error: {
+        errorCode: '1001',
+        errorDescription: 'Connection error'
+      }
     }
   })
 
@@ -83,28 +113,68 @@ describe('Quote response service tests', () => {
   })
 
   describe('Testing of quote response tools', () => {
+    // test('Should sucessfully construct tool object with valid quote response', async () => {
+    //   await knexQuoteService.add(validQuote)
+    //   let serializedResponse: string
+    //   try {
+    //     const quoteResponseTool = new QuoteResponseTool(validQuoteResponse, validQuote.quoteId)
+    //     quoteResponseTool.initAuthorization()
+    //     serializedResponse = await quoteResponseTool.getSerializedResponse()
+    //     expect(serializedResponse).toEqual(JSON.stringify(validQuoteResponse))
+    //   } catch (error) {
+    //     console.log(error)
+    //     expect(true).toEqual(false)
+    //   }
+    //   expect(authorizeQuote).toBeCalledTimes(1)
+    // })
+
     test('Should sucessfully construct tool object with valid quote response', async () => {
       await knexQuoteService.add(validQuote)
-      let serializedResponse: string
+      let generatedResponse: QuoteResponseProps
       try {
         const quoteResponseTool = new QuoteResponseTool(validQuoteResponse, validQuote.quoteId)
         quoteResponseTool.initAuthorization()
-        serializedResponse = await quoteResponseTool.getSerializedResponse()
-        expect(serializedResponse).toEqual(JSON.stringify(validQuoteResponse))
+        generatedResponse = await quoteResponseTool.getQuoteResponseProps()
+        expect(generatedResponse).toEqual(quoteResponseProps)
       } catch (error) {
-        console.log(error)
-        expect(true).toEqual(false)
+        expect(error).toBeUndefined()
       }
       expect(authorizeQuote).toBeCalledTimes(1)
     })
-    // Can't construct a bad Quote response because it is just strings.
-    // test('Should throw error on using invalid quote response', async () => {
-    //   await knexQuoteService.add(validQuote)
-    //   expect(() => {
-    //     const quoteResponseTool = new QuoteResponseTool(invalidQuoteResponse, validQuote.quoteId)
-    //     quoteResponseTool.initAuthorization()
-    //   }).toThrow()
-    //   expect(authorizeQuote).toBeCalledTimes(0)
-    // })
+
+    test('Should sucessfully construct error response tool object with valid error quote response', async () => {
+      await knexQuoteService.add(validQuote)
+      let generatedResponse: QuoteResponseProps
+      try {
+        const errorQuoteResponseTool = new ErrorQuoteResponseTool(validErrorQuoteResponse, validQuote.quoteId)
+        generatedResponse = await errorQuoteResponseTool.getQuoteResponseProps()
+      } catch (error) {
+        expect(error).toBeUndefined()
+      }
+    })
+  })
+
+  describe('Testing of KnexQuotesResponse', () => {
+    test('Should store a quote response to mojaQuotesResponse', async () => {
+      const storedQuoteResponse = await knexQuotesResponse.store(quoteResponseProps)
+
+      expect(storedQuoteResponse).toBeDefined()
+      expect(storedQuoteResponse).toEqual({...quoteResponseProps, id: 1})
+    })
+
+    test('Should store an error quote response to mojaQuotesResponse', async () => {
+      const storedQuoteResponse = await knexQuotesResponse.store(errorQuoteResponseProps)
+
+      expect(storedQuoteResponse).toBeDefined()
+      expect(storedQuoteResponse).toEqual({...errorQuoteResponseProps, id: 1})
+    })
+
+    test('Should retrieve a quote response from mojaQuotesResponse by quoteId', async () => {
+      await knexQuotesResponse.store(quoteResponseProps)
+
+      const retrievedQuoteResponse = await knexQuotesResponse.get(quoteResponseProps.quoteId as string)
+
+      expect(retrievedQuoteResponse).toEqual([{...quoteResponseProps, id: 1}])
+    })
   })
 })
