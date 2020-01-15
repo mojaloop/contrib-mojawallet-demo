@@ -45,7 +45,7 @@ export class QuoteResponseTool {
     this._quoteResponseProps = {
       quoteId: quoteId,
       transferAmount: quoteResponse.transferAmount,
-      expiration: new Date(quoteResponse.expiration).toISOString(),
+      expiration: new Date(quoteResponse.expiration).toISOString().slice(0, 19).replace('T', ' '),
       ilpPacket: quoteResponse.ilpPacket,
       condition: quoteResponse.condition
     }
