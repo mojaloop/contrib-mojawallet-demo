@@ -29,6 +29,8 @@ import { MojaloopRequests } from '@mojaloop/sdk-standard-components'
 import Knex from 'knex'
 import { KnexOtpService } from './services/otp-service'
 import { authorizations } from './controllers/authorizations'
+import { transfersResponse } from './controllers/transfersResponse'
+import { transfersErrors } from './controllers/transfersErrors'
 import { MojaloopService } from './services/mojaloop-service'
 import { KnexQuotesResponse } from './services/quoteResponse-service'
 
@@ -127,6 +129,9 @@ export function createApp (appConfig: AppConfig): Koa<any, AccountsAppContext> {
 
   // privateRouter.post('/oauth2/clients', createValidationOauth2, storeOauth2)
   publicRouter.put('/authorizations/:id', authorizations)
+
+  publicRouter.put('/transfers/:id', transfersResponse)
+  publicRouter.put('/transfers/:id/error', transfersErrors)
 
   app.use(publicRouter.routes())
   app.use(privateRouter.routes())

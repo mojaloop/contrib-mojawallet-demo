@@ -1,9 +1,7 @@
 import axios from 'axios'
-import { MojaQuoteObj } from '../src/services/quote-service'
-import { QuoteResponse, QuoteResponseProps } from '../src/services/quoteResponse-service'
+import { QuoteResponse } from '../src/services/quoteResponse-service'
 // import { getAuthorization } from '../src/services/mojaloop-service'
 import { QuotesPostRequest } from '../src/types/mojaloop'
-import uuid from 'uuid'
 import { createTestApp, TestAppContainer } from './utils/app'
 
 describe('Response from switch after a quote is sent', () => {
@@ -83,17 +81,17 @@ describe('Response from switch after a quote is sent', () => {
       const retrievedQuoteResponse = await appContainer.quotesResponseService.get(validQuote.quoteId)
 
       if (retrievedQuoteResponse) {
-        expect(retrievedQuoteResponse[0]).toMatchObject({
+        expect(retrievedQuoteResponse).toMatchObject({
           condition: '1234567890123456789012345678901234567890123',
           error: null,
           id: 1,
           ilpPacket: 'abc123',
           quoteId: 'aa602839-6acb-49b8-9bed-3dc0ca3e09ab',
-            transferAmount: {
-              amount: '20',
-              currency: 'USD',
-            }
-          })
+          transferAmount: {
+            amount: '20',
+            currency: 'USD'
+          }
+        })
         expect(response.status).toEqual(200)
         // expect(mock).toBeCalledTimes(1) // wont get here yet because the transactionRequest is undefined. Need to find a better way to test this.
       } else {
@@ -161,15 +159,15 @@ describe('Quote Error Endpoint', () => {
 
   test('Should return 200 status for quote error and write error to mojaQuotesResponse', async () => {
     const response = await axios.put(`http://localhost:${appContainer.port}/quotes/randomId/error`, {
-      errorInformation: {
+      error: {
         errorCode: '1001',
         errorDescription: 'Connection error'
       }
     })
 
-    const retrievedResponses = await appContainer.quotesResponseService.get('randomId')
-    
-    expect(retrievedResponses).toEqual([{
+    const retrievedResponses = await appContainer.quotesResponseService.getError('randomId')
+
+    expect(retrievedResponses).toEqual({
       quoteId: 'randomId',
       condition: null,
       ilpPacket: null,
@@ -180,7 +178,7 @@ describe('Quote Error Endpoint', () => {
         errorCode: '1001',
         errorDescription: 'Connection error'
       }
-    }])
+    })
     expect(response.status).toBe(200)
   })
 })

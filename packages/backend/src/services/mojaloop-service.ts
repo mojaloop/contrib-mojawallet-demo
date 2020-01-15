@@ -1,16 +1,25 @@
 import Knex from 'knex'
-import { MojaloopRequests, PostTransferBody } from '@mojaloop/sdk-standard-components'
+import { MojaloopRequests } from '@mojaloop/sdk-standard-components'
 import { KnexOtpService } from './otp-service'
 import { StoredRequest } from './transaction-request-service'
 import axios, { AxiosResponse } from 'axios'
-import { Money } from '../types/mojaloop'
+import { Money, TransfersPostRequest } from '../types/mojaloop'
 
 const baseMojaUrl: string = process.env.PUT_BASE_URI || 'http://localhost:8008'
+
+export type StoredTransfer = {
+  transferId: string
+  transactionId: string
+  transactionRequestId: string
+  quoteId: string
+  response?: string
+  error?: string
+}
 
 export interface MojaloopService {
   getAuthorization: (transactionRequestId: string, transferAmount: Money) => Promise<AxiosResponse>
   validateTransactionOTP: (transactionRequestId: string, OTP: string) => Promise<boolean>
-  initiateTransfer: (transactionRequestId: string) => Promise<void>
+  initiateTransfer: (transferBody: TransfersPostRequest, storedTransfer: StoredTransfer) => Promise<void>
 }
 
 export class KnexMojaloopService implements MojaloopService {
@@ -53,21 +62,9 @@ export class KnexMojaloopService implements MojaloopService {
     return false
   }
 
-  async initiateTransfer (transactionRequestId: string): Promise<void> {
-    // Get the quote object first based on transferId?
-    const transferBody: PostTransferBody = {
-      amount: {
-        amount: '',
-        currency: ''
-      },
-      condition: '',
-      expiration: '',
-      ilpPacket: '',
-      payeeFsp: '',
-      payerFsp: '',
-      transferId: ''
-    }
-
+  async initiateTransfer (transferBody: TransfersPostRequest, storedTransfer: StoredTransfer): Promise<void> {
+    await this._knex<StoredTransfer>('transfers').insert(storedTransfer)
+    // TODO Remove funds from the users account.
     await this._mojaloopRequests.postTransfers(transferBody, transferBody.payerFsp)
   }
 }

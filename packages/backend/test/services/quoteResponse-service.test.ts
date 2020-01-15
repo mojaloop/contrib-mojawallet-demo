@@ -1,9 +1,8 @@
-import { QuoteResponse, QuoteResponseTool, KnexQuotesResponse, QuoteResponseProps, ErrorQuoteResponseTool, ErrorQuoteResponse } from '../../src/services/quoteResponse-service'
+import { QuoteResponse, QuoteResponseTool, KnexQuotesResponse, QuoteResponseProps, ErrorQuoteResponseTool, ErrorQuoteResponse, ErrorQuoteResponseProps } from '../../src/services/quoteResponse-service'
 import { KnexQuoteService } from '../../src/services/quote-service'
 import { QuotesPostRequest } from '../../src/types/mojaloop'
 import { authorizeQuote } from '../../src/services/authorization-service'
 import Knex = require('knex')
-import { Money } from '@mojaloop/sdk-standard-components'
 
 jest.mock('../../src/services/authorization-service', () => ({
   authorizeQuote: jest.fn()
@@ -17,7 +16,7 @@ describe('Quote response service tests', () => {
   let validQuoteResponse: QuoteResponse
   let validErrorQuoteResponse: ErrorQuoteResponse
   let quoteResponseProps: QuoteResponseProps
-  let errorQuoteResponseProps: QuoteResponseProps
+  let errorQuoteResponseProps: ErrorQuoteResponseProps
 
   beforeAll(async () => {
     knex = Knex({
@@ -68,7 +67,15 @@ describe('Quote response service tests', () => {
     }
 
     validErrorQuoteResponse = {
-      errorInformation: {
+      error: {
+        errorCode: '1001',
+        errorDescription: 'Connection error'
+      }
+    }
+
+    errorQuoteResponseProps = {
+      quoteId: 'aa602839-6acb-49b8-9bed-3dc0ca3e09ab',
+      error: {
         errorCode: '1001',
         errorDescription: 'Connection error'
       }
@@ -82,20 +89,7 @@ describe('Quote response service tests', () => {
       },
       expiration: '2020-01-14T08:50:28.745Z',
       ilpPacket: 'abc123',
-      condition: '1234567890123456789012345678901234567890123',
-      error: null
-    }
-
-    errorQuoteResponseProps = {
-      quoteId: 'aa602839-6acb-49b8-9bed-3dc0ca3e09ab',
-      transferAmount: null,
-      expiration: null,
-      ilpPacket: null,
-      condition: null,
-      error: {
-        errorCode: '1001',
-        errorDescription: 'Connection error'
-      }
+      condition: '1234567890123456789012345678901234567890123'
     }
   })
 
@@ -144,10 +138,9 @@ describe('Quote response service tests', () => {
 
     test('Should sucessfully construct error response tool object with valid error quote response', async () => {
       await knexQuoteService.add(validQuote)
-      let generatedResponse: QuoteResponseProps
       try {
         const errorQuoteResponseTool = new ErrorQuoteResponseTool(validErrorQuoteResponse, validQuote.quoteId)
-        generatedResponse = await errorQuoteResponseTool.getQuoteResponseProps()
+        await errorQuoteResponseTool.getQuoteResponseProps()
       } catch (error) {
         expect(error).toBeUndefined()
       }
@@ -159,14 +152,14 @@ describe('Quote response service tests', () => {
       const storedQuoteResponse = await knexQuotesResponse.store(quoteResponseProps)
 
       expect(storedQuoteResponse).toBeDefined()
-      expect(storedQuoteResponse).toEqual({...quoteResponseProps, id: 1})
+      expect(storedQuoteResponse).toEqual({ ...quoteResponseProps, id: 1, error: null })
     })
 
     test('Should store an error quote response to mojaQuotesResponse', async () => {
-      const storedQuoteResponse = await knexQuotesResponse.store(errorQuoteResponseProps)
+      const storedQuoteResponse = await knexQuotesResponse.storeError(errorQuoteResponseProps)
 
       expect(storedQuoteResponse).toBeDefined()
-      expect(storedQuoteResponse).toEqual({...errorQuoteResponseProps, id: 1})
+      expect(storedQuoteResponse).toEqual({ ...validErrorQuoteResponse, quoteId: 'aa602839-6acb-49b8-9bed-3dc0ca3e09ab', id: 1, condition: null, expiration: null, ilpPacket: null, transferAmount: null })
     })
 
     test('Should retrieve a quote response from mojaQuotesResponse by quoteId', async () => {
@@ -174,7 +167,7 @@ describe('Quote response service tests', () => {
 
       const retrievedQuoteResponse = await knexQuotesResponse.get(quoteResponseProps.quoteId as string)
 
-      expect(retrievedQuoteResponse).toEqual([{...quoteResponseProps, id: 1}])
+      expect(retrievedQuoteResponse).toEqual({ ...quoteResponseProps, id: 1, error: null })
     })
   })
 })

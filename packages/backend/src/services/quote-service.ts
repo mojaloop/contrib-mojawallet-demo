@@ -114,7 +114,22 @@ export class KnexQuoteService {
       retrievedQuote.fees = JSON.parse(retrievedQuote.fees)
       retrievedQuote.transactionType = JSON.parse(retrievedQuote.transactionType)
     }
+    return retrievedQuote
+  }
 
+  async getByTransactionId (transactionId: string): Promise<MojaQuoteObj | undefined> {
+    const retrievedQuote = await this._knex<MojaQuoteObj>('mojaQuote')
+      .where({ transactionId: transactionId })
+      .first()
+    return (retrievedQuote)
+  }
+
+  async update (quoteId: string, updatedFields: MojaQuoteProps): Promise<MojaQuoteObj | undefined> {
+    await this._knex<MojaQuoteObj>('mojaQuote')
+      .update(updatedFields)
+      .where('quoteId', quoteId)
+    const retrievedQuote = await this._knex<MojaQuoteObj>('mojaQuote')
+      .where('quoteId', quoteId).first()
     return (retrievedQuote)
   }
 }
