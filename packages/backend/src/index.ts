@@ -21,7 +21,7 @@ const KNEX_CLIENT = process.env.KNEX_CLIENT || 'sqlite3'
 const DFSP_ID = process.env.DFSP_ID || 'mojawallet'
 const ALS_ENDPOINT = process.env.ALS_ENDPOINT || 'account-lookup-service.iso-demo.openafrica.network'
 const QUOTES_ENDPOINT = process.env.ALS_ENDPOINT || 'quoting-service.iso-demo.openafrica.network'
-const TRANSFERS_ENDPOINT = process.env.TRANSFERS_ENDPOINT || 'central-ledger.iso-demo.openafrica.network'
+const TRANSFERS_ENDPOINT = process.env.TRANSFERS_ENDPOINT || 'ml-api-adapter.iso-demo.openafrica.network'
 
 export interface AccountsAppContext extends Context {
   accounts: KnexAccountService;
