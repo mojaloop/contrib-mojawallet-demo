@@ -9,8 +9,8 @@ export async function authorizations (ctx: AccountsAppContext): Promise<void> {
   const { id } = ctx.params
   const { body } = ctx.request
 
-  const payeeFsp = ctx.get('fspiop-destination')
-  const payerFsp = ctx.get('fspiop-source')
+  const payerFsp = ctx.get('fspiop-destination')
+  const payeeFsp = ctx.get('fspiop-source')
   try {
     const transactionRequest = await transactionRequests.getByRequestId(id)
     if (transactionRequest) {
