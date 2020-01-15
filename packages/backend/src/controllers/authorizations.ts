@@ -37,7 +37,7 @@ export async function authorizations (ctx: AccountsAppContext): Promise<void> {
             quoteId: quote.quoteId as string
           }
           await otp.markUsed(transactionRequest.userId.toString())
-          await transactions.create(storedOtp.accountId, BigInt(quoteResponse.transferAmount.amount))
+          await transactions.create(storedOtp.accountId, BigInt(quoteResponse.transferAmount.amount) * BigInt(-100))
           await mojaloopService.initiateTransfer(transferBody, transfer)
         }
       }
