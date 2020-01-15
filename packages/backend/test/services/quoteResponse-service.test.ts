@@ -162,6 +162,18 @@ describe('Quote response service tests', () => {
       expect(storedQuoteResponse).toEqual({ ...validErrorQuoteResponse, quoteId: 'aa602839-6acb-49b8-9bed-3dc0ca3e09ab', id: 1, condition: null, expiration: null, ilpPacket: null, transferAmount: null })
     })
 
+    test('Should throw an error if a quote with the same id is in the database', async () => {
+      try {
+        await knexQuotesResponse.store(quoteResponseProps)
+        await knexQuotesResponse.storeError(errorQuoteResponseProps)
+        .then(() => {
+          expect(true).toEqual(false)
+        })
+      } catch (error) {
+        expect(error).toEqual(new Error(`Quote response with id: ${quoteResponseProps.quoteId} already exists`))
+      }
+    })
+
     test('Should retrieve a quote response from mojaQuotesResponse by quoteId', async () => {
       await knexQuotesResponse.store(quoteResponseProps)
 

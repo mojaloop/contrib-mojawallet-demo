@@ -9,23 +9,6 @@ export async function quoteResponse (ctx: AccountsAppContext): Promise<void> {
   const retrievedQuote = await quotes.get(id)
   ctx.logger.info('quoteResponse retrievedQuote', retrievedQuote)
   ctx.status = 200
-  // if (retrievedQuote) {
-  //   try {
-  //     const transactionRequest = await ctx.transactionRequests.getByTransactionId(retrievedQuote.transactionId)
-  //     ctx.logger.info('quoteResponse transactionRequest', transactionRequest)
-  //     const quoteResponseTools = new QuoteResponseTool(body, id)
-  //     await quotes.update(id, {
-  //       quoteResponse: quoteResponseTools.getSerializedResponse()
-  //     })
-  //     if (transactionRequest) {
-  //       const auth = await mojaloopService.getAuthorization(transactionRequest.transactionRequestId, body.transferAmount)
-  //       ctx.logger.info('quoteResponse auth', auth)
-  //     }
-  //     return
-  //   } catch (error) {
-  //     ctx.logger.error(error)
-  //   }
-  // }
   if (retrievedQuote) {
     try {
       const transactionRequest = await ctx.transactionRequests.getByTransactionId(retrievedQuote.transactionId)

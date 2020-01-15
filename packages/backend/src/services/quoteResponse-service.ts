@@ -142,6 +142,14 @@ export class KnexQuotesResponse {
   }
 
   async store (quoteResponseProps: QuoteResponseProps): Promise<QuoteResponseProps> {
+    const retrievedQuoteResponse = await this._knex<QuoteResponseProps>('mojaQuotesResponse')
+      .where({ quoteId: quoteResponseProps.quoteId })
+      .first()
+
+    if (retrievedQuoteResponse) {
+      throw new Error(`Quote response with id: ${quoteResponseProps.quoteId} already exists`)
+    }
+
     const storedObject: any = JSON.parse(JSON.stringify(quoteResponseProps))
     if (quoteResponseProps.transferAmount) { storedObject.transferAmount = JSON.stringify(storedObject.transferAmount) }
     console.log('Stored object ', storedObject)
@@ -163,6 +171,14 @@ export class KnexQuotesResponse {
   }
 
   async storeError (quoteResponseProps: ErrorQuoteResponseProps): Promise<ErrorQuoteResponse> {
+    const retrievedQuoteResponse = await this._knex<QuoteResponseProps>('mojaQuotesResponse')
+      .where({ quoteId: quoteResponseProps.quoteId })
+      .first()
+
+    if (retrievedQuoteResponse) {
+      throw new Error(`Quote response with id: ${quoteResponseProps.quoteId} already exists`)
+    }
+
     const storedObject: any = JSON.parse(JSON.stringify(quoteResponseProps))
     if (quoteResponseProps.error) { storedObject.error = JSON.stringify(storedObject.error) }
     console.log(storedObject)
