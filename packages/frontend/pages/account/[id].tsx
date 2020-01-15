@@ -4,7 +4,7 @@ import dynamic from 'next/dynamic'
 import { NextPage } from 'next'
 import { TransactionService } from '../../services/transactions'
 import { OTPService } from '../../services/otp'
-import { TransactionCardProps, AccountPageProps, Totals, OTPCardProps, CreateOTPCardProps, TimerProps } from "../../types"
+import { TransactionCardProps, AccountPageProps, Totals, OTPCardProps, CreateOTPCardProps, TimerProps, ActiveOTPCardProps } from "../../types"
 import { formatCurrency, checkUser } from "../../utils"
 import { AccountsService } from '../../services/accounts'
 import moment from 'moment'
@@ -20,6 +20,7 @@ const Account: NextPage<AccountPageProps> = ({ account, transactions, otp, user 
     hasOTP: otp && otp.accountId == account.id,
     disableOTP: otp && otp.accountId != account.id
   })
+  transactions = transactions.reverse()
   return (
     <div>
       <Head>
@@ -36,7 +37,7 @@ const Account: NextPage<AccountPageProps> = ({ account, transactions, otp, user 
                 </div>
               </div>
               <div className="w-full flex my-4 flex-wrap">
-                { otpState.hasOTP ? <OTP otp={otpState.otp} setOTP={setOTP}/> : otpState.disableOTP ? <DisabledOTP/> : <CreateOTP accountId={account.id} token={user.token} setOTP={setOTP}/> }
+                { otpState.hasOTP ? <OTP token={user.token} otp={otpState.otp} setOTP={setOTP}/> : otpState.disableOTP ? <DisabledOTP/> : <CreateOTP accountId={account.id} token={user.token} setOTP={setOTP}/> }
                 <Balance balance={account.balance} assetScale={2}/>
                 { transactions.length > 0 ? transactions.map(transaction => <TransactionCard key={'transaction_' + transaction.id} transaction={transaction}/>) : <Empty/>}
               </div>
@@ -122,14 +123,32 @@ const CreateOTP: React.FC<CreateOTPCardProps> = ({accountId, token, setOTP}) => 
   )
 }
 
-const OTP: React.FC<TimerProps> = ({ otp, setOTP }) => {
+const OTP: React.FC<ActiveOTPCardProps> = ({ otp, setOTP, token }) => {
   return (
     <div className="inline-block max-w-xl sm:max-w-xs flex flex-col w-full mt-8 px-6 py-4 mx-8 rounded-xl elevation-4 bg-white hover:elevation-8 active:bg-dark focus:outline-none">
-      <div className="flex flex-wrap">
-        <div className="w-full text-center text-headline tracking-otp text-primary uppercase my-3 ">
+      <div className="flex flex-1">
+        <div className="flex-1">
+        <div className="flex-1 text-center text-headline tracking-otp text-primary uppercase my-3 ">
           { otp.otp }
         </div>
-        <Timer otp={otp} setOTP={setOTP}/>
+        <div className="w-full">
+          <Timer otp={otp} setOTP={setOTP}/>
+        </div>
+        </div>
+        <motion.div
+          className="h-10"
+          onTap={async () => {
+            let otp = await otpService.cancelOTP(token)
+            console.log(otp)
+            setOTP({
+              otp: otp,
+              hasOTP: false,
+              disableOTP: false
+            })
+          }}
+        >
+          <img className="" src={'/icons/delete-24px.svg'}/>
+        </motion.div>
       </div>
     </div>
   )

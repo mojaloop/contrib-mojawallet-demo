@@ -23,6 +23,12 @@ export type TimerProps = {
   setOTP: React.Dispatch<SetStateAction<{ otp: OTPDetails; hasOTP: boolean; disableOTP: boolean; }>>
 }
 
+export type ActiveOTPCardProps = {
+  otp: OTPDetails,
+  setOTP: React.Dispatch<SetStateAction<{ otp: OTPDetails; hasOTP: boolean; disableOTP: boolean; }>>
+  token: string
+}
+
 export type AccountPageProps = {
   account: AccountDetails
   transactions: TransactionsDetails[]
