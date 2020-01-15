@@ -17,7 +17,7 @@ import { create as createTransactionRequest } from './controllers/transactionReq
 import { show as showConsent, store as storeConsent } from './controllers/consent'
 import { quoteResponse } from './controllers/quoteResponse'
 import { store as quoteErrorStore } from './controllers/quoteErrors'
-import { create as createOtp, fetch as fetchOtp } from './controllers/otp'
+import { create as createOtp, fetch as fetchOtp, cancel as cancelOtp } from './controllers/otp'
 import { AccountsAppContext } from './index'
 import { HydraApi } from './apis/hydra'
 import { createAuthMiddleware } from './middleware/auth'
@@ -32,6 +32,7 @@ import { authorizations } from './controllers/authorizations'
 import { transfersResponse } from './controllers/transfersResponse'
 import { transfersErrors } from './controllers/transfersErrors'
 import { MojaloopService } from './services/mojaloop-service'
+import { KnexQuotesResponse } from './services/quoteResponse-service'
 
 export type AppConfig = {
   logger: Logger;
@@ -39,6 +40,7 @@ export type AppConfig = {
   transactionsService: KnexTransactionService;
   transactionRequestService: KnexTransactionRequestService;
   quoteService: KnexQuoteService;
+  quotesResponseService: KnexQuotesResponse;
   hydraApi: HydraApi;
   userService: KnexUserService;
   otpService: KnexOtpService;
@@ -64,6 +66,7 @@ export function createApp (appConfig: AppConfig): Koa<any, AccountsAppContext> {
     ctx.users = appConfig.userService
     ctx.transactionRequests = appConfig.transactionRequestService
     ctx.quotes = appConfig.quoteService
+    ctx.quotesResponse = appConfig.quotesResponseService
     ctx.otp = appConfig.otpService
     ctx.hydraApi = appConfig.hydraApi
     ctx.mojaloopRequests = appConfig.mojaloopRequests
@@ -111,6 +114,7 @@ export function createApp (appConfig: AppConfig): Koa<any, AccountsAppContext> {
   publicRouter.put('/quotes/:id/error', quoteErrorStore)
 
   privateRouter.post('/otp', createOtp)
+  privateRouter.post('/otp/cancel', cancelOtp)
   privateRouter.get('/otp', fetchOtp)
 
   publicRouter.get('/parties/msisdn/:msisdnNumber', showParty)

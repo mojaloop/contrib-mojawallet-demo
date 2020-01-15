@@ -125,4 +125,57 @@ describe('Tests for the otp endpoints', () => {
       })
     })
   })
+
+  describe('Tests for cancelling an otp', () => {
+    test('Should set an otp\'s expiration date to now to "cancel" it', async () => {
+      await axios.post(
+        `http://localhost:${appContainer.port}/otp`,
+        { accountId: account.id },
+        { headers: { authorization: 'Bearer user1token' } }
+      )
+
+      const response = await axios.post(
+        `http://localhost:${appContainer.port}/otp/cancel`,
+        {},
+        { headers: { authorization: 'Bearer user1token' } }
+      )
+      expect(response.status).toEqual(200)
+
+      const updatedEntry = await appContainer.knex('mojaOtp').where({ accountId: account.id }).first()
+
+      if (updatedEntry) {
+        expect(updatedEntry.expiresAt).toBeLessThanOrEqual(Date.now() / 1000)
+      } else {
+        expect(true).toEqual(false)
+      }      
+    })
+
+    test('Should prevent cancellation of an otp without a valid token', async () => {
+      await axios.post(
+        `http://localhost:${appContainer.port}/otp/cancel`,
+        {},
+        { headers: { authorization: 'Bearer user3token' } }
+      )
+      .then(response => {
+        expect(response).toBeUndefined()
+      })
+      .catch(error => {
+        expect(error.response.status).toEqual(401)
+      })
+    })
+
+    test('Should return a 404 on no active otp\'s present', async () => {
+      await axios.post(
+        `http://localhost:${appContainer.port}/otp/cancel`,
+        {},
+        { headers: { authorization: 'Bearer user1token' } }
+      )
+      .then(response => {
+        expect(response).toBeUndefined()
+      })
+      .catch(error => {
+        expect(error.response.status).toEqual(404)
+      })
+    })
+  })
 })

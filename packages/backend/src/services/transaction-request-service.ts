@@ -26,7 +26,6 @@ export class TransactionRequestTools {
 
   constructor (postedObject: object) {
     if (this.isValid(postedObject).error) {
-      console.log(this.isValid(postedObject).error)
       this._valid = false
     } else {
       this._transactionRequest = postedObject as TransactionRequestsPostRequest

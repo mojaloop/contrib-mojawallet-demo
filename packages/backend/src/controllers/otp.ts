@@ -1,5 +1,5 @@
 import { AccountsAppContext } from '../index'
-import { OtpTools } from '../services/otp-service'
+import { OtpTools, OtpProps } from '../services/otp-service'
 
 export async function create (ctx: AccountsAppContext): Promise<void> {
   const { otp, accounts } = ctx
@@ -40,6 +40,26 @@ export async function fetch (ctx: AccountsAppContext): Promise<void> {
     ctx.status = 200
   } else {
     ctx.body = 'No active otps for this account'
+    ctx.status = 404
+  }
+}
+
+export async function cancel (ctx: AccountsAppContext): Promise<void> {
+  const { otp } = ctx
+  const userId = ctx.state.user.sub
+
+  const activeOtp = await otp.getActiveOtp(userId)
+
+  if (activeOtp) {
+    const otpProps: OtpProps = {
+      userId,
+      isUsed: activeOtp.isUsed,
+      expiresAt: Date.now() / 1000
+    }
+    otp.update(otpProps)
+    ctx.status = 200
+  } else {
+    ctx.body = 'No active otp for this account'
     ctx.status = 404
   }
 }

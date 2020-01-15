@@ -12,6 +12,7 @@ import Knex from 'knex'
 import { createApp } from '../../src/app'
 import createLogger from 'pino'
 import { KnexOtpService } from '../../src/services/otp-service'
+import { KnexQuotesResponse } from '../../src/services/quoteResponse-service'
 
 export type TestAppContainer = {
   server: Server,
@@ -24,6 +25,7 @@ export type TestAppContainer = {
   userService: KnexUserService
   transactionRequestService: KnexTransactionRequestService
   quoteService: KnexQuoteService
+  quotesResponseService: KnexQuotesResponse
   hydraApi: HydraApi
   mojaloopRequests: MojaloopRequests
   otpService: KnexOtpService
@@ -49,6 +51,7 @@ export const createTestApp = (): TestAppContainer => {
   const userService = new KnexUserService(knex)
   const transactionRequestService = new KnexTransactionRequestService(knex)
   const quoteService = new KnexQuoteService(knex)
+  const quotesResponseService = new KnexQuotesResponse(knex)
   const otpService = new KnexOtpService(knex)
   const mojaloopService = new KnexMojaloopService(knex, mojaloopRequests, otpService)
   const hydraApi = {
@@ -83,6 +86,7 @@ export const createTestApp = (): TestAppContainer => {
     hydraApi,
     userService,
     quoteService,
+    quotesResponseService,
     mojaloopRequests,
     mojaloopService,
     otpService
@@ -102,6 +106,7 @@ export const createTestApp = (): TestAppContainer => {
     userService,
     transactionRequestService,
     quoteService,
+    quotesResponseService,
     hydraApi,
     mojaloopRequests,
     otpService

@@ -1,5 +1,5 @@
 import Knex from 'knex'
-import { Otp, KnexOtpService, OtpTools } from '../../src/services/otp-service'
+import { Otp, KnexOtpService, OtpTools, OtpProps } from '../../src/services/otp-service'
 
 describe('Otp Service', () => {
   let knex: Knex
@@ -83,6 +83,28 @@ describe('Otp Service', () => {
         expect(retrievedOtp.userId).toEqual('0123456789')
       }
       expect(retrievedOtp2).toBeUndefined()
+    })
+
+    test('Should update an otp', async () => {
+      await knex('mojaOtp').insert({
+        userId: '0123456789',
+        accountId: 'accountId',
+        expiresAt: Math.floor((Date.now() + (5 * 1000 * 60)) / 1000),
+        isUsed: false,
+        otp: '1234'
+      })
+
+      const otpProps: OtpProps = {
+        userId: '0123456789',
+        isUsed: true,
+        expiresAt: Date.now() / 1000
+      }
+
+      try {
+        await otpService.update(otpProps)
+      } catch (error) {
+        expect(error).toBeUndefined()
+      }
     })
   })
 
