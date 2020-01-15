@@ -87,7 +87,7 @@ describe('Quote response service tests', () => {
         currency: 'USD',
         amount: '20'
       },
-      expiration: '2020-01-15T12:35:47.000Z',
+      expiration: '2020-01-15 12:35:47',
       ilpPacket: 'abc123',
       condition: '1234567890123456789012345678901234567890123'
     }
