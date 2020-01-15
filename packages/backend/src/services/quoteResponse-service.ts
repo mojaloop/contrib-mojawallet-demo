@@ -17,18 +17,21 @@ export type QuoteResponse = {
 }
 
 export type ErrorQuoteResponse = {
-  errorInformation: ErrorInformation
+  error: ErrorInformation
 }
 
 export type QuoteResponseProps = {
   quoteId: string;
-  transferAmount: Money | null;
-  expiration: string | null;
-  ilpPacket: string | null;
-  condition: string | null;
-  error: ErrorInformation | null;
+  transferAmount: Money;
+  expiration: string;
+  ilpPacket: string;
+  condition: string;
 }
 
+export type ErrorQuoteResponseProps = {
+  quoteId: string
+  error: ErrorInformation
+}
 export class QuoteResponseTool {
   private _quoteId: string
   private _quoteResponseProps: QuoteResponseProps
@@ -44,8 +47,7 @@ export class QuoteResponseTool {
       transferAmount: quoteResponse.transferAmount,
       expiration: quoteResponse.expiration,
       ilpPacket: quoteResponse.ilpPacket,
-      condition: quoteResponse.condition,
-      error: null
+      condition: quoteResponse.condition
     }
   }
 
@@ -97,21 +99,17 @@ export class QuoteResponseTool {
 
 export class ErrorQuoteResponseTool {
   private _quoteId: string
-  private _quoteResponseProps: QuoteResponseProps
+  private _quoteResponseProps: ErrorQuoteResponseProps
 
   constructor (errorQuoteResponse: ErrorQuoteResponse, quoteId: string) {
     this._quoteId = quoteId
     if (this.isValid(errorQuoteResponse).error) {
       console.log(this.isValid(errorQuoteResponse).error)
-      throw new Error('Bad quote response:' + this.isValid(errorQuoteResponse).error.toString())
+      throw new Error('Bad quote error response:' + this.isValid(errorQuoteResponse).error.toString())
     }
     this._quoteResponseProps = {
       quoteId: quoteId,
-      transferAmount: null,
-      expiration: null,
-      ilpPacket: null,
-      condition: null,
-      error: errorQuoteResponse.errorInformation
+      error: errorQuoteResponse.error
     }
   }
 
@@ -122,7 +120,7 @@ export class ErrorQuoteResponseTool {
     }))
 
     const ErrorQuoteResponseSchema = Joi.object({
-      errorInformation: Joi.object({
+      error: Joi.object({
         errorCode: Joi.string().regex(/^[1-9]\d{3}$/).required(),
         errorDescription: Joi.string().max(128).required(),
         extensionList: extensionListSchema
@@ -132,11 +130,7 @@ export class ErrorQuoteResponseTool {
     return Joi.validate(quoteResponse, ErrorQuoteResponseSchema)
   }
 
-  initAuthorization () {
-    authorizeQuote(this._quoteId)
-  }
-
-  getQuoteResponseProps (): QuoteResponseProps {
+  getQuoteResponseProps (): ErrorQuoteResponseProps {
     return (this._quoteResponseProps)
   }
 }
@@ -150,7 +144,6 @@ export class KnexQuotesResponse {
   async store (quoteResponseProps: QuoteResponseProps): Promise<QuoteResponseProps> {
     const storedObject: any = JSON.parse(JSON.stringify(quoteResponseProps))
     if (quoteResponseProps.transferAmount) { storedObject.transferAmount = JSON.stringify(storedObject.transferAmount) }
-    if (quoteResponseProps.error) { storedObject.error = JSON.stringify(storedObject.error) }
     console.log(storedObject)
     const insertedQuoteResponseId = await this._knex<QuoteResponseProps>('mojaQuotesResponse')
       .insert(storedObject)
@@ -163,6 +156,26 @@ export class KnexQuotesResponse {
       throw new Error('Error inserting quote response')
     }
     insertedQuoteResponse.transferAmount = JSON.parse(insertedQuoteResponse.transferAmount as any)
+
+    console.log(insertedQuoteResponse)
+
+    return insertedQuoteResponse
+  }
+
+  async storeError (quoteResponseProps: ErrorQuoteResponseProps): Promise<ErrorQuoteResponse> {
+    const storedObject: any = JSON.parse(JSON.stringify(quoteResponseProps))
+    if (quoteResponseProps.error) { storedObject.error = JSON.stringify(storedObject.error) }
+    console.log(storedObject)
+    const insertedQuoteResponseId = await this._knex<ErrorQuoteResponseProps>('mojaQuotesResponse')
+      .insert(storedObject)
+      .then(result => result[0])
+
+    const insertedQuoteResponse = await this._knex<ErrorQuoteResponseProps>('mojaQuotesResponse')
+      .where('id', insertedQuoteResponseId).first()
+
+    if (!insertedQuoteResponse) {
+      throw new Error('Error inserting quote response')
+    }
     insertedQuoteResponse.error = JSON.parse(insertedQuoteResponse.error as any)
 
     console.log(insertedQuoteResponse)
@@ -170,15 +183,25 @@ export class KnexQuotesResponse {
     return insertedQuoteResponse
   }
 
-  async get (quoteId: string): Promise<QuoteResponseProps[]> {
+  async get (quoteId: string): Promise<QuoteResponseProps | undefined> {
     const retrievedQuoteResponses = await this._knex<QuoteResponseProps>('mojaQuotesResponse')
       .where({ quoteId })
+      .where({ error: null })
+      .first()
+    return retrievedQuoteResponses ? {
+      ...retrievedQuoteResponses,
+      transferAmount: JSON.parse(retrievedQuoteResponses.transferAmount as unknown as string) as Money
+    } : undefined
+  }
 
-    retrievedQuoteResponses.forEach((value, index) => {
-      retrievedQuoteResponses[index].transferAmount = JSON.parse(value.transferAmount as any)
-      retrievedQuoteResponses[index].error = JSON.parse(value.error as any)
-    })
-
-    return (retrievedQuoteResponses)
+  async getError (quoteId: string): Promise<ErrorQuoteResponse | undefined> {
+    const retrievedQuoteResponses = await this._knex<ErrorQuoteResponse>('mojaQuotesResponse')
+      .where({ quoteId })
+      .where({ transferAmount: null })
+      .first()
+    return retrievedQuoteResponses ? {
+      ...retrievedQuoteResponses,
+      error: JSON.parse(retrievedQuoteResponses.error as unknown as string) as ErrorInformation
+    } : undefined
   }
 }

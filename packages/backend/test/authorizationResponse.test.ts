@@ -92,11 +92,9 @@ describe('Authorization Response', () => {
       ilpPacket: 'abc123',
       condition: '1234567890123456789012345678901234567890123'
     }
-
+    // await appContainer.quotesResponseService.store(validQuoteResponse)
     const quoteResponseTools = new QuoteResponseTool(validQuoteResponse, quote.quoteId)
-    await appContainer.quoteService.update(quote.quoteId, {
-      quoteResponse: quoteResponseTools.getSerializedResponse()
-    })
+    await appContainer.quotesResponseService.store(quoteResponseTools.getQuoteResponseProps())
   })
 
   afterEach(async () => {
