@@ -45,7 +45,7 @@ export class QuoteResponseTool {
     this._quoteResponseProps = {
       quoteId: quoteId,
       transferAmount: quoteResponse.transferAmount,
-      expiration: quoteResponse.expiration,
+      expiration: new Date(quoteResponse.expiration).toISOString(),
       ilpPacket: quoteResponse.ilpPacket,
       condition: quoteResponse.condition
     }
@@ -144,7 +144,7 @@ export class KnexQuotesResponse {
   async store (quoteResponseProps: QuoteResponseProps): Promise<QuoteResponseProps> {
     const storedObject: any = JSON.parse(JSON.stringify(quoteResponseProps))
     if (quoteResponseProps.transferAmount) { storedObject.transferAmount = JSON.stringify(storedObject.transferAmount) }
-    console.log(storedObject)
+    console.log('Stored object ', storedObject)
     const insertedQuoteResponseId = await this._knex<QuoteResponseProps>('mojaQuotesResponse')
       .insert(storedObject)
       .then(result => result[0])
