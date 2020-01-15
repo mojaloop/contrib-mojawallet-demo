@@ -20,7 +20,6 @@ const Account: NextPage<AccountPageProps> = ({ account, transactions, otp, user 
     hasOTP: otp && otp.accountId == account.id,
     disableOTP: otp && otp.accountId != account.id
   })
-  transactions = transactions.reverse()
   return (
     <div>
       <Head>
@@ -39,7 +38,7 @@ const Account: NextPage<AccountPageProps> = ({ account, transactions, otp, user 
               <div className="w-full flex my-4 flex-wrap">
                 { otpState.hasOTP ? <OTP token={user.token} otp={otpState.otp} setOTP={setOTP}/> : otpState.disableOTP ? <DisabledOTP/> : <CreateOTP accountId={account.id} token={user.token} setOTP={setOTP}/> }
                 <Balance balance={account.balance} assetScale={2}/>
-                { transactions.length > 0 ? transactions.map(transaction => <TransactionCard key={'transaction_' + transaction.id} transaction={transaction}/>) : <Empty/>}
+                { transactions.length > 0 ? [...transactions].reverse().map(transaction => <TransactionCard key={'transaction_' + transaction.id} transaction={transaction}/>) : <Empty/>}
               </div>
             </div>
         </div>
