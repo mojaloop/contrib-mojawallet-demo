@@ -1,10 +1,11 @@
-import { TransactionRequestTools, KnexTransactionRequestService } from '../../src/services/transaction-request-service'
+import { KnexTransactionRequestService, isValid, TransactionRequestProps } from '../../src/services/transaction-request-service'
 import { TransactionRequestsPostRequest } from '../../src/types/mojaloop'
 import Knex from 'knex'
 
 describe('Transaction Request Tests', () => {
   let validRequest: TransactionRequestsPostRequest
   let invalidRequest: TransactionRequestsPostRequest
+  let validTransactionrequestProps: TransactionRequestProps
   beforeAll(async () => {
     validRequest = {
       transactionRequestId: 'ca919568-e559-42a8-b763-1be22179decc',
@@ -27,6 +28,33 @@ describe('Transaction Request Tests', () => {
         initiator: 'PAYER',
         initiatorType: 'CONSUMER'
       }
+    }
+    validTransactionrequestProps = {
+      id: 1,
+      transactionId: 'xxxxxxxxxxxxxx',
+      userId: 1,
+      state: 'RECEIVED',
+      transactionRequestId: 'ca919568-e559-42a8-b763-1be22179decc',
+      payee: {
+        partyIdInfo: {
+          partyIdType: 'MSISDN',
+          partyIdentifier: 'party1'
+        }
+      },
+      payer: {
+        partyIdType: 'MSISDN',
+        partyIdentifier: 'party2'
+      },
+      amount: {
+        currency: 'USD',
+        amount: '20'
+      },
+      transactionType: {
+        scenario: 'DEPOSIT',
+        initiator: 'PAYER',
+        initiatorType: 'CONSUMER'
+      },
+      serializedRequest: JSON.stringify(validRequest)
     }
     invalidRequest = {
       transactionRequestId: 'ca919568-e559-42a8763-1be22179decc',
@@ -54,13 +82,13 @@ describe('Transaction Request Tests', () => {
 
   describe('Validate a transaction request', () => {
     it('Should identify a valid transaction request', async () => {
-      const myRequest = new TransactionRequestTools(validRequest)
-      expect(myRequest.getValidStatus()).toEqual(true)
+      const validState = isValid(validRequest)
+      expect(validState.error).toBeFalsy()
     })
 
     it('Should identify an invalid transaction request', async () => {
-      const myRequest = new TransactionRequestTools(invalidRequest)
-      expect(myRequest.getValidStatus()).toEqual(false)
+      const validState = isValid(invalidRequest)
+      expect(validState.error).toBeDefined()
     })
   })
 
@@ -93,30 +121,36 @@ describe('Transaction Request Tests', () => {
     })
 
     test('Should serialize and write a valid request to mojaTransactionRequest table', async () => {
-      await transactionRequestService.create(validRequest, 1)
-      const storedRequest = await knex('mojaTransactionRequest').first()
+      const storedRequest = await transactionRequestService.create(validRequest, 1)
       const serializedRequest = JSON.stringify(validRequest)
+
+      validTransactionrequestProps.transactionId = storedRequest.transactionId
+
+      expect(storedRequest).toEqual(validTransactionrequestProps)
 
       expect(storedRequest.transactionRequestId).toEqual(validRequest.transactionRequestId)
       expect(storedRequest.serializedRequest).toEqual(serializedRequest)
-      expect(storedRequest.valid).toEqual(1)
     })
 
     test('Should fail to serialize and write an invalid request to mojaTransactionRequest table', async () => {
-      const myTest = async () => { await transactionRequestService.create(invalidRequest, 1) }
-
-      expect(myTest).toThrowError
+      try {
+        await transactionRequestService.create(invalidRequest, 1)
+        .then(() => {
+          expect(true).toEqual(false)
+        })
+      } catch (error) {
+        expect(error).toBeDefined()
+      }
     })
 
     test('Should retrieve an existing request', async () => {
       await transactionRequestService.create(validRequest, 1)
       const retrievedRequest = await transactionRequestService.getByRequestId(validRequest.transactionRequestId)
-      const serializedRequest = JSON.stringify(validRequest)
 
       if (retrievedRequest) {
-        expect(retrievedRequest.transactionRequestId).toEqual(validRequest.transactionRequestId)
-        expect(retrievedRequest.serializedRequest).toEqual(serializedRequest)
-        expect(retrievedRequest.valid).toEqual(1)
+        validTransactionrequestProps.transactionId = retrievedRequest.transactionId
+  
+        expect(retrievedRequest).toEqual(validTransactionrequestProps)
       } else {
         expect(true).toEqual(false)
       }
