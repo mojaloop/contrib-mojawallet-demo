@@ -27,6 +27,15 @@ export const OTPService = (authErrorCallback?: () => void) => {
         }
       }).then(response => response.data)
         .catch(error => { throw error })
+    },
+    cancelOTP: async (authToken: string) => {
+      const url = new URL('otp/cancel', USERS_API_URL)
+      return axios.post(url.toString(), {}, {
+        headers: {
+          Authorization: `Bearer ${authToken}`
+        }
+      }).then(response => response.data)
+        .catch(error => { throw error })
     }
   }
 }

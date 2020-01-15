@@ -24,7 +24,7 @@ describe('Authorization Response', () => {
     account = await appContainer.accountsService.add({
       assetCode: 'XML',
       assetScale: 2,
-      limit: 0n,
+      limit: -3000n,
       name: 'Awesome Account',
       userId: user.id
     })
