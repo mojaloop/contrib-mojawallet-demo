@@ -1,7 +1,7 @@
 import Knex from 'knex'
 import { MojaloopRequests } from '@mojaloop/sdk-standard-components'
 import { KnexOtpService } from './otp-service'
-import { StoredRequest } from './transaction-request-service'
+import { StoredTransactionRequest } from './transaction-request-service'
 import axios, { AxiosResponse } from 'axios'
 import { Money, TransfersPostRequest } from '../types/mojaloop'
 
@@ -47,7 +47,7 @@ export class KnexMojaloopService implements MojaloopService {
   }
 
   async validateTransactionOTP (transactionRequestId: string, OTP: string): Promise<boolean> {
-    const transactionRequest = await this._knex<StoredRequest>('mojaTransactionRequest')
+    const transactionRequest = await this._knex<StoredTransactionRequest>('mojaTransactionRequest')
       .where({ transactionRequestId })
       .first()
 
