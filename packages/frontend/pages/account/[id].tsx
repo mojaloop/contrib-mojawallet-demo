@@ -4,7 +4,7 @@ import dynamic from 'next/dynamic'
 import { NextPage } from 'next'
 import { TransactionService } from '../../services/transactions'
 import { OTPService } from '../../services/otp'
-import { TransactionCardProps, AccountPageProps, Totals, OTPCardProps, CreateOTPCardProps, TimerProps, ActiveOTPCardProps } from "../../types"
+import { TransactionCardProps, AccountPageProps, Totals, OTPCardProps, CreateOTPCardProps, TimerProps, ActiveOTPCardProps, CreateFaucetCardProps } from "../../types"
 import { formatCurrency, checkUser } from "../../utils"
 import { AccountsService } from '../../services/accounts'
 import moment from 'moment'
@@ -36,7 +36,7 @@ const Account: NextPage<AccountPageProps> = ({ account, transactions, otp, user 
                 </div>
               </div>
               <div className="w-full flex my-4 flex-wrap">
-                { otpState.hasOTP ? <OTP token={user.token} otp={otpState.otp} setOTP={setOTP}/> : otpState.disableOTP ? <DisabledOTP/> : <CreateOTP accountId={account.id} token={user.token} setOTP={setOTP}/> }
+                { account.balance < 10 ? <CreateFaucet accountId={account.id} token={user.token}/> : otpState.hasOTP ? <OTP token={user.token} otp={otpState.otp} setOTP={setOTP}/> : otpState.disableOTP ? <DisabledOTP/> : <CreateOTP accountId={account.id} token={user.token} setOTP={setOTP}/> }
                 <Balance balance={account.balance} assetScale={2}/>
                 { transactions.length > 0 ? [...transactions].reverse().map(transaction => <TransactionCard key={'transaction_' + transaction.id} transaction={transaction}/>) : <Empty/>}
               </div>
@@ -95,7 +95,6 @@ const Empty: React.FC = () => {
   )
 }
 
-
 const CreateOTP: React.FC<CreateOTPCardProps> = ({accountId, token, setOTP}) => {
   return (
     <motion.div
@@ -121,7 +120,7 @@ const CreateOTP: React.FC<CreateOTPCardProps> = ({accountId, token, setOTP}) => 
     </motion.div>
   )
 }
-
+  
 const OTP: React.FC<ActiveOTPCardProps> = ({ otp, setOTP, token }) => {
   return (
     <div className="inline-block max-w-xl sm:max-w-xs flex flex-col w-full mt-8 px-6 py-4 mx-8 rounded-xl elevation-4 bg-white hover:elevation-8 active:bg-dark focus:outline-none">
@@ -145,7 +144,7 @@ const OTP: React.FC<ActiveOTPCardProps> = ({ otp, setOTP, token }) => {
               disableOTP: false
             })
           }}
-        >
+          >
           <img className="" src={'/icons/delete-24px.svg'}/>
         </motion.div>
       </div>
@@ -162,6 +161,27 @@ const DisabledOTP: React.FC = () => {
         </div>
       </div>
     </div>
+  )
+}
+
+const CreateFaucet: React.FC<CreateFaucetCardProps> = ({accountId, token}) => {
+  return (
+    <motion.div
+      className="inline-block max-w-xl sm:max-w-xs flex flex-col w-full mt-8 px-6 py-4 mx-8 rounded-xl elevation-4 bg-white hover:elevation-8 active:bg-dark focus:outline-none"
+      onTap={async () => {
+        await accountsService.addFunds(accountId + '', token)
+      }}
+      whileTap={{ boxShadow: "0px 5px 5px -3px rgba(0,0,0,0.20), 0px 8px 10px 1px rgba(0,0,0,0.14), 0px 3px 14px 2px rgba(0,0,0,0.12)" }}
+    >
+      <div className="flex flex-wrap">
+        <div className="mr-1 ml-auto">
+          <img className="" src={'/icons/add-24px.svg'}/>
+        </div>
+        <div className="ml-1 mr-auto text-button uppercase" style={{ paddingTop: '1px' }}>
+          add funds
+        </div>
+      </div>
+    </motion.div>
   )
 }
 
