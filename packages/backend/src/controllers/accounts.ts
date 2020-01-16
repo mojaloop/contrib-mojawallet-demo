@@ -39,7 +39,7 @@ export async function create (ctx: AccountsAppContext): Promise<void> {
 }
 
 export async function update (ctx: AccountsAppContext): Promise<void> {
-  const { accounts } = ctx
+  const { accounts, pusher } = ctx
   const { id } = ctx.params
   const { body } = ctx.request
 
@@ -67,6 +67,13 @@ export async function update (ctx: AccountsAppContext): Promise<void> {
       balance: account.balance.toString(),
       limit: account.limit.toString()
     }
+    pusher.trigger({
+      channel: `account-${id}`,
+      name: 'balance',
+      data: {
+        message: account.balance.toString()
+      }
+    })
   } catch (error) {
     ctx.logger.error('Error creating account', { error })
     throw error

@@ -8,6 +8,7 @@ import { hydraApi } from './apis/hydra'
 import createLogger, { Logger } from 'pino'
 import { createApp } from './app'
 import { KnexQuoteService } from './services/quote-service'
+import { PusherService } from './services/pusher-service'
 import { MojaloopRequests } from '@mojaloop/sdk-standard-components'
 import { KnexOtpService } from './services/otp-service'
 import { KnexMojaloopService, MojaloopService } from './services/mojaloop-service'
@@ -28,6 +29,7 @@ export interface AccountsAppContext extends Context {
   transactions: KnexTransactionService;
   transactionRequests: KnexTransactionRequestService;
   quotes: KnexQuoteService;
+  pusher: PusherService;
   quotesResponse: KnexQuotesResponse;
   otp: KnexOtpService;
   users: KnexUserService;
@@ -57,6 +59,12 @@ const transactionsService = new KnexTransactionService(knex)
 const userService = new KnexUserService(knex)
 const transactionRequestService = new KnexTransactionRequestService(knex)
 const quoteService = new KnexQuoteService(knex)
+const pusherService = new PusherService({
+  appId: '932692',
+  key: '55dfaae15da48fdc5bec',
+  secret: '498c54335cf92dec4541',
+  cluster: 'eu'
+})
 const quotesResponseService = new KnexQuotesResponse(knex)
 const otpService = new KnexOtpService(knex)
 const mojaloopRequests = new MojaloopRequests({
@@ -86,6 +94,7 @@ const app = createApp({
   userService,
   transactionRequestService,
   quoteService,
+  pusherService,
   quotesResponseService,
   otpService,
   mojaloopRequests,
