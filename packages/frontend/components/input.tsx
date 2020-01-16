@@ -23,7 +23,7 @@ const Input: React.FC<props> = (props) => {
         {props.label}
       </label>
       <input name={props.name} ref={props.formRef} className={props.className} value={props.value} id={props.id} type={props.type} placeholder={props.placeholder}/>
-      <p className="text-red-500 text-xs italic">{props.hint}</p>
+      <p className="h-6 text-error text-xs italic">{props.hint}</p>
     </div>
   )
 }
