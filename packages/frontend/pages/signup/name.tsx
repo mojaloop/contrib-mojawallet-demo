@@ -12,7 +12,7 @@ import FormButton from '../../components/form-button'
 
 type FormData = {
   name: string
-  phoneNumber: string
+  username: string
   password: string
 }
 
@@ -20,22 +20,27 @@ const Signup: NextPage = () => {
   const usersService = UsersService()
   const { register, setValue, handleSubmit, errors, setError } = useForm<FormData>()
   const onSubmit = handleSubmit(async (props) => {
-    if (!isValidPhoneNumber(props.phoneNumber)) {
-      setError('phoneNumber', 'Invalid phone number.', '')
+    console.log('submitted')
+    if (!isValidPhoneNumber(props.username)) {
+      setError('username', 'Invalid phone number.', '')
     } else {
-      await usersService.signup(props.phoneNumber, props.password).then((user) => {
-        console.log(user)
-        window.location.href = `/login?signupSessionId=${user.signupSessionId}`
+      let user = await usersService.signup(props.username, props.password).then(async (user) => {
+        const response = await user.json()
+        console.log('USER', response)
+        window.location.href = `/login?signupSessionId=${response.signupSessionId}`
+      }).catch(async (error) => {
+        let response = await error.response.json()
+        setError(response.errors[0].field, response.errors[0].message, '')
       })
     }
   })
-  const onValueChange = (phoneNumber) => {
-    if (!phoneNumber) {
-      setError('phoneNumber', 'Phone number required.', '')
-    } else if (!isValidPhoneNumber(phoneNumber)) {
-      setError('phoneNumber', 'Invalid phone number.', '')
+  const onValueChange = (username) => {
+    if (!username) {
+      setError('username', 'Phone number required.', '')
+    } else if (!isValidPhoneNumber(username)) {
+      setError('username', 'Invalid phone number.', '')
     } else {
-      setValue('phoneNumber', phoneNumber, true)
+      setValue('username', username, true)
     }
   }
 
@@ -44,14 +49,14 @@ const Signup: NextPage = () => {
       <div className="w-full text-gray-800 mb-10 text-headline">Sign up</div>
       <form className="w-3/4 max-w-sm" onSubmit={onSubmit}>
         <div className="w-full">
-          <input type="hidden" name="phoneNumber" ref={register({ required: true })}/>
+          <input type="hidden" name="username" ref={register({ required: true })}/>
           <PhoneInput
             smartCaret={false}
             placeholder="Phone number"
-            name={'phoneNumber'}
+            name={'username'}
             inputClassName={'appearance-none bg-gray-100 border-b border-light focus:border-primary py-2 px-3 mb-3 w-full leading-tight focus:outline-none'}
             onChange={onValueChange}
-            error={errors.phoneNumber ? errors.phoneNumber.type : ''}
+            error={errors.username ? errors.username.type : ''}
           />
         </div>
         <div className="w-full">

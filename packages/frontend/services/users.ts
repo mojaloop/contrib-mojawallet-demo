@@ -16,7 +16,7 @@ export const UsersService = (authErrorCallback?: () => void) => {
       const url = new URL('users', USERS_API_URL)
       return ky.post(url.toString(), {
         json: { username, password }
-      }).then(resp => resp.json()).catch(error => { handleError(error.response.status, authErrorCallback); return error })
+      })
     },
     getLogin: async (challenge: string) => {
       const url = new URL('login', USERS_API_URL)
