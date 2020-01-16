@@ -56,8 +56,9 @@ const Signup: NextPage = () => {
             name={'username'}
             inputClassName={'appearance-none bg-gray-100 border-b border-light focus:border-primary py-2 px-3 mb-3 w-full leading-tight focus:outline-none'}
             onChange={onValueChange}
-            error={errors.username ? errors.username.type : ''}
+            // error={errors.username ? errors.username.type : ''}
           />
+          <p className="h-6 text-error text-xs italic">{errors.username ? errors.username.type : ''}</p>
         </div>
         <div className="w-full">
           <Input

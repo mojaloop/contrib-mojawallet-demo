@@ -65,8 +65,8 @@ const Login: NextPage<Props> = ({login_challenge}) => {
             name={'phoneNumber'}
             inputClassName={'appearance-none bg-gray-100 border-b border-light focus:border-primary py-2 px-3 mb-3 w-full leading-tight focus:outline-none'}
             onChange={onValueChange}
-            error={errors.phoneNumber ? errors.phoneNumber.type : ''}
           />
+          <p className="h-6 text-error text-xs italic">{errors.phoneNumber ? errors.phoneNumber.type : ''}</p>
         </div>
         <div className="w-full">
           <Input
