@@ -18,6 +18,11 @@ export type CreateOTPCardProps = {
   setOTP: React.Dispatch<SetStateAction<{ otp: OTPDetails; hasOTP: boolean; disableOTP: boolean; }>>
 }
 
+export type CreateFaucetCardProps = {
+  accountId: number
+  token: string
+}
+
 export type TimerProps = {
   otp: OTPDetails,
   setOTP: React.Dispatch<SetStateAction<{ otp: OTPDetails; hasOTP: boolean; disableOTP: boolean; }>>

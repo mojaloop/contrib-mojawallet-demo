@@ -20,13 +20,11 @@ const Signup: NextPage = () => {
   const usersService = UsersService()
   const { register, setValue, handleSubmit, errors, setError } = useForm<FormData>()
   const onSubmit = handleSubmit(async (props) => {
-    console.log('submitted')
     if (!isValidPhoneNumber(props.username)) {
       setError('username', 'Invalid phone number.', '')
     } else {
       let user = await usersService.signup(props.username, props.password).then(async (user) => {
         const response = await user.json()
-        console.log('USER', response)
         window.location.href = `/login?signupSessionId=${response.signupSessionId}`
       }).catch(async (error) => {
         let response = await error.response.json()
@@ -56,7 +54,6 @@ const Signup: NextPage = () => {
             name={'username'}
             inputClassName={'appearance-none bg-gray-100 border-b border-light focus:border-primary py-2 px-3 mb-3 w-full leading-tight focus:outline-none'}
             onChange={onValueChange}
-            // error={errors.username ? errors.username.type : ''}
           />
           <p className="h-6 text-error text-xs italic">{errors.username ? errors.username.type : ''}</p>
         </div>
