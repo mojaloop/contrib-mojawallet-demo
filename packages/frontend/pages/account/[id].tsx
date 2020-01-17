@@ -37,7 +37,6 @@ const Account: NextPage<AccountPageProps> = ({ account, transactions, otp, user 
     })
     const channel = pusher.subscribe(`account-${accountState.id}`)
     channel.bind('transaction', (balance) => {
-      console.log('A transaction was created:', balance.message)
       setAccount({ ...accountState, balance: +accountState.balance + +balance.message })
       setTransactions([...transactionsState, {
         id: Math.floor(Math.random() * 10000),
@@ -46,6 +45,11 @@ const Account: NextPage<AccountPageProps> = ({ account, transactions, otp, user 
         epoch: Date.now(),
         Description: ''
       }])
+      setOTP({
+        otp: otp,
+        hasOTP: false,
+        disableOTP: false
+      })
     })
     pusher.connection.bind('connected', () => {
       console.log('Connected to pusher')
