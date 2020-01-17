@@ -33,12 +33,14 @@ import { transfersResponse } from './controllers/transfersResponse'
 import { transfersErrors } from './controllers/transfersErrors'
 import { MojaloopService } from './services/mojaloop-service'
 import { KnexQuotesResponse } from './services/quoteResponse-service'
+import { PusherService } from './services/pusher-service'
 
 export type AppConfig = {
   logger: Logger;
   accountsService: KnexAccountService;
   transactionsService: KnexTransactionService;
   transactionRequestService: KnexTransactionRequestService;
+  pusherService: PusherService;
   quoteService: KnexQuoteService;
   quotesResponseService: KnexQuotesResponse;
   hydraApi: HydraApi;
@@ -66,6 +68,7 @@ export function createApp (appConfig: AppConfig): Koa<any, AccountsAppContext> {
     ctx.users = appConfig.userService
     ctx.transactionRequests = appConfig.transactionRequestService
     ctx.quotes = appConfig.quoteService
+    ctx.pusher = appConfig.pusherService
     ctx.quotesResponse = appConfig.quotesResponseService
     ctx.otp = appConfig.otpService
     ctx.hydraApi = appConfig.hydraApi

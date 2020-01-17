@@ -9,6 +9,7 @@ import { formatCurrency, checkUser } from "../../utils"
 import { AccountsService } from '../../services/accounts'
 import moment from 'moment'
 import { motion } from 'framer-motion'
+import Pusher from 'pusher-js'
 
 const accountsService = AccountsService()
 const transactionService = TransactionService()
@@ -19,6 +20,24 @@ const Account: NextPage<AccountPageProps> = ({ account, transactions, otp, user 
     otp: otp,
     hasOTP: otp && otp.accountId == account.id,
     disableOTP: otp && otp.accountId != account.id
+  })
+  useEffect(() => {
+    console.log('Initialising Pusher')
+    const pusher = new Pusher('932692', {
+      cluster: 'eu'
+    })
+    const channel = pusher.subscribe(`account-${account.id}`)
+    channel.bind('balance', ({ balance = null }) => {
+      console.log('The balance was updated:', balance)
+    })
+    pusher.connection.bind('connected', () => {
+      console.log('Connected to pusher')
+    })
+    console.log(pusher)
+    return () => {
+      console.log('disconnecting...')
+      pusher.disconnect()
+    }
   })
   return (
     <div>

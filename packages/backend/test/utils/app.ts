@@ -13,6 +13,7 @@ import { createApp } from '../../src/app'
 import createLogger from 'pino'
 import { KnexOtpService } from '../../src/services/otp-service'
 import { KnexQuotesResponse } from '../../src/services/quoteResponse-service'
+import { PusherService } from '../../src/services/pusher-service'
 
 export type TestAppContainer = {
   server: Server,
@@ -26,6 +27,7 @@ export type TestAppContainer = {
   transactionRequestService: KnexTransactionRequestService
   quoteService: KnexQuoteService
   quotesResponseService: KnexQuotesResponse
+  pusherService: PusherService
   hydraApi: HydraApi
   mojaloopRequests: MojaloopRequests
   otpService: KnexOtpService
@@ -50,6 +52,12 @@ export const createTestApp = (): TestAppContainer => {
   const transactionsService = new KnexTransactionService(knex)
   const userService = new KnexUserService(knex)
   const transactionRequestService = new KnexTransactionRequestService(knex)
+  const pusherService = new PusherService({
+    appId: '932692',
+    key: '55dfaae15da48fdc5bec',
+    secret: '498c54335cf92dec4541',
+    cluster: 'eu'
+  })
   const quoteService = new KnexQuoteService(knex)
   const quotesResponseService = new KnexQuotesResponse(knex)
   const otpService = new KnexOtpService(knex)
@@ -86,6 +94,7 @@ export const createTestApp = (): TestAppContainer => {
     hydraApi,
     userService,
     quoteService,
+    pusherService,
     quotesResponseService,
     mojaloopRequests,
     mojaloopService,
@@ -106,6 +115,7 @@ export const createTestApp = (): TestAppContainer => {
     userService,
     transactionRequestService,
     quoteService,
+    pusherService,
     quotesResponseService,
     hydraApi,
     mojaloopRequests,

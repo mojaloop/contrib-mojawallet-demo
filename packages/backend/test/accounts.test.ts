@@ -65,6 +65,8 @@ describe('Accounts API Test', () => {
     })
 
     it('User can update their own account', async () => {
+      const mock = jest.fn()
+      appContainer.pusherService.trigger = mock
       await axios.patch(`http://localhost:${appContainer.port}/accounts/${account.id}`, {
         name: 'new test'
       }, {
@@ -78,9 +80,18 @@ describe('Accounts API Test', () => {
       const edittedAccount = await appContainer.accountsService.get(account.id)
 
       expect(edittedAccount.name).toBe('new test')
+      expect(mock).toHaveBeenCalledWith({
+        channel: `account-${account.id}`,
+        name: 'balance',
+        data: {
+          message: account.balance.toString()
+        }
+      })
     })
 
     it('User cant update another users account', async () => {
+      const mock = jest.fn()
+      appContainer.pusherService.trigger = mock
       const response = axios.patch(`http://localhost:${appContainer.port}/accounts/${account.id}`, {
         name: 'new test'
       }, {
@@ -92,6 +103,7 @@ describe('Accounts API Test', () => {
       })
 
       await expect(response).rejects.toEqual(Error('Request failed with status code 403'))
+      expect(mock).toHaveBeenCalledTimes(0)
     })
   })
 
