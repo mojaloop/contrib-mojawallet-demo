@@ -23,7 +23,7 @@ const Account: NextPage<AccountPageProps> = ({ account, transactions, otp, user 
   })
   useEffect(() => {
     console.log('Initialising Pusher')
-    const pusher = new Pusher('932692', {
+    const pusher = new Pusher('55dfaae15da48fdc5bec', {
       cluster: 'eu'
     })
     const channel = pusher.subscribe(`account-${account.id}`)

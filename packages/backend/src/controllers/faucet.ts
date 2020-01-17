@@ -6,7 +6,7 @@ const enforce = (subject: string, account: Account): boolean => {
 }
 
 export async function create (ctx: AccountsAppContext): Promise<void> {
-  const { accounts, transactions } = ctx
+  const { accounts, transactions, pusher } = ctx
   const { body } = ctx.request
 
   const FAUCET_AMOUNT = 10000
@@ -20,6 +20,13 @@ export async function create (ctx: AccountsAppContext): Promise<void> {
 
   try {
     await transactions.create(account.id, BigInt(FAUCET_AMOUNT), 'Faucet Money')
+    await pusher.trigger({
+      channel: `account-${account.id}`,
+      name: 'balance',
+      data: {
+        message: (BigInt(FAUCET_AMOUNT) + account.balance).toString()
+      }
+    })
     ctx.status = 201
   } catch (error) {
     console.log(error)

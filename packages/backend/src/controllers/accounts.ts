@@ -67,7 +67,7 @@ export async function update (ctx: AccountsAppContext): Promise<void> {
       balance: account.balance.toString(),
       limit: account.limit.toString()
     }
-    pusher.trigger({
+    await pusher.trigger({
       channel: `account-${id}`,
       name: 'balance',
       data: {
