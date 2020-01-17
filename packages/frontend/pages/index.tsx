@@ -32,7 +32,7 @@ const Home: NextPage<AccountsPageProps> = ({accounts, user}) => {
             </div>
 
             <div className="w-full flex my-4 flex-wrap">
-              <Balance balance={accounts.reduce((sum, current) => sum + current.balance, 0)} assetScale={2}/>
+              <Balance balance={accounts.reduce((sum, current) => sum + +current.balance, 0)} assetScale={2}/>
                 { accounts.length > 0 ? accounts.map(account => <AccountCard key={'account_' + account.id} account={account}/>) : <Empty/> }
               <AddAccount/>
             </div>

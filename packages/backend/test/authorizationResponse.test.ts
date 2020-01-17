@@ -122,6 +122,7 @@ describe('Authorization Response', () => {
 
     test('If authorization is valid transfer is initiated', async () => {
       appContainer.mojaloopService.initiateTransfer = jest.fn()
+      appContainer.pusherService.trigger = jest.fn()
 
       const response = await axios.put(`http://localhost:${appContainer.port}/authorizations/ca919568-e559-42a8-b763-1be22179decc`, {
         authenticationInfo: {
@@ -132,11 +133,13 @@ describe('Authorization Response', () => {
       })
 
       expect(appContainer.mojaloopService.initiateTransfer).toBeCalledTimes(1)
+      expect(appContainer.pusherService.trigger).toBeCalledTimes(1)
       expect(response.status).toBe(200)
     })
 
     test('If authorization is invalid dont initiate transfer', async () => {
       appContainer.mojaloopService.initiateTransfer = jest.fn()
+      appContainer.pusherService.trigger = jest.fn()
 
       const response = await axios.put(`http://localhost:${appContainer.port}/authorizations/ca919568-e559-42a8-b763-1be22179decc`, {
         authenticationInfo: {
@@ -147,6 +150,7 @@ describe('Authorization Response', () => {
       })
 
       expect(appContainer.mojaloopService.initiateTransfer).toBeCalledTimes(0)
+      expect(appContainer.pusherService.trigger).toBeCalledTimes(0)
       expect(response.status).toBe(200)
     })
   })

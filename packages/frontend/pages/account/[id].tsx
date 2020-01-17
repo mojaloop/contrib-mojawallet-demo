@@ -15,25 +15,44 @@ const accountsService = AccountsService()
 const transactionService = TransactionService()
 const otpService = OTPService()
 
+// export type AccountDetails = {
+//   id: number
+//   name: string
+//   balance: number
+//   owner: number
+//   assetScale: number
+// }
+
 const Account: NextPage<AccountPageProps> = ({ account, transactions, otp, user }) => {
   const [otpState, setOTP] = useState({
     otp: otp,
     hasOTP: otp && otp.accountId == account.id,
     disableOTP: otp && otp.accountId != account.id
   })
+  const [accountState, setAccount] = useState(account)
+  const [transactionsState, setTransactions] = useState(transactions)
   useEffect(() => {
-    console.log('Initialising Pusher')
     const pusher = new Pusher('55dfaae15da48fdc5bec', {
       cluster: 'eu'
     })
-    const channel = pusher.subscribe(`account-${account.id}`)
-    channel.bind('balance', ({ balance = null }) => {
-      console.log('The balance was updated:', balance)
+    const channel = pusher.subscribe(`account-${accountState.id}`)
+    channel.bind('transaction', (balance) => {
+      console.log('A transaction was created:', balance.message)
+      setAccount({ ...accountState, balance: +accountState.balance + +balance.message })
+      setTransactions([...transactionsState, {
+        id: Math.floor(Math.random() * 10000),
+        accountId: accountState.id.toString(),
+        amount: +balance.message,
+        epoch: Date.now(),
+        Description: ''
+      }])
     })
     pusher.connection.bind('connected', () => {
       console.log('Connected to pusher')
     })
-    console.log(pusher)
+    pusher.connection.bind('disconnected', () => {
+      console.log('Disconnected from pusher')
+    })
     return () => {
       console.log('disconnecting...')
       pusher.disconnect()
@@ -42,7 +61,7 @@ const Account: NextPage<AccountPageProps> = ({ account, transactions, otp, user 
   return (
     <div>
       <Head>
-        <title>{account.name}</title>
+        <title>{accountState.name}</title>
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <div>
@@ -51,13 +70,13 @@ const Account: NextPage<AccountPageProps> = ({ account, transactions, otp, user 
             <div className='w-full mx-auto max-w-lg'>
               <div className="flex">
                 <div className="text-headline text-white flex-1 text-base mx-4 px-4">
-                  {account.name}
+                  {accountState.name}
                 </div>
               </div>
               <div className="w-full flex my-4 flex-wrap">
-                { account.balance < 10 ? <CreateFaucet accountId={account.id} token={user.token}/> : otpState.hasOTP ? <OTP token={user.token} otp={otpState.otp} setOTP={setOTP}/> : otpState.disableOTP ? <DisabledOTP/> : <CreateOTP accountId={account.id} token={user.token} setOTP={setOTP}/> }
-                <Balance balance={account.balance} assetScale={2}/>
-                { transactions.length > 0 ? [...transactions].reverse().map(transaction => <TransactionCard key={'transaction_' + transaction.id} transaction={transaction}/>) : <Empty/>}
+                { accountState.balance < 10 ? <CreateFaucet accountId={accountState.id} token={user.token}/> : otpState.hasOTP ? <OTP token={user.token} otp={otpState.otp} setOTP={setOTP}/> : otpState.disableOTP ? <DisabledOTP/> : <CreateOTP accountId={accountState.id} token={user.token} setOTP={setOTP}/> }
+                <Balance balance={accountState.balance} assetScale={2}/>
+                { transactionsState.length > 0 ? [...transactionsState].reverse().map(transaction => <TransactionCard key={'transaction_' + transaction.id} transaction={transaction}/>) : <Empty/>}
               </div>
             </div>
         </div>

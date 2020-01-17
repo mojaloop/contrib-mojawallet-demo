@@ -5,7 +5,7 @@ import { StoredTransfer } from '../services/mojaloop-service'
 import uuidv4 = require('uuid/v4')
 
 export async function authorizations (ctx: AccountsAppContext): Promise<void> {
-  const { transactionRequests, mojaloopService, quotes, otp, transactions, quotesResponse } = ctx
+  const { transactionRequests, mojaloopService, quotes, otp, transactions, quotesResponse, pusher } = ctx
   const { id } = ctx.params
   const { body } = ctx.request
 
@@ -40,6 +40,13 @@ export async function authorizations (ctx: AccountsAppContext): Promise<void> {
           }
           await otp.markUsed(transactionRequest.userId.toString())
           await transactions.create(storedOtp.accountId, BigInt(quoteResponse.transferAmount.amount) * BigInt(-100))
+          await pusher.trigger({
+            channel: `account-${storedOtp.accountId}`,
+            name: 'transaction',
+            data: {
+              message: (BigInt(quoteResponse.transferAmount.amount) * BigInt(-100)).toString()
+            }
+          })
           await mojaloopService.initiateTransfer(transferBody, transfer)
         }
       }
