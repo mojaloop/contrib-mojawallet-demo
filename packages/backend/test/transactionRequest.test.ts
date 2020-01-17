@@ -6,9 +6,9 @@ import { cloneDeep } from 'lodash'
 
 jest.mock('../src/services/mojaResponseService', () => ({
   mojaResponseService: {
-    putResponse: jest.fn(),
-    putErrorResponse: jest.fn(),
-    quoteResponse: jest.fn()
+    putResponse: jest.fn().mockResolvedValue(undefined),
+    putErrorResponse: jest.fn().mockResolvedValue(undefined),
+    quoteResponse: jest.fn().mockResolvedValue(undefined)
   }
 }))
 
