@@ -34,7 +34,9 @@ export async function authorizations (ctx: AccountsAppContext): Promise<void> {
             transferId: transferId,
             transactionId: transactionRequest.transactionId,
             transactionRequestId: transactionRequest.transactionRequestId,
-            quoteId: quote.quoteId as string
+            quoteId: quote.quoteId as string,
+            accountId: storedOtp.accountId,
+            isReverted: false
           }
           await otp.markUsed(transactionRequest.userId.toString())
           await transactions.create(storedOtp.accountId, BigInt(quoteResponse.transferAmount.amount) * BigInt(-100))
