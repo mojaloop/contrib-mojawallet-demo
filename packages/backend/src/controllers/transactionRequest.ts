@@ -71,7 +71,9 @@ export async function create (ctx: AccountsAppContext): Promise<void> {
       },
       body.transactionRequestId,
       destFspId
-    )
+    ).catch(error => {
+      ctx.logger.error("Error sending error response back", {error: error.response})
+    })
   }
   if (transactionId) {
     try {
