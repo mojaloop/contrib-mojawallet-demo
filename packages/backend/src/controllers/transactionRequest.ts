@@ -32,7 +32,7 @@ export async function create (ctx: AccountsAppContext): Promise<void> {
     if (activeOtp) {
       const account = await accounts.get(activeOtp.accountId)
       // currency is not taken into account when checking available funds
-      if (account.balance < parseInt(transactionId.amount.amount)) {
+      if (account.balance < (parseInt(transactionId.amount.amount) * 100)) {
         throw new Error('4000')
       }
     } else {

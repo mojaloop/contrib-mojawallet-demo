@@ -14,6 +14,8 @@ export type StoredTransfer = {
   quoteId: string
   response?: string
   error?: string
+  accountId: string
+  isReverted: boolean
 }
 
 export interface MojaloopService {
