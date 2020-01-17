@@ -34,7 +34,9 @@ describe('Faucet API Test', () => {
     })
 
     test('User can add money via fuacet', async () => {
-      const response = await axios.post(`http://localhost:${appContainer.port}/faucet`, {
+      const mock = jest.fn()
+      appContainer.pusherService.trigger = mock
+      await axios.post(`http://localhost:${appContainer.port}/faucet`, {
         accountId: account.id
       }
       , {
@@ -48,9 +50,18 @@ describe('Faucet API Test', () => {
 
       const acc = await appContainer.accountsService.get(account.id)
       expect(acc.balance.toString()).toBe('10000')
+      expect(mock).toHaveBeenCalledWith({
+        channel: `account-${account.id}`,
+        name: 'transaction',
+        data: {
+          message: '10000'
+        }
+      })
     })
 
     test('User cant add a transaction for an account that\'s not theirs', async () => {
+      const mock = jest.fn()
+      appContainer.pusherService.trigger = mock
       const response = axios.post(`http://localhost:${appContainer.port}/transactions`, {
         accountId: account.id,
         amount: '100'
@@ -62,6 +73,7 @@ describe('Faucet API Test', () => {
       })
 
       await expect(response).rejects.toEqual(Error('Request failed with status code 404'))
+      expect(mock).toHaveBeenCalledTimes(0)
     })
   })
 })

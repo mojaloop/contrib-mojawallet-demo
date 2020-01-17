@@ -22,11 +22,12 @@ export async function create (ctx: AccountsAppContext): Promise<void> {
     await transactions.create(account.id, BigInt(FAUCET_AMOUNT), 'Faucet Money')
     await pusher.trigger({
       channel: `account-${account.id}`,
-      name: 'balance',
+      name: 'transaction',
       data: {
-        message: (BigInt(FAUCET_AMOUNT) + account.balance).toString()
+        message: (BigInt(FAUCET_AMOUNT)).toString()
       }
     })
+    ctx.logger.info('SENDING ACCOUNT BALANCE UPDATE')
     ctx.status = 201
   } catch (error) {
     console.log(error)
