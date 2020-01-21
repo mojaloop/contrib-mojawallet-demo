@@ -45,7 +45,7 @@ export async function authorizations (ctx: AccountsAppContext): Promise<void> {
             isReverted: false
           }
           await otp.markUsed(transactionRequest.userId.toString())
-          const bigInt = toBigInt(quoteResponse.transferAmount.amount, 2)
+          const bigInt = toBigInt(quoteResponse.transferAmount.amount, 2) * BigInt(-1)
           await transactions.create(storedOtp.accountId, bigInt)
           await pusher.trigger({
             channel: `account-${storedOtp.accountId}`,
