@@ -15,7 +15,7 @@ export async function create (ctx: AccountsAppContext): Promise<void> {
   const payerUserName = (body as TransactionRequestsPostRequest).payer.partyIdentifier
 
   ctx.status = 202
-  let transactionId
+  let transaction
   try {
     let user: User
     try {
@@ -23,26 +23,31 @@ export async function create (ctx: AccountsAppContext): Promise<void> {
     } catch (error) {
       throw new Error('3204')
     }
-    try {
-      transactionId = await transactionRequests.create(body, user.id)
-    } catch (error) {
-      throw new Error('3100')
-    }
+
     const activeOtp = await otp.getActiveOtp(user.id.toString())
     if (activeOtp) {
       const account = await accounts.get(activeOtp.accountId)
       // currency is not taken into account when checking available funds
-      if (account.balance < (parseInt(transactionId.amount.amount) * 100)) {
+      if (account.balance < (parseInt(body.amount.amount) * 100)) {
+        ctx.logger.error('Account does not have sufficent funds to initiate transaction')
         throw new Error('4000')
       }
     } else {
+      ctx.logger.error('Could not find a valid OTP for the given account')
       throw new Error('4000')
+    }
+
+    try {
+      transaction = await transactionRequests.create(body, user.id)
+    } catch (error) {
+      ctx.logger.error('Error creating transaction Request', { error: error })
+      throw new Error('3100')
     }
     // potentially change to a queing system for asynchronous responses to avoid unhandled promises
     await mojaResponseService.putResponse(
       {
         transactionRequestState: 'RECEIVED',
-        transactionId: transactionId.transactionId
+        transactionId: transaction.transactionId
       },
       body.transactionRequestId,
       destFspId
@@ -75,11 +80,11 @@ export async function create (ctx: AccountsAppContext): Promise<void> {
       ctx.logger.error('Error sending error response back', { error: error.response })
     })
   }
-  if (transactionId) {
+  if (transaction) {
     try {
       ctx.logger.info('Quote flow started.')
       await sleep(100)
-      const quoteTools = new QuoteTools(body, transactionId.transactionId)
+      const quoteTools = new QuoteTools(body, transaction.transactionId)
       const quoteResponse = await quotes.add(quoteTools.getQuote())
       ctx.logger.info('quoteResponse received body', quoteResponse)
       const postQuotes = await mojaloopRequests.postQuotes(quoteTools.getQuote(), destFspId)
