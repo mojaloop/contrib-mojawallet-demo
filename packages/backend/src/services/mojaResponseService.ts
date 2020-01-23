@@ -29,7 +29,8 @@ export const mojaResponseService: MojaResponseService = {
       headers: {
         'Content-Type': 'application/vnd.interoperability.transactionRequests+json;version=1.0',
         'FSPIOP-Source': 'mojawallet',
-        'FSPIOP-Destination': destFspId
+        'FSPIOP-Destination': destFspId,
+        'Date': new Date().toUTCString()
       }
     })
   },
@@ -39,7 +40,8 @@ export const mojaResponseService: MojaResponseService = {
       headers: {
         'Content-Type': 'application/vnd.interoperability.transactionRequests+json;version=1.0',
         'FSPIOP-Source': 'mojawallet',
-        'FSPIOP-Destination': destFspId
+        'FSPIOP-Destination': destFspId,
+        'Date': new Date().toUTCString()
       }
     })
   }
