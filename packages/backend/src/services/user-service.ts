@@ -16,6 +16,7 @@ export type User = {
 interface UserService {
   store(user: UserProps): Promise<User>;
   update(user: UserProps): Promise<User>;
+  getAll(): Promise<Array<User>>
 //   delete(id: string): Promise<void>;
 //   get(id: string): Promise<User>;
 }
@@ -75,24 +76,7 @@ export class KnexUserService implements UserService {
     return user
   }
 
-  //   async get (id: string): Promise<User> {
-  //     const account = await this._knex<User>('users').where('id', id).first()
-
-  //     if (!account) {
-  //       throw new Error('Error inserting account into database')
-  //     }
-  //     return dbAccountToAccount(account)
-  //   }
-
-  //   async delete (id: string): Promise<void> {
-  //     return undefined
-  //   }
-
-  //   async getByUserId (userId: string): Promise<Array<Account>> {
-  //     const accounts = await this._knex<DatabaseAccount>('accounts').where({ userId })
-
-//     return accounts.map(account => {
-//       return dbAccountToAccount(account)
-//     })
-//   }
+  async getAll (): Promise<Array<User>> {
+    return this._knex<User>('users')
+  }
 }

@@ -12,6 +12,7 @@ import { show as showLogin, store as storeLogin } from './controllers/login'
 import { store as storeLogout } from './controllers/logout'
 import { show as showParty, errorCallback as errorPartiesCallback, successCallback as successPartiesCallback } from './controllers/parties'
 import { errorCallback as errorParticipantsCallback, successCallback as successParticipantsCallback } from './controllers/participants'
+import { index as refreshALS } from './controllers/refreshALS'
 import { errorCallback as errorAuthorizationCallback } from './controllers/authorizationsError'
 import { create as createTransactionRequest } from './controllers/transactionRequest'
 import { show as showConsent, store as storeConsent } from './controllers/consent'
@@ -110,6 +111,8 @@ export function createApp (appConfig: AppConfig): Koa<any, AccountsAppContext> {
 
   publicRouter.get('/consent', showConsent)
   publicRouter.post('/consent', storeConsent)
+
+  publicRouter.get('/refreshALS', refreshALS)
 
   publicRouter.post('/transactionRequests', createTransactionRequest)
 
