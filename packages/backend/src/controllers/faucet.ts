@@ -9,7 +9,7 @@ export async function create (ctx: AccountsAppContext): Promise<void> {
   const { accounts, transactions, pusher } = ctx
   const { body } = ctx.request
 
-  const FAUCET_AMOUNT = 10000
+  const FAUCET_AMOUNT = 200000
 
   const account = await accounts.get(body.accountId)
 
