@@ -12,7 +12,7 @@ const enforceGetUserAcccounts = (subject: string, userId: string): boolean => {
 }
 
 export async function create (ctx: AccountsAppContext): Promise<void> {
-  const { accounts } = ctx
+  const { accounts, transactions, pusher } = ctx
   const { body } = ctx.request
 
   ctx.logger.info('Creating an account', { body })
@@ -27,6 +27,17 @@ export async function create (ctx: AccountsAppContext): Promise<void> {
 
   try {
     const account = await accounts.add(accountProps)
+
+    // TODO Temp automatically add money
+    await transactions.create(account.id, BigInt(200000), 'Faucet Money')
+    await pusher.trigger({
+      channel: `account-${account.id}`,
+      name: 'transaction',
+      data: {
+        message: (BigInt(200000)).toString()
+      }
+    })
+
     ctx.body = {
       ...account,
       balance: account.balance.toString(),

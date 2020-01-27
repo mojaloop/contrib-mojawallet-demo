@@ -9,6 +9,7 @@ describe('Accounts API Test', () => {
   })
 
   beforeEach(async () => {
+    appContainer.pusherService.trigger = jest.fn()
     await appContainer.knex.migrate.latest()
   })
 

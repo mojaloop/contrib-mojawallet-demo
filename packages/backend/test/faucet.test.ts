@@ -49,12 +49,12 @@ describe('Faucet API Test', () => {
       })
 
       const acc = await appContainer.accountsService.get(account.id)
-      expect(acc.balance.toString()).toBe('10000')
+      expect(acc.balance.toString()).toBe('200000')
       expect(mock).toHaveBeenCalledWith({
         channel: `account-${account.id}`,
         name: 'transaction',
         data: {
-          message: '10000'
+          message: '200000'
         }
       })
     })
