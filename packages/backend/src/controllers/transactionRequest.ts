@@ -2,14 +2,13 @@ import { AccountsAppContext } from '../index'
 import { QuoteTools } from '../services/quote-service'
 import { mojaResponseService } from '../services/mojaResponseService'
 import { TransactionRequestsPostRequest } from '../types/mojaloop'
-import { User } from '../services/user-service'
 
 const sleep = (ms: number): Promise<void> => {
   return new Promise(resolve => setTimeout(resolve, ms))
 }
 
 export async function create (ctx: AccountsAppContext): Promise<void> {
-  const { transactionRequests, quotes, users, mojaloopRequests, otp, accounts } = ctx
+  const { transactionRequests, quotes, users, mojaloopRequests } = ctx
   const { body } = ctx.request
   const destFspId = ctx.get('fspiop-source')
   const payerUserName = (body as TransactionRequestsPostRequest).payer.partyIdentifier
@@ -17,25 +16,23 @@ export async function create (ctx: AccountsAppContext): Promise<void> {
   ctx.status = 202
   let transaction
   try {
-    let user: User
-    try {
-      user = await users.getByUsername('+' + payerUserName)
-    } catch (error) {
+    const user = await users.getByUsername('+' + payerUserName).catch(() => {
       throw new Error('3204')
-    }
+    })
 
-    const activeOtp = await otp.getActiveOtp(user.id.toString())
-    if (activeOtp) {
-      const account = await accounts.get(activeOtp.accountId)
-      // currency is not taken into account when checking available funds
-      if (account.balance < (parseInt(body.amount.amount) * 100)) {
-        ctx.logger.error('Account does not have sufficent funds to initiate transaction')
-        throw new Error('4000')
-      }
-    } else {
-      ctx.logger.error('Could not find a valid OTP for the given account')
-      throw new Error('4000')
-    }
+    // TODO look how to reenable this validation
+    // const activeOtp = await otp.getActiveOtp(user.id.toString())
+    // if (activeOtp) {
+    //   const account = await accounts.get(activeOtp.accountId)
+    //   // currency is not taken into account when checking available funds
+    //   if (account.balance < (parseInt(body.amount.amount) * 100)) {
+    //     ctx.logger.error('Account does not have sufficent funds to initiate transaction')
+    //     throw new Error('4000')
+    //   }
+    // } else {
+    //   ctx.logger.error('Could not find a valid OTP for the given account')
+    //   throw new Error('4000')
+    // }
 
     try {
       transaction = await transactionRequests.create(body, user.id)
