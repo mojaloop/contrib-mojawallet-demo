@@ -16,7 +16,7 @@
     "ky": "^0.16.1",
     "ky-universal": "^0.3.0",
     "moment": "^2.24.0",
-    "next": "9.1.4",
+    "next": "9.3.2",
     "nookies": "^2.0.8",
     "openid-client": "^3.8.4",
     "pusher-js": "^5.0.3",
