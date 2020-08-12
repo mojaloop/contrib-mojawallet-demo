@@ -6,6 +6,11 @@
   "workspaces": [
     "packages/backend"
   ],
+  "contributors": [
+    "Cairin Michie <github:cairinmichie>",
+    "Donovan Changfoot <github:donchangfoot>",
+    "Matthew de Haast <github:matdehaast>"
+  ],
   "devDependencies": {
     "@typescript-eslint/eslint-plugin": "^2.9.0",
     "@typescript-eslint/parser": "^2.9.0",
