@@ -1,8 +1,9 @@
 import { AccountsAppContext } from '../index'
-import { TransfersPostRequest } from '../types/mojaloop'
+import { TransfersPostRequest, AuthorizationsIDPutResponse } from '../types/mojaloop'
 // import { QuoteResponse } from '../services/quoteResponse-service'
 import { StoredTransfer } from '../services/mojaloop-service'
 import uuidv4 = require('uuid/v4')
+import got from 'got/dist/source'
 
 const toBigInt = (value: string, scale: number): bigint => {
   const floatValue = parseFloat(value)
@@ -30,7 +31,7 @@ export async function authorizations (ctx: AccountsAppContext): Promise<void> {
           const transferBody: TransfersPostRequest = {
             amount: quoteResponse.transferAmount,
             condition: quoteResponse.condition,
-            expiration: quoteResponse.expiration,
+            expiration: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(),
             ilpPacket: quoteResponse.ilpPacket,
             payeeFsp: payeeFsp,
             payerFsp: payerFsp,
@@ -63,4 +64,34 @@ export async function authorizations (ctx: AccountsAppContext): Promise<void> {
   }
 
   ctx.status = 200
+}
+
+export async function show (ctx: AccountsAppContext) {
+  const transactionRequestId = ctx.params['transactionRequestId']
+
+  try {
+    const mobileMoneyTransaction = await ctx.mobileMoneyTransactions.get(transactionRequestId)
+    if (!mobileMoneyTransaction.oneTimeCode) {
+      ctx.mojaloopRequests.putAuthorizations(transactionRequestId, { responseType: 'REJECTED' } as AuthorizationsIDPutResponse, ctx.request.headers['fspiop-source'])
+      return
+    }
+
+    // await ctx.mojaloopRequests.putAuthorizations(transactionRequestId, { responseType: 'ENTERED', authenticationInfo: { authenticationValue: mobileMoneyTransaction.oneTimeCode, authentication: 'OTP' } } as AuthorizationsIDPutResponse, ctx.request.headers['fspiop-source'])
+    const authResponse: AuthorizationsIDPutResponse = { responseType: 'ENTERED', authenticationInfo: { authenticationValue: mobileMoneyTransaction.oneTimeCode, authentication: 'OTP' } } 
+    await got.put('https://transaction-request-service.mojaloop.app/authorizations/' + transactionRequestId, { json: authResponse,
+      headers: {
+        'Content-Type': 'application/vnd.interoperability.authorizations+json;version=1.0',
+        'Accept': 'application/vnd.interoperability.authorizations+json;version=1.0',
+        'FSPIOP-Source': 'mojawallet',
+        'FSPIOP-Destination': ctx.request.headers['fspiop-source'],
+        'Date': new Date().toUTCString()
+      }
+    })
+    ctx.response.status = 200
+  } catch (error) {
+    console.log('error', error)
+    ctx.logger.error('Could not find mobile money transaction associated to mojaloop transaction request')
+    ctx.response.status = 404
+  }
+
 }

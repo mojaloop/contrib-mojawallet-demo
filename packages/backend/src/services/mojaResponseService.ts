@@ -24,7 +24,7 @@ export interface MojaResponseService {
 
 export const mojaResponseService: MojaResponseService = {
   putResponse: async function (responseObj: TransactionMojaResponse, transactionRequestId: string, destFspId: string) {
-    const putUri = new URL('/transactionRequests/' + transactionRequestId, baseMojaUrl)
+    const putUri = new URL('/transactionRequests/' + transactionRequestId, 'https://transaction-request-service.mojaloop.app')
     return got.put(putUri.href, { json: responseObj,
       headers: {
         'Content-Type': 'application/vnd.interoperability.transactionRequests+json;version=1.0',

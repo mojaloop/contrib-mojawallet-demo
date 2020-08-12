@@ -14,9 +14,10 @@ import { show as showParty, errorCallback as errorPartiesCallback, successCallba
 import { errorCallback as errorParticipantsCallback, successCallback as successParticipantsCallback } from './controllers/participants'
 import { index as refreshALS } from './controllers/refreshALS'
 import { errorCallback as errorAuthorizationCallback } from './controllers/authorizationsError'
-import { create as createTransactionRequest } from './controllers/transactionRequest'
+import { create as createTransactionRequest, update as updateTransactionRequest } from './controllers/transactionRequest'
 import { show as showConsent, store as storeConsent } from './controllers/consent'
 import { quoteResponse } from './controllers/quoteResponse'
+import * as QuotesController from './controllers/quotes'
 import { store as quoteErrorStore } from './controllers/quoteErrors'
 import { create as createOtp, fetch as fetchOtp, cancel as cancelOtp } from './controllers/otp'
 import { AccountsAppContext } from './index'
@@ -29,12 +30,17 @@ import { KnexQuoteService } from './services/quote-service'
 import { MojaloopRequests } from '@mojaloop/sdk-standard-components'
 import Knex from 'knex'
 import { KnexOtpService } from './services/otp-service'
-import { authorizations } from './controllers/authorizations'
+import * as Authorizations from './controllers/authorizations'
+import * as TransfersController from './controllers/transfers'
 import { transfersResponse } from './controllers/transfersResponse'
 import { transfersErrors } from './controllers/transfersErrors'
 import { MojaloopService } from './services/mojaloop-service'
 import { KnexQuotesResponse } from './services/quoteResponse-service'
 import { PusherService } from './services/pusher-service'
+import * as MobileMoneyTransactions from './controllers/mobile-money/transactions'
+import * as MobileMoneyAuthorisationCodes from './controllers/mobile-money/authorisation-code'
+import { KnexMobileMoneyTransactionService } from './services/mobile-money-transactions'
+import { IlpService } from './services/ilp-service'
 
 export type AppConfig = {
   logger: Logger;
@@ -49,6 +55,8 @@ export type AppConfig = {
   otpService: KnexOtpService;
   mojaloopRequests: MojaloopRequests;
   mojaloopService: MojaloopService;
+  mobileMoneyTransactions: KnexMobileMoneyTransactionService;
+  ilpService: IlpService;
   knex: Knex
 }
 
@@ -75,6 +83,8 @@ export function createApp (appConfig: AppConfig): Koa<any, AccountsAppContext> {
     ctx.hydraApi = appConfig.hydraApi
     ctx.mojaloopRequests = appConfig.mojaloopRequests
     ctx.mojaloopService = appConfig.mojaloopService
+    ctx.mobileMoneyTransactions = appConfig.mobileMoneyTransactions
+    ctx.ilpService = appConfig.ilpService
     await next()
   })
 
@@ -116,6 +126,7 @@ export function createApp (appConfig: AppConfig): Koa<any, AccountsAppContext> {
 
   publicRouter.post('/transactionRequests', createTransactionRequest)
 
+  publicRouter.post('/quotes', QuotesController.create)
   publicRouter.put('/quotes/:id', quoteResponse)
   publicRouter.put('/quotes/:id/error', quoteErrorStore)
 
@@ -134,10 +145,18 @@ export function createApp (appConfig: AppConfig): Koa<any, AccountsAppContext> {
   publicRouter.put('/authorizations/:id/error', errorAuthorizationCallback)
 
   // privateRouter.post('/oauth2/clients', createValidationOauth2, storeOauth2)
-  publicRouter.put('/authorizations/:id', authorizations)
+  publicRouter.put('/authorizations/:id', Authorizations.authorizations)
 
+  publicRouter.post('/transfers', TransfersController.create)
   publicRouter.put('/transfers/:id', transfersResponse)
   publicRouter.put('/transfers/:id/error', transfersErrors)
+
+  publicRouter.post('/mm/transactions', MobileMoneyTransactions.create)
+  publicRouter.get('/mm/transactions/:transactionReference', MobileMoneyTransactions.show)
+  publicRouter.post('/mm/accounts/accountId/:accountId/authorisationCodes', MobileMoneyAuthorisationCodes.create)
+
+  publicRouter.get('/authorizations/:transactionRequestId', Authorizations.show)
+  publicRouter.put('/transactionRequests/:transactionRequestId', updateTransactionRequest)
 
   app.use(publicRouter.routes())
   app.use(privateRouter.routes())

@@ -13,7 +13,10 @@ class MyDocument extends Document {
   render() {
     return (
       <Html>
-        <Head />
+        <Head>
+          <link rel="manifest" href="manifest.json"/>
+          <link rel="payment-method-manifest" href="payment-manifest.json"/>
+        </Head>
       <body className="bg-gray-100">
         <Main />
       <NextScript />

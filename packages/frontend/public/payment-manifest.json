@@ -1,0 +1,4 @@
+{
+  "default_applications": ["https://mojaloop.app/manifest.json"],
+  "supported_origins": ["https://mojaloop.app", "http://localhost:3000"]
+}

@@ -117,7 +117,7 @@ export class KnexTransactionRequestService {
     this._knex = knex
   }
 
-  async create (transactionRequest: TransactionRequestsPostRequest, userId: number): Promise<TransactionRequestProps> {
+  async create (transactionRequest: TransactionRequestsPostRequest, userId: number, mobileMoneyOneTimeCode: string | null = null): Promise<TransactionRequestProps> {
     const validationError = isValid(transactionRequest).error
     if (validationError) {
       throw new Error(validationError.message)
@@ -162,7 +162,7 @@ export class KnexTransactionRequestService {
 
   async getByRequestId (requestId: string): Promise<TransactionRequestProps | undefined> {
     const retrievedRequest = await this._knex<StoredTransactionRequest>('mojaTransactionRequest')
-      .where({ transactionrequestId: requestId })
+      .where('transactionrequestId', requestId)
       .first()
     if (retrievedRequest) {
       const returnedProps = {

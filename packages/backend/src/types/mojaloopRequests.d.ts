@@ -38,7 +38,8 @@ declare module '@mojaloop/sdk-standard-components' {
       outbound: {
         mutualTLS: {
           enabled: boolean
-        }
+        },
+        creds: {}
       }
     };
     jwsSign: boolean;
@@ -48,6 +49,7 @@ declare module '@mojaloop/sdk-standard-components' {
     alsEndpoint?: string
     quotesEndpoint?: string
     transfersEndpoint?: string
+    transactionRequestsEndpoint?: string
     wso2Auth?: any
   }
 
@@ -69,5 +71,11 @@ declare module '@mojaloop/sdk-standard-components' {
     postTransfers(prepare: PostTransferBody, destFspId: string): Promise<object>
     putTransfers(transferId: string, fulfilment: object, destFspId: string): Promise<object>
     putTransfersError(transferId: string, error: object, destFspId: string): Promise<object>
+
+    postTransactionRequests(transactionRequest: object, destFspId: string): Promise<object>
+    putTransactionRequests(transactionRequestId: string, transactionRequestResponse: object, destFspId: string): Promise<object>
+
+    getAuthorizations(transactionRequestId: string, authorizationParameters: string, destFspId: string): Promise<object>
+    putAuthorizations(transactionRequestId: string, authorizationResponse: object, destFspId: string): Promise<object>
   }
 }

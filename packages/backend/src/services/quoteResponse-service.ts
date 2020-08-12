@@ -201,8 +201,8 @@ export class KnexQuotesResponse {
 
   async get (quoteId: string): Promise<QuoteResponseProps | undefined> {
     const retrievedQuoteResponses = await this._knex<QuoteResponseProps>('mojaQuotesResponse')
-      .where({ quoteId })
-      .where({ error: null })
+      .where('quoteId', quoteId)
+      .where('error', null)
       .first()
     return retrievedQuoteResponses ? {
       ...retrievedQuoteResponses,
@@ -212,8 +212,8 @@ export class KnexQuotesResponse {
 
   async getError (quoteId: string): Promise<ErrorQuoteResponse | undefined> {
     const retrievedQuoteResponses = await this._knex<ErrorQuoteResponse>('mojaQuotesResponse')
-      .where({ quoteId })
-      .where({ transferAmount: null })
+      .where('quoteId', quoteId)
+      .where('transferAmount', null)
       .first()
     return retrievedQuoteResponses ? {
       ...retrievedQuoteResponses,

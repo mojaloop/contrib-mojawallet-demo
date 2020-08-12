@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react'
+import getConfig from 'next/config'
 import Head from 'next/head'
 import dynamic from 'next/dynamic'
 import { NextPage } from 'next'
@@ -10,6 +11,10 @@ import { AccountsService } from '../../services/accounts'
 import moment from 'moment'
 import { motion } from 'framer-motion'
 import Pusher from 'pusher-js'
+
+const { publicRuntimeConfig } = getConfig()
+
+const PUSHER_KEY = publicRuntimeConfig.PUSHER_KEY
 
 const accountsService = AccountsService()
 const transactionService = TransactionService()
@@ -32,34 +37,36 @@ const Account: NextPage<AccountPageProps> = ({ account, transactions, otp, user 
   const [accountState, setAccount] = useState(account)
   const [transactionsState, setTransactions] = useState(transactions)
   useEffect(() => {
-    const pusher = new Pusher('55dfaae15da48fdc5bec', {
-      cluster: 'eu'
-    })
-    const channel = pusher.subscribe(`account-${accountState.id}`)
-    channel.bind('transaction', (balance) => {
-      setAccount({ ...accountState, balance: +accountState.balance + +balance.message })
-      setTransactions([...transactionsState, {
-        id: Math.floor(Math.random() * 10000),
-        accountId: accountState.id.toString(),
-        amount: +balance.message,
-        epoch: Date.now(),
-        Description: ''
-      }])
-      setOTP({
-        otp: otp,
-        hasOTP: false,
-        disableOTP: false
+    if (PUSHER_KEY) {
+      const pusher = new Pusher(PUSHER_KEY, {
+        cluster: 'eu'
       })
-    })
-    pusher.connection.bind('connected', () => {
-      console.log('Connected to pusher')
-    })
-    pusher.connection.bind('disconnected', () => {
-      console.log('Disconnected from pusher')
-    })
-    return () => {
-      console.log('disconnecting...')
-      pusher.disconnect()
+      const channel = pusher.subscribe(`account-${accountState.id}`)
+      channel.bind('transaction', (balance) => {
+        setAccount({ ...accountState, balance: +accountState.balance + +balance.message })
+        setTransactions([...transactionsState, {
+          id: Math.floor(Math.random() * 10000),
+          accountId: accountState.id.toString(),
+          amount: +balance.message,
+          epoch: Date.now(),
+          Description: ''
+        }])
+        setOTP({
+          otp: otp,
+          hasOTP: false,
+          disableOTP: false
+        })
+      })
+      pusher.connection.bind('connected', () => {
+        console.log('Connected to pusher')
+      })
+      pusher.connection.bind('disconnected', () => {
+        console.log('Disconnected from pusher')
+      })
+      return () => {
+        console.log('disconnecting...')
+        pusher.disconnect()
+      }
     }
   })
   return (

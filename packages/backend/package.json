@@ -7,7 +7,8 @@
     "test": "jest --runInBand",
     "build:docker": "tsc -p tsconfig.docker.json",
     "build": "tsc -p tsconfig.build.json",
-    "start": "node dist/index.js"
+    "start": "node dist/index.js",
+    "migrate:make": "knex migrate:make"
   },
   "keywords": [],
   "author": "",
@@ -39,18 +40,20 @@
     "typescript": "^3.7.2"
   },
   "dependencies": {
-    "@mojaloop/sdk-standard-components": "8.6.8",
+    "@mojaloop/ml-number": "^8.2.0",
+    "@mojaloop/sdk-standard-components": "10.6.1",
     "@types/lodash": "^4.14.149",
     "axios": "^0.19.0",
     "bcrypt": "3.0.6",
     "got": "^10.2.2",
+    "ilp-packet": "2.2.0",
     "joi": "^14.3.1",
     "knex": "^0.20.3",
     "koa": "latest",
     "koa-bodyparser": "latest",
     "koa-joi-router": "^6.0.0",
     "koa-route": "^3.2.0",
-    "libphonenumber-js": "^1.7.29",
+    "libphonenumber-js": "^1.7.54",
     "lodash": "^4.17.15",
     "mysql": "^2.17.1",
     "objection": "^2.0.0",

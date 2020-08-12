@@ -14,6 +14,9 @@ import createLogger from 'pino'
 import { KnexOtpService } from '../../src/services/otp-service'
 import { KnexQuotesResponse } from '../../src/services/quoteResponse-service'
 import { PusherService } from '../../src/services/pusher-service'
+import { KnexMobileMoneyTransactionService } from '../../src/services/mobile-money-transactions'
+import { IlpService } from 'packages/backend/src/services/ilp-service'
+const MojaloopSdk = require('@mojaloop/sdk-standard-components')
 
 export type TestAppContainer = {
   server: Server,
@@ -31,6 +34,8 @@ export type TestAppContainer = {
   hydraApi: HydraApi
   mojaloopRequests: MojaloopRequests
   otpService: KnexOtpService
+  mobileMoneyTransactions: KnexMobileMoneyTransactionService
+  ilpService: IlpService
 }
 
 export const createTestApp = (): TestAppContainer => {
@@ -38,7 +43,8 @@ export const createTestApp = (): TestAppContainer => {
     client: 'sqlite3',
     connection: {
       filename: ':memory:'
-    }
+    },
+    useNullAsDefault: true
   })
   const mojaloopRequests = new MojaloopRequests({
     dfspId: 'mojawallet',
@@ -46,7 +52,7 @@ export const createTestApp = (): TestAppContainer => {
     jwsSigningKey: 'test',
     logger: console,
     peerEndpoint: '',
-    tls: { outbound: { mutualTLS: { enabled: false } } }
+    tls: { outbound: { mutualTLS: { enabled: false }, creds: {} } }
   })
   const accountsService = new KnexAccountService(knex)
   const transactionsService = new KnexTransactionService(knex)
@@ -62,6 +68,8 @@ export const createTestApp = (): TestAppContainer => {
   const quotesResponseService = new KnexQuotesResponse(knex)
   const otpService = new KnexOtpService(knex)
   const mojaloopService = new KnexMojaloopService(knex, mojaloopRequests, otpService)
+  const mobileMoneyTransactions = new KnexMobileMoneyTransactionService(knex)
+  const ilpService = new MojaloopSdk.Ilp({ secret: 'secret', logger: console })
   const hydraApi = {
     introspectToken: async (token) => {
       if (token === 'user1token') {
@@ -98,7 +106,9 @@ export const createTestApp = (): TestAppContainer => {
     quotesResponseService,
     mojaloopRequests,
     mojaloopService,
-    otpService
+    otpService,
+    mobileMoneyTransactions,
+    ilpService
   })
   const server = app.listen(0)
   // @ts-ignore
@@ -119,6 +129,8 @@ export const createTestApp = (): TestAppContainer => {
     quotesResponseService,
     hydraApi,
     mojaloopRequests,
-    otpService
+    otpService,
+    mobileMoneyTransactions,
+    ilpService
   }
 }

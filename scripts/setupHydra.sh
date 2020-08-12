@@ -7,6 +7,9 @@ export DSN=memory
 export URLS_CONSENT=http://localhost:3000/consent
 export URLS_LOGIN=http://localhost:3000/login
 
+# export URLS_CONSENT=https://d647395aa9ee.ngrok.io/consent
+# export URLS_LOGIN=https://d647395aa9ee.ngrok.io/login
+
 docker run -d \
   --name oauth-hydra \
   --network hydra \

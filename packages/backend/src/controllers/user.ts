@@ -2,7 +2,7 @@ import bcrypt from 'bcrypt'
 import { Joi } from 'koa-joi-router'
 import { AccountsAppContext } from '..'
 import { UserProps, User } from '../services/user-service'
-import { parseNumber, isValidNumber } from 'libphonenumber-js'
+import { parseNumber, isValidNumber, ParsedNumber } from 'libphonenumber-js'
 import { v4 } from 'uuid'
 import { ValidationError } from 'joi'
 
@@ -54,7 +54,7 @@ export async function store (ctx: AccountsAppContext): Promise<void> {
     return
   }
 
-  if (!isValidNumber(parseNumber(username))) {
+  if (!isValidNumber(parseNumber(username) as any as ParsedNumber)) {
     ctx.body = {
       message: 'Validation Failed',
       errors: [
@@ -146,7 +146,7 @@ export async function update (ctx: AccountsAppContext): Promise<void> {
     username: username,
     password: hashedPassword
   }
-  ctx.assert(isValidNumber(parseNumber(username)), 400, 'Invalid phonenumber.')
+  ctx.assert(isValidNumber(parseNumber(username) as any as ParsedNumber), 400, 'Invalid phonenumber.')
   try {
     const user = await users.update(userProps)
     ctx.logger.debug(`Creating user ${user}`)

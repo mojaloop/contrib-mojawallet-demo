@@ -87,3 +87,8 @@ export type Totals = {
   balance: number
   assetScale: number
 }
+
+export type CheckoutProps = {
+  accounts: AccountDetails[],
+  user: UserDetails
+}

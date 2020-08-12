@@ -100,6 +100,7 @@ describe('Transaction Request Test', () => {
 
   describe('Handling a transaction request post', () => {
     test('Can store a valid transaction request and returns 200', async () => {
+      appContainer.mojaloopRequests.putTransactionRequests = jest.fn()
       const response = await axios.post(`http://localhost:${appContainer.port}/transactionRequests`, validRequest, {
         headers: { 'Content-Type': 'application/vnd.interoperability.transactionRequests+json;version=1.0', 'FSPIOP-Source': 'mojawallet' }
       })
@@ -109,10 +110,11 @@ describe('Transaction Request Test', () => {
         expect(response.status).toEqual(202)
         expect(storedRequest.transactionRequestId).toEqual(validRequest.transactionRequestId)
         expect(storedRequest.userId).toEqual(1)
-        expect(mojaResponseService.putResponse).toHaveBeenCalledWith({
+        expect(appContainer.mojaloopRequests.putTransactionRequests).toHaveBeenCalledWith(
+          validRequest.transactionRequestId, {
           transactionId: storedRequest.transactionId,
           transactionRequestState: 'RECEIVED'
-        }, validRequest.transactionRequestId,
+        },
         'mojawallet')
       } else {
         fail('Transaction Request not found')

@@ -1,7 +1,7 @@
 import { AccountsAppContext } from '../index'
 import { QuoteTools } from '../services/quote-service'
 import { mojaResponseService } from '../services/mojaResponseService'
-import { TransactionRequestsPostRequest } from '../types/mojaloop'
+import { TransactionRequestsPostRequest, TransactionRequestsIDPutResponse } from '../types/mojaloop'
 
 const sleep = (ms: number): Promise<void> => {
   return new Promise(resolve => setTimeout(resolve, ms))
@@ -41,12 +41,12 @@ export async function create (ctx: AccountsAppContext): Promise<void> {
       throw new Error('3100')
     }
     // potentially change to a queing system for asynchronous responses to avoid unhandled promises
-    await mojaResponseService.putResponse(
+    await ctx.mojaloopRequests.putTransactionRequests(
+      body.transactionRequestId,
       {
         transactionRequestState: 'RECEIVED',
         transactionId: transaction.transactionId
       },
-      body.transactionRequestId,
       destFspId
     )
   } catch (error) {
@@ -90,4 +90,15 @@ export async function create (ctx: AccountsAppContext): Promise<void> {
       ctx.logger.error(error, 'Error in transactionRequests')
     }
   }
+}
+
+export async function update(ctx: AccountsAppContext): Promise<void> {
+  const payload = ctx.request.body as TransactionRequestsIDPutResponse
+  ctx.logger.info('Received Mojaloop transaction request update: ', payload)
+
+  if (payload.transactionId) {
+    await ctx.mobileMoneyTransactions.updateMojaTransactionId(ctx.params.transactionRequestId, payload.transactionId)
+  }
+
+  ctx.response.status = 200
 }

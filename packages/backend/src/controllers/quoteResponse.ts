@@ -16,7 +16,9 @@ export async function quoteResponse (ctx: AccountsAppContext): Promise<void> {
       const quoteResponseTools = new QuoteResponseTool(body, id)
       await quotesResponse.store(quoteResponseTools.getQuoteResponseProps())
       if (transactionRequest) {
-        const auth = await mojaloopService.getAuthorization(transactionRequest.transactionRequestId, body.transferAmount)
+        const query = `authenticationType=OTP&retriesLeft=1&amount=${body.transferAmount.amount}&currency=${body.transferAmount.currency}`
+        ctx.logger.info('requesting auth', query)
+        const auth = await ctx.mojaloopRequests.getAuthorizations(transactionRequest.transactionRequestId, query, ctx.request.headers['fspiop-source'])
         ctx.logger.info('quoteResponse auth', auth)
       }
       return

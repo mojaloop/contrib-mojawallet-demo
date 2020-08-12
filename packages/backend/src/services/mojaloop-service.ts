@@ -5,7 +5,6 @@ import { StoredTransactionRequest } from './transaction-request-service'
 import axios, { AxiosResponse } from 'axios'
 import { Money, TransfersPostRequest } from '../types/mojaloop'
 
-const baseMojaUrl: string = process.env.PUT_BASE_URI || 'http://localhost:8008'
 
 export type StoredTransfer = {
   transferId: string
@@ -37,12 +36,13 @@ export class KnexMojaloopService implements MojaloopService {
 
   // Initiate the GET request to the Mojaloop Switch
   async getAuthorization (transactionRequestId: string, transferAmount: Money): Promise<AxiosResponse> {
-    const url = new URL(`/authorizations/${transactionRequestId}?authenticationType=OTP&retriesLeft=1&amount=${transferAmount.amount}&currency=${transferAmount.currency}`, baseMojaUrl)
+    const url = new URL(`/authorizations/${transactionRequestId}?authenticationType=OTP&retriesLeft=1&amount=${transferAmount.amount}&currency=${transferAmount.currency}`, 'https://transaction-request-service.mojaloop.app')
     return axios.get(url.toString(), {
       headers: {
         'fspiop-source': 'mojawallet',
         'fspiop-destination': 'adaptor',
-        'Content-Type': 'application/vnd.interoperability.authorizations+json;version=1.0'
+        'Content-Type': 'application/vnd.interoperability.authorizations+json;version=1.0',
+        'accept': 'application/vnd.interoperability.authorizations+json;version=1.0'
       },
       timeout: 5000
     }).then(resp => resp.data)

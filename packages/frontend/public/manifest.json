@@ -1,0 +1,16 @@
+{
+  "name": "Pay with Moja Wallet",
+  "short_name": "Moja Wallet",
+  "display": "standalone",
+  "icons": [
+    {
+      "src": "Logo.svg",
+      "sizes": "any",
+      "type": "image/svg+xml"
+    }
+  ],
+  "serviceworker": {
+    "src": "sw.js",
+    "use_cache": false
+  }
+}

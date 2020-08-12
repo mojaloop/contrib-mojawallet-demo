@@ -44,6 +44,15 @@ export const AccountsService = (authErrorCallback?: () => void) => {
         }
       }).then(response => response.data)
         .catch(error => { handleError(error.response.status, authErrorCallback); return error })
+    },
+    getAuthorizationCode: async (accountId: number, amount: string, currency: string, authToken: string) => {
+      const url = new URL(`mm/accounts/accountId/${accountId}/authorisationCodes`, ACCOUNTS_API_URL)
+      const authCodeRequest = {
+        amount,
+        currency,
+        requestDate: new Date().toUTCString()
+      }
+      return axios.post(url.toString(), authCodeRequest, { headers: { Authorization: `Bearer ${authToken}` } }).then(resp => resp.data)
     }
   }
 }

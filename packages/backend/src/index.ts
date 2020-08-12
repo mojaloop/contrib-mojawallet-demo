@@ -14,15 +14,20 @@ import { KnexOtpService } from './services/otp-service'
 import { KnexMojaloopService, MojaloopService } from './services/mojaloop-service'
 import { KnexQuotesResponse } from './services/quoteResponse-service'
 import Knex = require('knex')
+import { KnexMobileMoneyTransactionService } from './services/mobile-money-transactions'
+import { IlpService } from './services/ilp-service'
+const MojaloopSdk = require('@mojaloop/sdk-standard-components')
 const logger = createLogger()
 logger.level = process.env.LOG_LEVEL || 'info'
 
 const PORT = process.env.PORT || 3001
 const KNEX_CLIENT = process.env.KNEX_CLIENT || 'sqlite3'
 const DFSP_ID = process.env.DFSP_ID || 'mojawallet'
-const ALS_ENDPOINT = process.env.ALS_ENDPOINT || 'account-lookup-service.iso-demo.openafrica.network'
-const QUOTES_ENDPOINT = process.env.ALS_ENDPOINT || 'quoting-service.iso-demo.openafrica.network'
-const TRANSFERS_ENDPOINT = process.env.TRANSFERS_ENDPOINT || 'ml-api-adapter.iso-demo.openafrica.network'
+const ALS_ENDPOINT = process.env.ALS_ENDPOINT || 'account-lookup-service.mojaloop.app'
+const QUOTES_ENDPOINT = process.env.QUOTES_ENDPOINT || 'quoting-service.mojaloop.app'
+const TRANSFERS_ENDPOINT = process.env.TRANSFERS_ENDPOINT || 'ml-api-adapter.mojaloop.app'
+const TRANSACTION_REQUEST_ENDPOINT = process.env.TRANSACTION_REQUEST_ENDPOINT || 'transaction-request-service.mojaloop.app'
+const ILP_SECRET = process.env.ILP_SECRET || 'secret'
 
 export interface AccountsAppContext extends Context {
   accounts: KnexAccountService;
@@ -36,6 +41,8 @@ export interface AccountsAppContext extends Context {
   logger: Logger;
   mojaloopRequests: MojaloopRequests
   mojaloopService: MojaloopService
+  mobileMoneyTransactions: KnexMobileMoneyTransactionService
+  ilpService: IlpService
   knex: Knex
 }
 
@@ -76,14 +83,17 @@ const mojaloopRequests = new MojaloopRequests({
   quotesEndpoint: QUOTES_ENDPOINT,
   alsEndpoint: ALS_ENDPOINT,
   transfersEndpoint: TRANSFERS_ENDPOINT,
-  tls: { outbound: { mutualTLS: { enabled: false } } },
+  transactionRequestsEndpoint: TRANSACTION_REQUEST_ENDPOINT,
+  tls: { outbound: { mutualTLS: { enabled: true }, creds: {} } },
   // TODO: Hack until fix is pushed
   wso2Auth: {
     getToken: () => null
   }
 })
+const mobileMoneyTransactions = new KnexMobileMoneyTransactionService(knex)
 
 const mojaloopService = new KnexMojaloopService(knex, mojaloopRequests, otpService)
+const ilpService = new MojaloopSdk.Ilp({ secret: ILP_SECRET, logger: console })
 
 const app = createApp({
   knex,
@@ -98,7 +108,9 @@ const app = createApp({
   quotesResponseService,
   otpService,
   mojaloopRequests,
-  mojaloopService
+  mojaloopService,
+  mobileMoneyTransactions,
+  ilpService
 })
 
 let server: Server

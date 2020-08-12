@@ -6,7 +6,7 @@ export async function transfersErrors (ctx: AccountsAppContext): Promise<void> {
   const { id } = ctx.params
   const { body } = ctx.request
 
-  ctx.logger.error(`Transfer error with details: ${id}: ${body}`)
+  ctx.logger.error(`Transfer error with details: ${id}: ${JSON.stringify(body)}`)
 
   try {
     const retrievedTransfer = await knex<StoredTransfer>('transfers')

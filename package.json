@@ -35,6 +35,7 @@
     "test-quick": "lerna run test --parallel",
     "lint": "eslint --cache --cache-location node_modules/.cache/eslint",
     "lint:all": "yarn lint 'packages/*/src/**/*.ts*'",
-    "lint:staged": "lint-staged"
+    "lint:staged": "lint-staged",
+    "ngrok": "ngrok start -config ./ngrok.yml --all"
   }
 }
