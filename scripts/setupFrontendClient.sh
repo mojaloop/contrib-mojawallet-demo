@@ -1,3 +1,5 @@
+#!/bin/sh
+
 docker run --rm -it \
   -e HYDRA_ADMIN_URL=http://oauth-hydra:4445 \
   --network hydra \

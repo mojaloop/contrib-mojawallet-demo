@@ -1,3 +1,5 @@
+#!/bin/sh
+
 docker network create hydra
 
 export SECRETS_SYSTEM=mysupersecretsecret
