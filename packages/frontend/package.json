@@ -5,7 +5,8 @@
   "contributors": [
     "Cairin Michie <github:cairinmichie>",
     "Donovan Changfoot <github:donchangfoot>",
-    "Matthew de Haast <github:matdehaast>"
+    "Matthew de Haast <github:matdehaast>",
+    "Talon Patterson <github:TalPat>"
   ],
   "scripts": {
     "dev": "next dev",
