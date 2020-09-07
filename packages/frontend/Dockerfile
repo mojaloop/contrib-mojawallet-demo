@@ -1,4 +1,4 @@
-FROM node:lts-alpine
+FROM node:lts-alpine as builder
 
 # Create app directory
 WORKDIR /usr/src/app
@@ -8,14 +8,28 @@ WORKDIR /usr/src/app
 # where available (npm@5+)
 COPY package.json ./
 
-RUN yarn install
+RUN npm install --frozen-lockfile
 # If you are building your code for production
 # RUN npm ci --only=production
 
 # Bundle app source
 COPY . .
 
-RUN yarn build
+RUN npm run build
+
+FROM node:12.16.1-alpine
+WORKDIR /usr/src/app
+
+# Create empty log file & link stdout to the application log file
+RUN mkdir ./logs && touch ./logs/combined.log
+RUN ln -sf /dev/stdout ./logs/combined.log
+
+# Create a non-root user: ml-user
+RUN adduser -D mojawallet-user
+USER mojawallet-user
+
+COPY --chown=mojawallet-user --from=builder /usr/src/app .
+RUN npm prune --production
 
 EXPOSE 3000
-CMD [ "yarn", "start" ]
+CMD ["npm", "run", "start"]
