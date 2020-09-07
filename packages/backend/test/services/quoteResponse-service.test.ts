@@ -166,9 +166,9 @@ describe('Quote response service tests', () => {
       try {
         await knexQuotesResponse.store(quoteResponseProps)
         await knexQuotesResponse.storeError(errorQuoteResponseProps)
-        .then(() => {
-          expect(true).toEqual(false)
-        })
+          .then(() => {
+            expect(true).toEqual(false)
+          })
       } catch (error) {
         expect(error).toEqual(new Error(`Quote response with id: ${quoteResponseProps.quoteId} already exists`))
       }

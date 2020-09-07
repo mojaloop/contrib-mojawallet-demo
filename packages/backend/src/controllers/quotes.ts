@@ -1,7 +1,6 @@
 
-import { AccountsAppContext } from "../index"
-import { QuotesIDPutResponse, QuotesPostRequest } from "../types/mojaloop"
-const MlNumber = require('@mojaloop/ml-number')
+import { AccountsAppContext } from '../index'
+import { QuotesIDPutResponse, QuotesPostRequest } from '../types/mojaloop'
 
 const QUOTE_EXPIRATION_WINDOW = process.env.QUOTE_EXPIRATION_WINDOW || 120
 

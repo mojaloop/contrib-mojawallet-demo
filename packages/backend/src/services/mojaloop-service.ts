@@ -5,7 +5,6 @@ import { StoredTransactionRequest } from './transaction-request-service'
 import axios, { AxiosResponse } from 'axios'
 import { Money, TransfersPostRequest } from '../types/mojaloop'
 
-
 export type StoredTransfer = {
   transferId: string
   transactionId: string

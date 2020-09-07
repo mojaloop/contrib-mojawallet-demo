@@ -1,6 +1,6 @@
+import { MobileMoneyTransactionRequest, MobileMoneyTransaction } from '../types/mobile-money'
 import Knex = require('knex')
 import uuidv4 = require('uuid/v4')
-import { MobileMoneyTransactionRequest, MobileMoneyTransaction } from '../types/mobile-money'
 
 export type DBMobileMoneyTransaction = {
   type: string
@@ -15,10 +15,28 @@ export type DBMobileMoneyTransaction = {
   mojaTransactionId?: string
 }
 
+function mapToMobileTransaction (dbModel: DBMobileMoneyTransaction): MobileMoneyTransaction {
+  return {
+    amount: dbModel.amount,
+    creditParty: [
+      { key: 'msisdn', value: dbModel.creditorMSISDN },
+      { key: 'accountId', value: dbModel.creditorAccountId }
+    ],
+    debitParty: [
+      { key: 'msisdn', value: dbModel.debtorMSISDN }
+    ],
+    currency: dbModel.currency,
+    transactionReference: dbModel.transactionReference,
+    transactionStatus: dbModel.transactionStatus,
+    type: 'merchantpay',
+    oneTimeCode: dbModel.oneTimeCode
+  }
+}
+
 export class KnexMobileMoneyTransactionService {
   private _knex: Knex
 
-  constructor(knex: Knex) {
+  constructor (knex: Knex) {
     this._knex = knex
   }
 
@@ -43,7 +61,7 @@ export class KnexMobileMoneyTransactionService {
   }
 
   async updateMojaTransactionId (transactionReference: string, mojaTransactionId: string) {
-    await this._knex<DBMobileMoneyTransaction>('mobileMoneyTransactions').where({ transactionReference }).update({ mojaTransactionId })    
+    await this._knex<DBMobileMoneyTransaction>('mobileMoneyTransactions').where({ transactionReference }).update({ mojaTransactionId })
   }
 
   async updateStatus (transactionReference: string, transactionStatus: string) {
@@ -68,27 +86,9 @@ export class KnexMobileMoneyTransactionService {
       debtorMSISDN: debtorMsisdn.value,
       oneTimeCode: request.oneTimeCode
     }
-    
+
     await this._knex<DBMobileMoneyTransaction>('mobileMoneyTransactions').insert(transaction)
 
     return mapToMobileTransaction(transaction)
-  }
-}
-
-function mapToMobileTransaction (dbModel: DBMobileMoneyTransaction): MobileMoneyTransaction {
-  return {
-    amount: dbModel.amount,
-    creditParty: [
-      { key: 'msisdn', value: dbModel.creditorMSISDN },
-      { key: 'accountId', value: dbModel.creditorAccountId }
-    ],
-    debitParty: [
-      { key: 'msisdn', value: dbModel.debtorMSISDN }
-    ],
-    currency: dbModel.currency,
-    transactionReference: dbModel.transactionReference,
-    transactionStatus: dbModel.transactionStatus,
-    type: 'merchantpay',
-    oneTimeCode: dbModel.oneTimeCode
   }
 }

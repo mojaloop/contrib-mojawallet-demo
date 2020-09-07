@@ -46,5 +46,13 @@ module.exports = {
         "@typescript-eslint/member-delimiter-style": [
             "off"
         ]
-    }
+    },
+    "overrides": [
+        {
+            "files": "src/controllers/transfers.ts",
+            "rules": {
+                "@typescript-eslint/no-var-requires": "off"
+            }
+        }
+    ]
 }

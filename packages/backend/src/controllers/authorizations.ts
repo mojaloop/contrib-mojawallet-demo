@@ -2,8 +2,8 @@ import { AccountsAppContext } from '../index'
 import { TransfersPostRequest, AuthorizationsIDPutResponse } from '../types/mojaloop'
 // import { QuoteResponse } from '../services/quoteResponse-service'
 import { StoredTransfer } from '../services/mojaloop-service'
-import uuidv4 = require('uuid/v4')
 import got from 'got/dist/source'
+import uuidv4 = require('uuid/v4')
 
 const toBigInt = (value: string, scale: number): bigint => {
   const floatValue = parseFloat(value)
@@ -77,7 +77,7 @@ export async function show (ctx: AccountsAppContext) {
     }
 
     // await ctx.mojaloopRequests.putAuthorizations(transactionRequestId, { responseType: 'ENTERED', authenticationInfo: { authenticationValue: mobileMoneyTransaction.oneTimeCode, authentication: 'OTP' } } as AuthorizationsIDPutResponse, ctx.request.headers['fspiop-source'])
-    const authResponse: AuthorizationsIDPutResponse = { responseType: 'ENTERED', authenticationInfo: { authenticationValue: mobileMoneyTransaction.oneTimeCode, authentication: 'OTP' } } 
+    const authResponse: AuthorizationsIDPutResponse = { responseType: 'ENTERED', authenticationInfo: { authenticationValue: mobileMoneyTransaction.oneTimeCode, authentication: 'OTP' } }
     await got.put('https://transaction-request-service.mojaloop.app/authorizations/' + transactionRequestId, { json: authResponse,
       headers: {
         'Content-Type': 'application/vnd.interoperability.authorizations+json;version=1.0',
@@ -93,5 +93,4 @@ export async function show (ctx: AccountsAppContext) {
     ctx.logger.error('Could not find mobile money transaction associated to mojaloop transaction request')
     ctx.response.status = 404
   }
-
 }

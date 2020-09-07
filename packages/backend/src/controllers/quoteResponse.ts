@@ -2,7 +2,7 @@ import { AccountsAppContext } from '../index'
 import { QuoteResponseTool } from '../services/quoteResponse-service'
 
 export async function quoteResponse (ctx: AccountsAppContext): Promise<void> {
-  const { quotes, mojaloopService, quotesResponse } = ctx
+  const { quotes, quotesResponse } = ctx
   const { id } = ctx.params
   const { body } = ctx.request
   // TODO: Fire off an error if can't find quote.

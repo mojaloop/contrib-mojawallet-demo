@@ -1,9 +1,7 @@
-import { AccountsAppContext } from "../../src/index"
-import { TransfersPostRequest, TransfersIDPutResponse } from "../types/mojaloop"
-import { StoredTransfer } from "../services/mojaloop-service"
-import { quoteResponse } from "./quoteResponse"
-const IlpPacket = require('ilp-packet')
+import { AccountsAppContext } from '../../src/index'
+import { TransfersPostRequest, TransfersIDPutResponse } from '../types/mojaloop'
 
+const IlpPacket = require('ilp-packet')
 const toBigInt = (value: string, scale: number): bigint => {
   const floatValue = parseFloat(value)
   const intValue = (floatValue * 10 ** (scale)).toFixed(0)
@@ -22,7 +20,7 @@ export async function create (ctx: AccountsAppContext) {
   if (!creditorAccountId) {
     throw new Error('Could not process transfer: No creditor account information.')
   }
-  
+
   const bigInt = toBigInt(transferRequest.amount.amount, 2)
   await transactions.create(creditorAccountId.value, bigInt)
   await pusher.trigger({

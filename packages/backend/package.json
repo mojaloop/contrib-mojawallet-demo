@@ -11,6 +11,8 @@
   "scripts": {
     "build:docker": "tsc -p tsconfig.docker.json",
     "build": "tsc -p tsconfig.json",
+    "lint": "eslint ./src/**/*.ts",
+    "lint:fix": "eslint --fix ./src/**/*.ts",
     "start": "node dist/src/index.js",
     "test:unit": "jest --runInBand",
     "test:coverage-check": "jest --runInBand --coverage",

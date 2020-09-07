@@ -92,7 +92,7 @@ export async function create (ctx: AccountsAppContext): Promise<void> {
   }
 }
 
-export async function update(ctx: AccountsAppContext): Promise<void> {
+export async function update (ctx: AccountsAppContext): Promise<void> {
   const payload = ctx.request.body as TransactionRequestsIDPutResponse
   ctx.logger.info('Received Mojaloop transaction request update: ', payload)
 
