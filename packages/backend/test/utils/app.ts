@@ -15,7 +15,7 @@ import { KnexOtpService } from '../../src/services/otp-service'
 import { KnexQuotesResponse } from '../../src/services/quoteResponse-service'
 import { PusherService } from '../../src/services/pusher-service'
 import { KnexMobileMoneyTransactionService } from '../../src/services/mobile-money-transactions'
-import { IlpService } from 'packages/backend/src/services/ilp-service'
+import { IlpService } from '../../src/services/ilp-service'
 const MojaloopSdk = require('@mojaloop/sdk-standard-components')
 
 export type TestAppContainer = {

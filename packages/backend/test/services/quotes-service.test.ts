@@ -1,7 +1,7 @@
 import Knex from 'knex'
 import { KnexQuoteService, QuoteTools, MojaQuoteObj } from '../../src/services/quote-service'
 import { TransactionRequestsPostRequest, QuotesPostRequest } from '../../src/types/mojaloop'
-import { QuoteResponse } from 'packages/backend/src/services/quoteResponse-service'
+import { QuoteResponse } from '../../src/services/quoteResponse-service'
 
 describe('Quotes service', () => {
   let knex: Knex

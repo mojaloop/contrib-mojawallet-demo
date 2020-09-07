@@ -2,6 +2,11 @@
   "name": "frontend",
   "version": "0.1.0",
   "private": true,
+  "contributors": [
+    "Cairin Michie <github:cairinmichie>",
+    "Donovan Changfoot <github:donchangfoot>",
+    "Matthew de Haast <github:matdehaast>"
+  ],
   "scripts": {
     "dev": "next dev",
     "build": "next build",

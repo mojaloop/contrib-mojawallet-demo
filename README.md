@@ -32,8 +32,8 @@ The dependencies can be installed by running `yarn` from the root directory.
 The following commands are to be run in the `packages/backend` folder
 
 ```sh
-yarn build
-yarn start
+npm run build
+npm run start
 ```
 This will start the backend which will listen on `localhost:3000` and tell it to use an in-memory (SQLite) database. The following environment variables can be used to configure the backend:
 | Variable                     | Default                                  |   |   |   |
@@ -47,10 +47,10 @@ This will start the backend which will listen on `localhost:3000` and tell it to
 | ILP_SECRET                   | secret                                   |   |   |   |
 
 ### Starting the frontend
-The following commands are to be run in the `packages/backend` folder
+The following commands are to be run in the `packages/frontend` folder
 
 ```sh
-yarn dev
+npm run dev
 ```
 This will start the frontend which will listen on `localhost:3000`. The following environment variables can be changed in the `packages/front-end/next.config.js` to configure the frontend:
 | Variable                  | Default                                                                                                                                                       |   |   |   |

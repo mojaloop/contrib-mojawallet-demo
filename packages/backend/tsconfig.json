@@ -12,15 +12,11 @@
     "suppressImplicitAnyIndexErrors": true,
     "esModuleInterop": true,
     "baseUrl": ".",
-    "paths": {
-      "backend" : ["packages/backend/src"]
-    }
+    "rootDir": ".",
+    "outDir": "dist"
   },
-  "exclude": [
-    "**/node_modules/**/*",
-    "packages/*/dist/**/*"
-  ],
   "include": [
-    "packages/**/*.ts"
+    "src",
+    "test"
   ]
 }
