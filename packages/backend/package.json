@@ -9,10 +9,11 @@
     "Matthew de Haast <github:matdehaast>"
   ],
   "scripts": {
-    "test": "jest --runInBand",
     "build:docker": "tsc -p tsconfig.docker.json",
     "build": "tsc -p tsconfig.json",
     "start": "node dist/src/index.js",
+    "test:unit": "jest --runInBand",
+    "test:coverage-check": "jest --runInBand --coverage",
     "migrate:make": "knex migrate:make"
   },
   "keywords": [],
