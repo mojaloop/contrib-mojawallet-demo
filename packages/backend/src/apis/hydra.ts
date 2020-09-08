@@ -104,18 +104,14 @@ export interface HydraApi {
 }
 
 export const hydraApi: HydraApi = {
-  // Introspects the token
   introspectToken: function (token: string) {
     const url = new URL('/oauth2/introspect', hydraAdminUrl)
     const headers = Object.assign({ 'Content-Type': 'application/x-www-form-urlencoded' }, mockTlsTermination)
     const body = (new URLSearchParams({ token })).toString()
-    console.log('in introspect token: ', token, ' typeof token', typeof token)
     const instance = got.extend({
       hooks: {
         beforeRequest: [
           options => {
-            console.log('headers before going out', options.headers)
-            console.log('body before going out', options.body)
             if (options.headers) {
               options.headers['content-type'] = 'application/x-www-form-urlencoded'
             }
@@ -126,43 +122,16 @@ export const hydraApi: HydraApi = {
 
     return instance.post(url.toString(), { body, headers }).then(resp => JSON.parse(resp.body))
   },
-  // Fetches information on a login request.
-  getLoginRequest: async function (challenge: string): Promise<AxiosResponse> {
-    return get('login', challenge)
-  },
-  // Accepts a login request.
-  acceptLoginRequest: async function (challenge: string, body: any): Promise<AxiosResponse> {
-    return put('login', 'accept', challenge, body)
-  },
-  // Rejects a login request.
-  rejectLoginRequest: async function (challenge: string, body: any): Promise<AxiosResponse> {
-    return put('login', 'reject', challenge, body)
-  },
-  // Fetches information on a consent request.
-  getConsentRequest: async function (challenge: string): Promise<AxiosResponse> {
-    return get('consent', challenge)
-  },
-  // Accepts a consent request.
-  acceptConsentRequest: async function (challenge: string, body: any): Promise<AxiosResponse> {
-    return put('consent', 'accept', challenge, body)
-  },
-  // Rejects a consent request.
-  rejectConsentRequest: async function (challenge: string, body: any): Promise<AxiosResponse> {
-    return put('consent', 'reject', challenge, body)
-  },
-  // Fetches information on a logout request.
-  getLogoutRequest: async function (challenge: string): Promise<AxiosResponse> {
-    return get('logout', challenge)
-  },
-  // Accepts a logout request.
-  acceptLogoutRequest: async function (challenge: string): Promise<AxiosResponse> {
-    return put('logout', 'accept', challenge, {})
-  },
-  // Reject a logout request.
-  rejectLogoutRequest: async function (challenge: string): Promise<AxiosResponse> {
-    return put('logout', 'reject', challenge, {})
-  },
-  createOauthClient: async function (clientDetails: Oauth2ClientDetails): Promise<AxiosResponse> {
+  getLoginRequest: async (challenge: string): Promise<AxiosResponse> => get('login', challenge),
+  acceptLoginRequest: async (challenge: string, body: any): Promise<AxiosResponse> => put('login', 'accept', challenge, body),
+  rejectLoginRequest: async (challenge: string, body: any): Promise<AxiosResponse> => put('login', 'reject', challenge, body),
+  getConsentRequest: async (challenge: string): Promise<AxiosResponse> => get('consent', challenge),
+  acceptConsentRequest: async (challenge: string, body: any): Promise<AxiosResponse> => put('consent', 'accept', challenge, body),
+  rejectConsentRequest: async (challenge: string, body: any): Promise<AxiosResponse> => put('consent', 'reject', challenge, body),
+  getLogoutRequest: async (challenge: string): Promise<AxiosResponse> => get('logout', challenge),
+  acceptLogoutRequest: async (challenge: string): Promise<AxiosResponse> => put('logout', 'accept', challenge, {}),
+  rejectLogoutRequest: async (challenge: string): Promise<AxiosResponse> => put('logout', 'reject', challenge, {}),
+  createOauthClient: async (clientDetails: Oauth2ClientDetails): Promise<AxiosResponse> => {
     const url = new URL('/clients', hydraAdminUrl)
     const headers = Object.assign({ 'Content-Type': 'application/json' }, mockTlsTermination)
     return axios.post(url.toString(), clientDetails, { headers }).then(resp => resp.data)
