@@ -76,6 +76,9 @@ jobs:
           name: Update NPM install
           command: npm install --prefix ./packages/frontend
       - run:
+          name: Build
+          command: npm run build --prefix ./packages/frontend
+      - run:
           name: Delete build dependencies
           command: apk del build-dependencies
       - save_cache:
@@ -189,6 +192,15 @@ workflows:
   version: 2
   build_and_test:
     jobs:
+      - build-frontend:
+          context: org-global
+          filters:
+            tags:
+              only: /.*/
+            branches:
+              ignore:
+                - /feature*/
+                - /bugfix*/
       - setup:
           context: org-global
           filters:
