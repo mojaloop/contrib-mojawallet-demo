@@ -1,4 +1,7 @@
 # MojaWallet
+[![Git Commit](https://img.shields.io/github/last-commit/mojaloop/mojawallet.svg?style=flat)](https://github.com/mojaloop/mojawallet/commits/master)
+[![Git Releases](https://img.shields.io/github/release/mojaloop/mojawallet.svg?style=flat)](https://github.com/mojaloop/mojawallet/releases)
+[![CircleCI](https://circleci.com/gh/mojaloop/mojawallet.svg?style=svg)](https://app.circleci.com/pipelines/github/mojaloop/mojawallet)
 
 **NB!** This is a **demo** wallet and should **NOT** be used in production. It's purpose is to demonstrate the use of Mojaloop in the following cases:
 - ATM withdrawal
