@@ -62,6 +62,27 @@ executors:
 # A map of CircleCI jobs
 ##
 jobs:
+  build-frontend:
+    executor: default-docker
+    steps:
+      - checkout
+      - run:
+          name: Install general dependencies
+          command: *defaults_Dependencies
+      - run:
+          name: Access npm folder as root
+          command: cd $(npm root -g)/npm
+      - run:
+          name: Update NPM install
+          command: npm install --prefix ./packages/frontend
+      - run:
+          name: Delete build dependencies
+          command: apk del build-dependencies
+      - save_cache:
+          key: dependency-cache-{{ checksum "packages/frontend/package.json" }}
+          paths:
+            - packages/frontend/node_modules
+
   setup:
     executor: default-docker
     steps:
@@ -81,7 +102,7 @@ jobs:
       - save_cache:
           key: dependency-cache-{{ checksum "packages/backend/package.json" }}
           paths:
-            - node_modules
+            - packages/backend/node_modules
 
   test-unit:
     executor: default-docker
@@ -148,6 +169,8 @@ jobs:
           <<: *defaults_license_scanner
       - restore_cache:
           key: dependency-cache-{{ checksum "packages/backend/package.json" }}
+      - restore_cache:
+          key: dependency-cache-{{ checksum "packages/frontend/package.json" }}
       - run:
           name: Prune non-production packages before running license-scanner
           command: npm prune --prefix ./packages/backend --production && npm prune --prefix ./packages/frontend --production
