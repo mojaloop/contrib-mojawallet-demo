@@ -86,7 +86,7 @@ jobs:
           paths:
             - packages/frontend/node_modules
 
-  setup:
+  setup-backend:
     executor: default-docker
     steps:
       - checkout
@@ -107,31 +107,7 @@ jobs:
           paths:
             - packages/backend/node_modules
 
-  test-unit:
-    executor: default-docker
-    steps:
-      - checkout
-      - run:
-          name: Install general dependencies
-          command: *defaults_Dependencies
-      - restore_cache:
-          keys:
-            - dependency-cache-{{ checksum "packages/backend/package-lock.json" }}
-      - run:
-          name: Create dir for test results
-          command: mkdir -p ./packages/backend/test/results
-      - run:
-          name: Execute unit tests
-          command: npm run test:junit --prefix ./packages/backend
-          environment:
-            NODE_OPTIONS: --max_old_space_size=4096
-      - store_artifacts:
-          path: ./packages/backend/test/results
-          prefix: test
-      - store_test_results:
-          path: ./packages/backend/test/results
-
-  test-coverage:
+  test:
     executor: default-docker
     steps:
       - checkout
@@ -146,12 +122,17 @@ jobs:
             - dependency-cache-{{ checksum "packages/backend/package-lock.json" }}
       - run:
           name: Execute code coverage check
-          command: npm run test:coverage-check --prefix ./packages/backend
+          command: npm run test:junit-coverage-check --prefix ./packages/backend
       - store_artifacts:
-          path: coverage
+          path: ./packages/backend/coverage
+          prefix: coverage
+      - store_test_results:
+          path: ./packages/backend/coverage
+      - store_artifacts:
+          path: ./packages/backend/test/results
           prefix: test
       - store_test_results:
-          path: coverage
+          path: ./packages/backend/test/results
       - run:
           name: Copy code coverage to SonarQube
           command: |
@@ -203,7 +184,7 @@ workflows:
               ignore:
                 - /feature*/
                 - /bugfix*/
-      - setup:
+      - setup-backend:
           context: org-global
           filters:
             tags:
@@ -212,21 +193,10 @@ workflows:
               ignore:
                 - /feature*/
                 - /bugfix*/
-      - test-unit:
+      - test:
           context: org-global
           requires:
-            - setup
-          filters:
-            tags:
-              only: /.*/
-            branches:
-              ignore:
-                - /feature*/
-                - /bugfix*/
-      - test-coverage:
-          context: org-global
-          requires:
-            - setup
+            - setup-backend
           filters:
             tags:
               only: /v[0-9]+(\.[0-9]+)*/
@@ -237,7 +207,7 @@ workflows:
       - audit-licenses:
           context: org-global
           requires:
-            - setup
+            - setup-backend
             - build-frontend
           filters:
             tags:

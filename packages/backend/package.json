@@ -15,7 +15,7 @@
     "start": "node dist/src/index.js",
     "test:unit": "jest --runInBand",
     "test:coverage-check": "jest --runInBand --coverage",
-    "test:junit": "jest --reporters=default --reporters=jest-junit --testMatch '**/test/**/*.test.ts'",
+    "test:junit-coverage-check": "jest --runInBand --coverage --reporters=default --reporters=jest-junit",
     "migrate:make": "knex migrate:make"
   },
   "keywords": [],
