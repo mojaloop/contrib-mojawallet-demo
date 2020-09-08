@@ -123,6 +123,8 @@ jobs:
       - run:
           name: Execute unit tests
           command: npm run test:junit --prefix ./packages/backend
+          environment:
+            NODE_OPTIONS: --max_old_space_size=4096
       - store_artifacts:
           path: ./packages/backend/test/results
           prefix: test
