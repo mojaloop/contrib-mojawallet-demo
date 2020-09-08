@@ -10,12 +10,12 @@
     "Talon Patterson <github:TalPat>"
   ],
   "scripts": {
-    "build": "tsc -p tsconfig.json",
     "lint": "eslint ./src/**/*.ts",
     "lint:fix": "eslint --fix ./src/**/*.ts",
     "start": "node dist/src/index.js",
     "test:unit": "jest --runInBand",
     "test:coverage-check": "jest --runInBand --coverage",
+    "test:junit": "jest --reporters=default --reporters=jest-junit --testMatch '**/test/**/*.test.ts'",
     "migrate:make": "knex migrate:make"
   },
   "keywords": [],
@@ -27,17 +27,18 @@
     "@typescript-eslint/parser": "^2.9.0",
     "eslint": "^6.7.2",
     "eslint-config-prettier": "^6.7.0",
-    "eslint-plugin-prettier": "^3.1.1",
     "eslint-config-standard": "^12.0.0",
     "eslint-plugin-import": "^2.18.0",
     "eslint-plugin-node": "^9.1.0",
+    "eslint-plugin-prettier": "^3.1.1",
     "eslint-plugin-promise": "^4.2.1",
     "eslint-plugin-standard": "^4.0.0",
-    "prettier-standard": "^9.1.1",
     "husky": "^3.1.0",
     "jest": "^24.9.0",
+    "jest-junit": "^11.1.0",
     "lint-staged": "^9.5.0",
     "prettier": "^1.19.1",
+    "prettier-standard": "^9.1.1",
     "ts-jest": "^24.2.0",
     "ts-node": "^8.3.0",
     "typescript": "^3.7.2"
@@ -77,5 +78,9 @@
     "pusher": "^3.0.0",
     "rc": "^1.2.8",
     "sqlite": "^3.0.3"
+  },
+  "jest-junit": {
+    "outputDirectory": "./test/results",
+    "outputName": "junit.xml"
   }
 }

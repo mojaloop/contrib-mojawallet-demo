@@ -6,7 +6,7 @@ module.exports = {
         global: {
           statements: 80,
           functions: 80,
-          branches: 70,
+          branches: 67,
           lines: 80
         }
       },
@@ -17,6 +17,7 @@ module.exports = {
         "!src/controllers/oauth2Client.ts",
         "!src/controllers/refreshALS.ts",
         "!src/controllers/logout.ts",
-        "!src/controllers/consent.ts"
+        "!src/controllers/consent.ts",
+        "!src/services/user-accounts-service.ts"
       ]
 };

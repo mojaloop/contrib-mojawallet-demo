@@ -100,3 +100,6 @@ build/*
 .DS_Store
 
 .vscode
+
+# junit results
+packages/backend/test/results
