@@ -35,16 +35,16 @@ The following commands are to be run in the `packages/backend` folder
 npm run build
 npm run start
 ```
-This will start the backend which will listen on `localhost:3000` and tell it to use an in-memory (SQLite) database. The following environment variables can be used to configure the backend:
+This will start the backend which will listen on `localhost:3001` and tell it to use an in-memory (SQLite) database. The following environment variables can be used to configure the backend:
 | Variable                     | Default                                  |   |   |   |
 |------------------------------|------------------------------------------|---|---|---|
-| PORT                         | 3001                                     |   |   |   |
-| KNEX_CLIENT                  | sqlite3                                  |   |   |   |
-| ALS_ENDPOINT                 | account-lookup-service.mojaloop.app      |   |   |   |
-| TRANSFERS_ENDPOINT           | ml-api-adapter.mojaloop.app              |   |   |   |
-| QUOTES_ENDPOINT              | quoting-service.mojaloop.app             |   |   |   |
-| TRANSACTION_REQUEST_ENDPOINT | transaction-request-service.mojaloop.app |   |   |   |
-| ILP_SECRET                   | secret                                   |   |   |   |
+| MW_PORT                         | 3001                                     |   |   |   |
+| MW_KNEX_CLIENT                  | sqlite3                                  |   |   |   |
+| MW_ALS_ENDPOINT                 | account-lookup-service.mojaloop.app      |   |   |   |
+| MW_TRANSFERS_ENDPOINT           | ml-api-adapter.mojaloop.app              |   |   |   |
+| MW_QUOTES_ENDPOINT              | quoting-service.mojaloop.app             |   |   |   |
+| MW_TRANSACTION_REQUEST_ENDPOINT | transaction-request-service.mojaloop.app |   |   |   |
+| MW_ILP_SECRET                   | secret                                   |   |   |   |
 
 ### Starting the frontend
 The following commands are to be run in the `packages/frontend` folder

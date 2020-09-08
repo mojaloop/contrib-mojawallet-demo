@@ -23,10 +23,13 @@
  --------------
  ******/
 
+import rc from 'rc'
 import { v4 } from 'uuid'
 import { AccountsAppContext } from '../index'
+import DefaultConfig from '../../config/default.json'
 
-const DFSP_ID = process.env.DFSP_ID || 'mojawallet'
+const config = rc('MW', DefaultConfig)
+const DFSP_ID = config.DFSP_ID || 'mojawallet'
 
 export async function index (ctx: AccountsAppContext): Promise<void> {
   const { mojaloopRequests, logger, users } = ctx

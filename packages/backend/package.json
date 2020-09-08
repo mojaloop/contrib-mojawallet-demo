@@ -45,6 +45,8 @@
   "dependencies": {
     "@koa/cors": "latest",
     "@koa/router": "latest",
+    "@mojaloop/ml-number": "^8.2.0",
+    "@mojaloop/sdk-standard-components": "10.6.1",
     "@types/bcrypt": "^3.0.0",
     "@types/joi": "^14.3.4",
     "@types/knex": "^0.16.1",
@@ -53,11 +55,10 @@
     "@types/koa-joi-router": "^5.2.3",
     "@types/koa__cors": "^2.2.3",
     "@types/koa__router": "^8.0.2",
-    "@types/pino": "^5.8.13",
-    "@types/uuid": "^3.4.6",
-    "@mojaloop/ml-number": "^8.2.0",
-    "@mojaloop/sdk-standard-components": "10.6.1",
     "@types/lodash": "^4.14.149",
+    "@types/pino": "^5.8.13",
+    "@types/rc": "^1.1.0",
+    "@types/uuid": "^3.4.6",
     "axios": "^0.19.0",
     "bcrypt": "3.0.6",
     "got": "^10.2.2",
@@ -74,6 +75,7 @@
     "objection": "^2.0.0",
     "pino": "latest",
     "pusher": "^3.0.0",
+    "rc": "^1.2.8",
     "sqlite": "^3.0.3"
   }
 }

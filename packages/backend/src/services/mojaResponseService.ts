@@ -24,9 +24,12 @@
  ******/
 
 import got, { Response } from 'got'
+import rc from 'rc'
 import { ExtensionList } from './transaction-request-service'
+import DefaultConfig from '../../config/default.json'
 
-const baseMojaUrl: string = process.env.PUT_BASE_URI || 'http://localhost:8008' // base uri for testing
+const config = rc('MW', DefaultConfig)
+const baseMojaUrl: string = config.PUT_BASE_URI || 'http://localhost:8008' // base uri for testing
 
 export type TransactionMojaResponse = {
   transactionId?: string;

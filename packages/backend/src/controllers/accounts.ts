@@ -23,10 +23,13 @@
  --------------
  ******/
 
+import rc from 'rc'
 import { AccountsAppContext } from '../'
 import { Account, AccountProps } from '../services/accounts-service'
+import DefaultConfig from '../../config/default.json'
 
-const allowedServices = process.env.ALLOWED_SERVICES || ['ilp-service', 'users-service']
+const config = rc('MW', DefaultConfig)
+const allowedServices = config.ALLOWED_SERVICES || ['ilp-service', 'users-service']
 
 const enforce = (subject: string, account: Account): boolean => {
   return account.userId === subject || allowedServices.includes(subject)

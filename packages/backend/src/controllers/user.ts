@@ -25,13 +25,16 @@
 
 import bcrypt from 'bcrypt'
 import { Joi } from 'koa-joi-router'
+import rc from 'rc'
 import { AccountsAppContext } from '..'
 import { UserProps, User } from '../services/user-service'
 import { parseNumber, isValidNumber, ParsedNumber } from 'libphonenumber-js'
 import { v4 } from 'uuid'
 import { ValidationError } from 'joi'
+import DefaultConfig from '../../config/default.json'
 
-const DFSP_ID = process.env.DFSP_ID || 'mojawallet'
+const config = rc('MW', DefaultConfig)
+const DFSP_ID = config.DFSP_ID || 'mojawallet'
 
 export async function show (ctx: AccountsAppContext): Promise<void> {
   const { users } = ctx

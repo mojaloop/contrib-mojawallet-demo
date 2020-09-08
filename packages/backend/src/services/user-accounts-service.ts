@@ -24,8 +24,11 @@
  ******/
 
 import axios, { AxiosResponse } from 'axios'
+import rc from 'rc'
+import DefaultConfig from '../../config/default.json'
 
-const accountsUrl = process.env.ACCOUNTS_URL || 'http://localhost:3001'
+const config = rc('MW', DefaultConfig)
+const accountsUrl = config.ACCOUNTS_URL || 'http://localhost:3001'
 
 export const accounts = {
   async getUserAccounts (userId: string, token: string): Promise<AxiosResponse> {

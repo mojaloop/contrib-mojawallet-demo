@@ -23,10 +23,13 @@
  --------------
  ******/
 
+import rc from 'rc'
 import { AccountsAppContext } from '../index'
 import { Account } from '../services/accounts-service'
+import DefaultConfig from '../../config/default.json'
 
-const allowedServices = process.env.ALLOWED_SERVICES || ['ilp-service', 'users-service']
+const config = rc('MW', DefaultConfig)
+const allowedServices = config.ALLOWED_SERVICES || ['ilp-service', 'users-service']
 
 // TODO: Only our services should be able to call this I think
 const enforceCreate = (subject: string): boolean => {

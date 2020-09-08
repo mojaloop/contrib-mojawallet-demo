@@ -23,12 +23,14 @@
  --------------
  ******/
 
+import rc from 'rc'
 import { AccountsAppContext } from "../../index"
 import { MobileMoneyTransactionRequest, MobileMoneyTransaction } from "../../types/mobile-money"
-import uuid, { v4 } from 'uuid'
 import { TransactionRequestsPostRequest } from "../../types/mojaloop"
+import DefaultConfig from '../../../config/default.json'
 
-const PAYER_FSPID = process.env.PAYER_FSPID || 'mojawallet'
+const config = rc('MW', DefaultConfig)
+const PAYER_FSPID = config.DFSP_ID || 'mojawallet'
 
 export async function create (ctx: AccountsAppContext) {
 

@@ -23,12 +23,15 @@
  --------------
  ******/
 
+import rc from 'rc'
 import axios, { AxiosResponse } from 'axios'
 import got from 'got'
+import DefaultConfig from '../../config/default.json'
 
-const hydraAdminUrl = process.env.HYDRA_ADMIN_URL || 'http://localhost:9001'
+const config = rc('MW', DefaultConfig)
+const hydraAdminUrl = config.HYDRA_ADMIN_URL || 'http://localhost:9001'
 let mockTlsTermination = {}
-const MOCK_TLS_TERMINATION = process.env.MOCK_TLS_TERMINATION || 'true'
+const MOCK_TLS_TERMINATION = config.MOCK_TLS_TERMINATION || 'true'
 if (MOCK_TLS_TERMINATION) {
   mockTlsTermination = {
     'X-Forwarded-Proto': 'https'

@@ -23,8 +23,12 @@
  --------------
  ******/
 
+import rc from 'rc'
 import { DatabaseAccount } from './accounts-service'
+import DefaultConfig from '../../config/default.json'
 import Knex = require('knex')
+
+const config = rc('MW', DefaultConfig)
 
 export type Transaction = {
   accountId: string;
@@ -87,7 +91,7 @@ export class KnexTransactionService implements TransactionsService {
       return this._knex<Transaction>('transactions').where({ accountId })
     }
 
-    const division = process.env.KNEX_CLIENT === 'mysql' ? `epoch DIV ${aggregateBy.toString()}` : `epoch/${parseInt(aggregateBy.toString())}`
+    const division = config.KNEX_CLIENT === 'mysql' ? `epoch DIV ${aggregateBy.toString()}` : `epoch/${parseInt(aggregateBy.toString())}`
 
     const t: Array<Transaction> = await this._knex<Transaction>('transactions')
       .select(this._knex.raw(`${division} as utime, sum(amount) as amount, Description as description, accountId`))

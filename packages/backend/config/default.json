@@ -1,0 +1,17 @@
+{
+  "PORT": 3001,
+  "LOG_LEVEL": "info",
+  "KNEX_CLIENT": "sqlite3",
+  "DFSP_ID": "mojawallet",
+  "ALS_ENDPOINT": "account-lookup-service.mojaloop.app",
+  "QUOTES_ENDPOINT": "quoting-service.mojaloop.app",
+  "TRANSFERS_ENDPOINT": "ml-api-adapter.mojaloop.app",
+  "TRANSACTION_REQUEST_ENDPOINT": "transaction-request-service.mojaloop.app",
+  "ILP_SECRET": "secret",
+  "ALLOWED_SERVICES": ["ilp-service", "users-service"],
+  "HYDRA_ADMIN_URL": "http://localhost:9001",
+  "MOCK_TLS_TERMINATION": "true",
+  "QUOTE_EXPIRATION_WINDOW": 120,
+  "PUT_BASE_URI": "http://localhost:8008",
+  "ACCOUNTS_URL": "http://localhost:3001"
+}

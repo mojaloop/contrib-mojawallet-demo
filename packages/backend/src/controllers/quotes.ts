@@ -23,10 +23,13 @@
  --------------
  ******/
 
+import rc from 'rc'
 import { AccountsAppContext } from '../index'
 import { QuotesIDPutResponse, QuotesPostRequest } from '../types/mojaloop'
+import DefaultConfig from '../../config/default.json'
 
-const QUOTE_EXPIRATION_WINDOW = process.env.QUOTE_EXPIRATION_WINDOW || 120
+const config = rc('MW', DefaultConfig)
+const QUOTE_EXPIRATION_WINDOW = config.QUOTE_EXPIRATION_WINDOW || 120
 
 export async function create (ctx: AccountsAppContext) {
   // charge 1 USD in fees

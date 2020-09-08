@@ -23,9 +23,12 @@
  --------------
  ******/
 
+import rc from 'rc'
 import { AccountsAppContext } from '../index'
+import DefaultConfig from '../../config/default.json'
 
-const fspId = process.env.FSP_ID || 'mojawallet'
+const config = rc('MW', DefaultConfig)
+const fspId = config.DFSP_ID || 'mojawallet'
 
 export async function show (ctx: AccountsAppContext): Promise<void> {
   const { users, mojaloopRequests } = ctx
