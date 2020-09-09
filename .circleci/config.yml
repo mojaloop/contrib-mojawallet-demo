@@ -166,6 +166,31 @@ jobs:
       - store_artifacts:
           path: /tmp/license-scanner/results
           prefix: licenses
+
+  vulnerability-check:
+    executor: default-docker
+    steps:
+      - checkout
+      - run:
+          name: Install general dependencies
+          command: *defaults_Dependencies
+      - restore_cache:
+          key: dependency-cache-{{ checksum "packages/frontend/package-lock.json" }}
+      - restore_cache:
+          key: dependency-cache-{{ checksum "packages/backend/package-lock.json" }}
+      - run:
+          name: Create dir for test results
+          command: mkdir -p ./audit/results
+      - run:
+          name: Check for new npm vulnerabilities in backend
+          command: npm run --prefix ./packages/backend audit:check --silent -- --json > ./audit/results/backendAuditResults.json
+      - run:
+          name: Check for new npm vulnerabilities in backend
+          command: npm run --prefix ./packages/frontend audit:check --silent -- --json > ./audit/results/frontendAuditResults.json
+      - store_artifacts:
+          path: ./audit/results
+          prefix: audit
+
 ##
 # Workflows
 #
@@ -205,6 +230,18 @@ workflows:
                 - /feature*/
                 - /bugfix*/
       - audit-licenses:
+          context: org-global
+          requires:
+            - setup-backend
+            - build-frontend
+          filters:
+            tags:
+              only: /.*/
+            branches:
+              ignore:
+                - /feature*/
+                - /bugfix*/
+      - vulnerability-check:
           context: org-global
           requires:
             - setup-backend

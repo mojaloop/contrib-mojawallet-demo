@@ -1,0 +1,58 @@
+{
+  "decisions": {
+    "1553|bcrypt": {
+      "decision": "fix",
+      "madeAt": 1599654926026
+    },
+    "1179|@types/knex>knex>mkdirp>minimist": {
+      "decision": "fix",
+      "madeAt": 1599654940609
+    },
+    "1179|knex>mkdirp>minimist": {
+      "decision": "fix",
+      "madeAt": 1599654940609
+    },
+    "1179|bcrypt>node-pre-gyp>mkdirp>minimist": {
+      "decision": "fix",
+      "madeAt": 1599654940609
+    },
+    "1179|bcrypt>node-pre-gyp>tar>mkdirp>minimist": {
+      "decision": "fix",
+      "madeAt": 1599654940609
+    },
+    "1179|sqlite>sqlite3>node-pre-gyp>tar>mkdirp>minimist": {
+      "decision": "fix",
+      "madeAt": 1599654940609
+    },
+    "1179|sqlite>sqlite3>node-pre-gyp>mkdirp>minimist": {
+      "decision": "fix",
+      "madeAt": 1599654940609
+    },
+    "1179|bcrypt>node-pre-gyp>rc>minimist": {
+      "decision": "fix",
+      "madeAt": 1599654951980
+    },
+    "1179|rc>minimist": {
+      "decision": "fix",
+      "madeAt": 1599654951980
+    },
+    "1179|sqlite>sqlite3>node-pre-gyp>rc>minimist": {
+      "decision": "fix",
+      "madeAt": 1599654951980
+    },
+    "1523|@types/knex>knex>lodash": {
+      "decision": "fix",
+      "madeAt": 1599654962837
+    },
+    "1523|knex>lodash": {
+      "decision": "fix",
+      "madeAt": 1599654962837
+    },
+    "1523|lodash": {
+      "decision": "fix",
+      "madeAt": 1599654962837
+    }
+  },
+  "rules": {},
+  "version": 1
+}
