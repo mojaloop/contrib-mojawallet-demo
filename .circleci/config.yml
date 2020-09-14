@@ -62,7 +62,27 @@ executors:
 # A map of CircleCI jobs
 ##
 jobs:
-  build-frontend:
+  build-docker-images:
+    executor: default-docker
+    steps:
+      - checkout
+      - run:
+          name: Build Docker docker-image.tar
+          command: |
+            echo "Building Docker image local"
+            docker build -t @mojaloop/mojawallet-frontend:local -f ./packages/frontend .
+            docker build -t @mojaloop/mojawallet-backend:local -f ./packages/backend .
+      - run:
+          name: Save docker image to workspace
+          command: |
+            docker save -o /tmp/docker-frontend-image.tar @mojaloop/mojawallet-frontend:local
+            docker save -o /tmp/docker-backend-image.tar @mojaloop/mojawallet-backend:local
+      - persist_to_workspace:
+          root: /tmp
+          paths:
+            - docker-backend-image.tar
+            - docker-frontend-image.tar
+  setup-frontend:
     executor: default-docker
     steps:
       - checkout
@@ -191,6 +211,59 @@ jobs:
           path: ./audit/results
           prefix: audit
 
+  image-scan:
+    executor: anchore/anchore_engine
+    steps:
+      - setup_remote_docker
+      - checkout
+      - run:
+          name: Install docker dependencies for anchore
+          command: |
+            apk add --update python3 py3-pip docker python3-dev libffi-dev openssl-dev gcc libc-dev make jq npm
+      - run:
+          name: Install AWS CLI dependencies
+          command: *defaults_awsCliDependencies
+      - attach_workspace:
+          at: /tmp
+      - run:
+          name: Load the pre-built docker image from workspace
+          command: docker load -i /tmp/docker-image.tar
+      - run:
+          name: Download the mojaloop/ci-config repo
+          command: |
+            git clone https://github.com/mojaloop/ci-config /tmp/ci-config
+            # Generate the mojaloop anchore-policy
+            cd /tmp/ci-config/container-scanning && ./mojaloop-policy-generator.js /tmp/mojaloop-policy.json
+      - run:
+          name: Pull base image locally
+          command: |
+            docker pull node:12.16.1-alpine
+      # Analyze the base and derived image
+      # Note: It seems images are scanned in parallel, so preloading the base image result doesn't give us any real performance gain
+      - anchore/analyze_local_image:
+          # Force the older version, version 0.7.0 was just published, and is broken
+          anchore_version: v0.6.1
+          image_name: "docker.io/node:12.16.1-alpine @mojaloop/mojawallet-frontend:local @mojaloop/mojawallet-backend:local"
+          policy_failure: false
+          timeout: '1000'
+          # Note: if the generated policy is invalid, this will fallback to the default policy, which we don't want!
+          policy_bundle_file_path: /tmp/mojaloop-policy.json
+      - run:
+          name: Upload Anchore reports to s3
+          command: |
+            aws s3 cp anchore-reports ${AWS_S3_DIR_ANCHORE_REPORTS}/${CIRCLE_PROJECT_REPONAME}/ --recursive
+            aws s3 rm ${AWS_S3_DIR_ANCHORE_REPORTS}/latest/ --recursive --exclude "*" --include "mojawallet*"
+            aws s3 cp anchore-reports ${AWS_S3_DIR_ANCHORE_REPORTS}/latest/ --recursive
+      - run:
+          name: Evaluate failures
+          command: /tmp/ci-config/container-scanning/anchore-result-diff.js anchore-reports/node_12.16.1-alpine-policy.json anchore-reports/mojawallet*-policy.json
+      - slack/status:
+          fail_only: true
+          webhook: "$SLACK_WEBHOOK_ANNOUNCMENT_CI_CD"
+          failure_message: 'Anchore Image Scan failed  for: \`"${DOCKER_ORG}/${CIRCLE_PROJECT_REPONAME}:${CIRCLE_TAG}"\`'
+      - store_artifacts:
+          path: anchore-reports
+
 ##
 # Workflows
 #
@@ -200,7 +273,16 @@ workflows:
   version: 2
   build_and_test:
     jobs:
-      - build-frontend:
+      - build-docker-images:
+          context: org-global
+          filters:
+            tags:
+              only: /.*/
+            branches:
+              ignore:
+                - /feature*/
+                - /bugfix*/
+      - setup-frontend:
           context: org-global
           filters:
             tags:
@@ -233,7 +315,7 @@ workflows:
           context: org-global
           requires:
             - setup-backend
-            - build-frontend
+            - setup-frontend
           filters:
             tags:
               only: /.*/
@@ -245,7 +327,18 @@ workflows:
           context: org-global
           requires:
             - setup-backend
-            - build-frontend
+            - setup-frontend
+          filters:
+            tags:
+              only: /.*/
+            branches:
+              ignore:
+                - /feature*/
+                - /bugfix*/
+      - image-scan:
+          context: org-global
+          requires:
+            - build-docker-images
           filters:
             tags:
               only: /.*/
