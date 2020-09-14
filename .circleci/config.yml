@@ -83,7 +83,7 @@ jobs:
             - docker-backend-image.tar
             - docker-frontend-image.tar
   setup-frontend:
-    executor: default-docker
+    executor: default-machine
     steps:
       - checkout
       - run:
