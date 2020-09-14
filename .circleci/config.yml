@@ -63,7 +63,7 @@ executors:
 ##
 jobs:
   build-docker-images:
-    executor: default-docker
+    executor: default-machine
     steps:
       - checkout
       - run:
@@ -83,7 +83,7 @@ jobs:
             - docker-backend-image.tar
             - docker-frontend-image.tar
   setup-frontend:
-    executor: default-machine
+    executor: default-docker
     steps:
       - checkout
       - run:
