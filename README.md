@@ -10,7 +10,7 @@ This project does not form part of the core Mojaloop infrastructure and should *
 - POS sale
 - Web Payments using Mobile Money and Mojaloop Open-API
 
-For a production integration with Mojaloop, please checkout [Fineract]().
+For a production integration with Mojaloop, please checkout [Mifos Wallet Solution](https://mifos.gitbook.io/docs/mifos-mojaloop/mifos-wallet-solution).
 
 ## Structure
 The project comprises:
