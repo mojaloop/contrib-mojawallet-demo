@@ -29,7 +29,6 @@ RUN adduser -D mojawallet-user
 USER mojawallet-user
 
 COPY --chown=mojawallet-user --from=builder /usr/src/app .
-RUN npm prune --production
 
 EXPOSE 3000
 CMD ["npm", "run", "start"]
