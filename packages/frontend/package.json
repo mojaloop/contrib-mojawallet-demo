@@ -11,8 +11,9 @@
   "scripts": {
     "audit:resolve": "SHELL=sh resolve-audit --production",
     "audit:check": "SHELL=sh check-audit --production",
-    "dev": "next dev",
     "build": "next build",
+    "ci:build:docker": "docker build -t $IMAGE_TAG .",
+    "dev": "next dev",
     "start": "next start"
   },
   "dependencies": {

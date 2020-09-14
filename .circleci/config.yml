@@ -70,8 +70,8 @@ jobs:
           name: Build Docker docker-image.tar
           command: |
             echo "Building Docker image local"
-            cd $CIRCLE_WORKING_DIRECTORY/packages/frontend && docker build -t mojaloop/mojawallet-frontend:local
-            cd $CIRCLE_WORKING_DIRECTORY/packages/backend && docker build -t mojaloop/mojawallet-backend:local
+            IMAGE_TAG=mojaloop/mojawallet-frontend:local npm run ci:build:docker --prefix packages/frontend
+            IMAGE_TAG=mojaloop/mojawallet-backend:local npm run ci:build:docker --prefix packages/backend
       - run:
           name: Save docker image to workspace
           command: |

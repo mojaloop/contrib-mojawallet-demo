@@ -12,6 +12,8 @@
   "scripts": {
     "audit:resolve": "SHELL=sh resolve-audit --production",
     "audit:check": "SHELL=sh check-audit --production",
+    "build": "tsc",
+    "ci:build:docker": "docker build -t $IMAGE_TAG .",
     "lint": "eslint ./src/**/*.ts",
     "lint:fix": "eslint --fix ./src/**/*.ts",
     "start": "node dist/src/index.js",
