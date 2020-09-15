@@ -1,0 +1,17 @@
+{
+  "name": "@mojaloop/mojawallet",
+  "version": "1.0.0",
+  "private": true,
+  "contributors": [
+    "Cairin Michie <github:cairinmichie>",
+    "Donovan Changfoot <github:donchangfoot>",
+    "Matthew de Haast <github:matdehaast>",
+    "Talon Patterson <github:TalPat>"
+  ],
+  "scripts": {
+    "release": "standard-version --first-release --releaseCommitMessageFormat 'chore(release): {{currentTag}}'"
+  },
+  "devDependencies": {
+    "standard-version": "^9.0.0"
+  }
+}
