@@ -169,7 +169,7 @@ jobs:
       - run:
           name: Install general dependencies
           command: *defaults_Dependencies
-      - run:packages/frontend/package.json
+      - run:
           <<: *defaults_license_scanner
       - restore_cache:
           key: dependency-cache-{{ checksum "packages/backend/package-lock.json" }}
