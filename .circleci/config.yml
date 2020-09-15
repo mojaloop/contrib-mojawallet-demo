@@ -449,7 +449,7 @@ workflows:
       - publish:
           context: org-global
           requires:
-            - license-scan
+            - audit-licenses
             - image-scan
             - test
           filters:
