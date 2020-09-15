@@ -70,12 +70,12 @@ jobs:
           name: Build Docker docker-image.tar
           command: |
             echo "Building Docker image local"
-            IMAGE_TAG=mojaloop/mojawallet-frontend:local npm run ci:build:docker --prefix packages/frontend
-            IMAGE_TAG=mojaloop/mojawallet-backend:local npm run ci:build:docker --prefix packages/backend
+            IMAGE_TAG=$DOCKER_ORG/$CIRCLE_PROJECT_REPONAME-frontend:local npm run ci:build:docker --prefix packages/frontend
+            IMAGE_TAG=$DOCKER_ORG/$CIRCLE_PROJECT_REPONAME-backend:local npm run ci:build:docker --prefix packages/backend
       - run:
           name: Save docker image to workspace
           command: |
-            docker save -o /tmp/docker-images.tar mojaloop/mojawallet-frontend:local mojaloop/mojawallet-backend:local
+            docker save -o /tmp/docker-images.tar $DOCKER_ORG/$CIRCLE_PROJECT_REPONAME-frontend:local $DOCKER_ORG/$CIRCLE_PROJECT_REPONAME-backend:local
       - persist_to_workspace:
           root: /tmp
           paths:
@@ -241,7 +241,7 @@ jobs:
       - anchore/analyze_local_image:
           # Force the older version, version 0.7.0 was just published, and is broken
           anchore_version: v0.6.1
-          image_name: "docker.io/node:12.16.1-alpine mojaloop/mojawallet-frontend:local mojaloop/mojawallet-backend:local"
+          image_name: "docker.io/node:12.16.1-alpine $DOCKER_ORG/$CIRCLE_PROJECT_REPONAME-frontend:local $DOCKER_ORG/$CIRCLE_PROJECT_REPONAME-backend:local"
           policy_failure: false
           timeout: '1000'
           # Note: if the generated policy is invalid, this will fallback to the default policy, which we don't want!
@@ -345,21 +345,21 @@ jobs:
       - run:
           name: Re-tag pre built image
           command: |
-            docker tag mojaloop/mojawallet-frontend:local mojaloop/mojawallet-frontend:latest
-            docker tag mojaloop/mojawallet-frontend:local mojaloop/mojawallet-frontend:${CIRCLE_TAG}
-            docker tag mojaloop/mojawallet-backend:local mojaloop/mojawallet-backend:latest
-            docker tag mojaloop/mojawallet-backend:local mojaloop/mojawallet-backend:${CIRCLE_TAG}
+            docker tag $DOCKER_ORG/$CIRCLE_PROJECT_REPONAME-frontend:local $DOCKER_ORG/$CIRCLE_PROJECT_REPONAME-frontend:latest
+            docker tag $DOCKER_ORG/$CIRCLE_PROJECT_REPONAME-frontend:local $DOCKER_ORG/$CIRCLE_PROJECT_REPONAME-frontend:${CIRCLE_TAG}
+            docker tag $DOCKER_ORG/$CIRCLE_PROJECT_REPONAME-backend:local $DOCKER_ORG/$CIRCLE_PROJECT_REPONAME-backend:latest
+            docker tag $DOCKER_ORG/$CIRCLE_PROJECT_REPONAME-backend:local $DOCKER_ORG/$CIRCLE_PROJECT_REPONAME-backend:${CIRCLE_TAG}
       - run:
           name: Publish Docker image latest tag to Docker Hub
           command: |
-            echo "Publishing mojaloop/mojawallet-frontend:latest"
-            docker push mojaloop/mojawallet-frontend:latest
-            echo "Publishing mojaloop/mojawallet-frontend:${CIRCLE_TAG}"
-            docker push mojaloop/mojawallet-frontend:${CIRCLE_TAG}
-            echo "Publishing mojaloop/mojawallet-backend:latest"
-            docker push mojaloop/mojawallet-backend:latest
-            echo "Publishing mojaloop/mojawallet-backend:${CIRCLE_TAG}"
-            docker push mojaloop/mojawallet-backend:${CIRCLE_TAG}
+            echo "Publishing $DOCKER_ORG/$CIRCLE_PROJECT_REPONAME-frontend:latest"
+            docker push $DOCKER_ORG/$CIRCLE_PROJECT_REPONAME-frontend:latest
+            echo "Publishing $DOCKER_ORG/$CIRCLE_PROJECT_REPONAME-frontend:${CIRCLE_TAG}"
+            docker push $DOCKER_ORG/$CIRCLE_PROJECT_REPONAME-frontend:${CIRCLE_TAG}
+            echo "Publishing $DOCKER_ORG/$CIRCLE_PROJECT_REPONAME-backend:latest"
+            docker push $DOCKER_ORG/$CIRCLE_PROJECT_REPONAME-backend:latest
+            echo "Publishing $DOCKER_ORG/$CIRCLE_PROJECT_REPONAME-backend:${CIRCLE_TAG}"
+            docker push $DOCKER_ORG/$CIRCLE_PROJECT_REPONAME-backend:${CIRCLE_TAG}
       - slack/status:
           fail_only: true
           webhook: "$SLACK_WEBHOOK_ANNOUNCMENT_CI_CD"

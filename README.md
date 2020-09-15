@@ -1,4 +1,4 @@
-# Moja App
+# Demo Mojawallet
 [![Git Commit](https://img.shields.io/github/last-commit/mojaloop/mojawallet.svg?style=flat)](https://github.com/mojaloop/mojawallet/commits/master)
 [![Git Releases](https://img.shields.io/github/release/mojaloop/mojawallet.svg?style=flat)](https://github.com/mojaloop/mojawallet/releases)
 [![CircleCI](https://circleci.com/gh/mojaloop/mojawallet.svg?style=svg)](https://app.circleci.com/pipelines/github/mojaloop/mojawallet)
