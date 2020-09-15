@@ -262,6 +262,109 @@ jobs:
       - store_artifacts:
           path: anchore-reports
 
+  release:
+    executor: default-docker
+    steps:
+      - run:
+          name: Install general dependencies
+          command: *defaults_Dependencies
+      - checkout
+      - run:
+          name: Install npm dependencies
+          command: npm install
+      - run:
+          name: Configure git + ssh
+          command: |
+            git config user.email ${GIT_CI_EMAIL}
+            git config user.name ${GIT_CI_USER}
+            git checkout ${CIRCLE_BRANCH}
+            mkdir -p ~/.ssh
+            ssh-keyscan -p 443 ssh.github.com >> ~/.ssh/known_hosts
+            ssh-keyscan github.com >> ~/.ssh/known_hosts
+            chmod 0200 ~/.ssh/*
+      - run:
+          name: Generate changelog and bump package version
+          command: npm run release
+      - run:
+          name: Push the release
+          command: git push --follow-tags origin ${CIRCLE_BRANCH}
+
+  github-release:
+    executor: default-machine
+    steps:
+      - checkout
+      - run:
+          name: Install git
+          command: |
+            sudo apt-get update && sudo apt-get install -y git
+      - checkout
+      - run:
+          name: Fetch updated release branch
+          command: |
+            git config user.email ${GIT_CI_EMAIL}
+            git config user.name ${GIT_CI_USER}
+            git fetch origin
+            git checkout origin/${CIRCLE_BRANCH}
+      - run:
+          # Note: this is rather imperfect, but will do for now
+          name: Format the changelog into the github release body and get release tag
+          command: |
+            git diff --no-indent-heuristic master~1 HEAD CHANGELOG.md | sed -n '/^+[^+]/ s/^+//p' > /tmp/changes
+            echo 'export RELEASE_CHANGES=`cat /tmp/changes`' >> $BASH_ENV
+            echo 'export RELEASE_TAG=`cat package.json | jq -r .version`' >> $BASH_ENV
+      - run:
+          name: check the release changes
+          command: |
+            echo "Changes are: ${RELEASE_CHANGES}"
+      - github-release/create:
+          github-token-variable: ${GITHUB_TOKEN}
+          tag: v${RELEASE_TAG}
+          title: v${RELEASE_TAG} Release
+          description: ${RELEASE_CHANGES}
+          file-path: CHANGELOG.md      
+      - slack/status:
+          webhook: "$SLACK_WEBHOOK_ANNOUNCEMENT"
+          success_message: '*"${CIRCLE_PROJECT_REPONAME}"* - Release \`"v${RELEASE_TAG}"\` \nhttps://github.com/mojaloop/"${CIRCLE_PROJECT_REPONAME}"/releases/tag/"v${RELEASE_TAG}"'
+
+  publish:
+    executor: default-machine
+    steps:
+      - run:
+          name: Install git
+          command: |
+            sudo apt-get update && sudo apt-get install -y git
+      - checkout
+      - attach_workspace:
+          at: /tmp
+      - run:
+          name: Load the pre-built docker image from workspace
+          command: docker load -i /tmp/docker-images.tar
+      - run:
+          name: Login to Docker Hub
+          command: docker login -u $DOCKER_USER -p $DOCKER_PASS
+      - run:
+          name: Re-tag pre built image
+          command: |
+            docker tag mojaloop/mojawallet-frontend:local mojaloop/mojawallet-frontend:latest
+            docker tag mojaloop/mojawallet-frontend:local mojaloop/mojawallet-frontend:${CIRCLE_TAG}
+            docker tag mojaloop/mojawallet-backend:local mojaloop/mojawallet-backend:latest
+            docker tag mojaloop/mojawallet-backend:local mojaloop/mojawallet-backend:${CIRCLE_TAG}
+      - run:
+          name: Publish Docker image latest tag to Docker Hub
+          command: |
+            echo "Publishing mojaloop/mojawallet-frontend:latest"
+            docker push mojaloop/mojawallet-frontend:latest
+            echo "Publishing mojaloop/mojawallet-frontend:${CIRCLE_TAG}"
+            docker push mojaloop/mojawallet-frontend:${CIRCLE_TAG}
+            echo "Publishing mojaloop/mojawallet-backend:latest"
+            docker push mojaloop/mojawallet-backend:latest
+            echo "Publishing mojaloop/mojawallet-backend:${CIRCLE_TAG}"
+            docker push mojaloop/mojawallet-backend:${CIRCLE_TAG}
+      - slack/status:
+          fail_only: true
+          webhook: "$SLACK_WEBHOOK_ANNOUNCMENT_CI_CD"
+          failure_message: 'Publishing docker image failed for: \`"${DOCKER_ORG}/${CIRCLE_PROJECT_REPONAME}:${CIRCLE_TAG}"\`'
+
 ##
 # Workflows
 #
@@ -276,39 +379,23 @@ workflows:
           filters:
             tags:
               only: /.*/
-            branches:
-              ignore:
-                - /feature*/
-                - /bugfix*/
       - setup-frontend:
           context: org-global
           filters:
             tags:
               only: /.*/
-            branches:
-              ignore:
-                - /feature*/
-                - /bugfix*/
       - setup-backend:
           context: org-global
           filters:
             tags:
               only: /.*/
-            branches:
-              ignore:
-                - /feature*/
-                - /bugfix*/
       - test:
           context: org-global
           requires:
             - setup-backend
           filters:
             tags:
-              only: /v[0-9]+(\.[0-9]+)*/
-            branches:
-              ignore:
-                - /feature*/
-                - /bugfix*/
+              only: /.*/
       - audit-licenses:
           context: org-global
           requires:
@@ -317,10 +404,6 @@ workflows:
           filters:
             tags:
               only: /.*/
-            branches:
-              ignore:
-                - /feature*/
-                - /bugfix*/
       - vulnerability-check:
           context: org-global
           requires:
@@ -329,10 +412,6 @@ workflows:
           filters:
             tags:
               only: /.*/
-            branches:
-              ignore:
-                - /feature*/
-                - /bugfix*/
       - image-scan:
           context: org-global
           requires:
@@ -341,6 +420,41 @@ workflows:
             tags:
               only: /.*/
             branches:
+              only:
+                - master
+
+      # New commits to master release automatically
+      - release:
+          context: org-global
+          requires:
+            - test
+            - audit-licenses
+            - vulnerability-check
+            - image-scan
+          filters:
+            branches:
+              only:
+                - master
+
+      - github-release:
+          context: org-global
+          requires:
+            - release
+          filters:
+            branches:
+              only:
+                - master
+
+      # New Tags are built and deployed as docker artifacts
+      - publish:
+          context: org-global
+          requires:
+            - license-scan
+            - image-scan
+            - test
+          filters:
+            tags:
+              only: /.*/
+            branches:
               ignore:
-                - /feature*/
-                - /bugfix*/
+                - /.*/
