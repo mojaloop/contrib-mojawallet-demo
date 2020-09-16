@@ -9,7 +9,7 @@
     "Talon Patterson <github:TalPat>"
   ],
   "scripts": {
-    "release": "standard-version --releaseCommitMessageFormat 'chore(release): {{currentTag}}'"
+    "release": "standard-version --releaseCommitMessageFormat 'chore(release): {{currentTag}} [skip ci]'"
   },
   "devDependencies": {
     "standard-version": "^9.0.0"
