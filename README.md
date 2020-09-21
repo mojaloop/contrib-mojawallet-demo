@@ -1,15 +1,19 @@
-# MojaWallet
+# Demo Mojawallet
 [![Git Commit](https://img.shields.io/github/last-commit/mojaloop/mojawallet.svg?style=flat)](https://github.com/mojaloop/mojawallet/commits/master)
 [![Git Releases](https://img.shields.io/github/release/mojaloop/mojawallet.svg?style=flat)](https://github.com/mojaloop/mojawallet/releases)
 [![CircleCI](https://circleci.com/gh/mojaloop/mojawallet.svg?style=svg)](https://app.circleci.com/pipelines/github/mojaloop/mojawallet)
 
-**NB!** This is a **demo** wallet and should **NOT** be used in production. It's purpose is to demonstrate the use of Mojaloop in the following cases:
+**IMPORTANT**
+
+This project does not form part of the core Mojaloop infrastructure and should **NOT** be used in a production environment. It is to be used in a playground environment (such as a hackathon) to showcase how to interact with the Mojaloop Open-API. The following use-cases are supported:
 - ATM withdrawal
 - POS sale
-- Web Payments using Mobile Money and Mojaloop
+- Web Payments using Mobile Money and Mojaloop Open-API
+
+For a production integration with Mojaloop, please checkout [Mifos Wallet Solution](https://mifos.gitbook.io/docs/mifos-mojaloop/mifos-wallet-solution).
 
 ## Structure
-The wallet comprises:
+The project comprises:
 - [Hydra](https://www.ory.sh/hydra/docs/) (OAuth server)
 - backend (connected to a SQL database such as PostgreSQL or MySQL)
 - frontend

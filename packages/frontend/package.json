@@ -1,6 +1,6 @@
 {
   "name": "frontend",
-  "version": "0.1.0",
+  "version": "1.0.0",
   "private": true,
   "contributors": [
     "Cairin Michie <github:cairinmichie>",
@@ -9,8 +9,11 @@
     "Talon Patterson <github:TalPat>"
   ],
   "scripts": {
-    "dev": "next dev",
+    "audit:resolve": "SHELL=sh resolve-audit --production",
+    "audit:check": "SHELL=sh check-audit --production",
     "build": "next build",
+    "ci:build:docker": "docker build -t $IMAGE_TAG .",
+    "dev": "next dev",
     "start": "next start"
   },
   "dependencies": {
@@ -22,14 +25,14 @@
     "ky": "^0.16.1",
     "ky-universal": "^0.3.0",
     "moment": "^2.24.0",
-    "next": "9.1.4",
+    "next": "^9.5.3",
     "nookies": "^2.0.8",
     "openid-client": "^3.8.4",
     "pusher-js": "^5.0.3",
     "react": "16.12.0",
     "react-dom": "16.12.0",
     "react-hook-form": "^3.28.11",
-    "react-phone-number-input": "^2.5.1",
+    "react-phone-number-input": "^3.0.25",
     "react-select": "^3.1.0",
     "tailwindcss-elevation": "^0.3.3"
   },
@@ -38,6 +41,7 @@
     "@types/react": "^16.9.13",
     "@types/uuid": "^3.4.6",
     "autoprefixer": "^9.7.3",
+    "npm-audit-resolver": "^2.2.1",
     "postcss-loader": "^3.0.0",
     "tailwindcss": "^1.1.4",
     "typescript": "^3.7.2"

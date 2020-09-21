@@ -1,0 +1,59 @@
+{
+  "decisions": {
+    "1503|next": {
+      "decision": "fix",
+      "madeAt": 1599655128440
+    },
+    "1179|next>babel-loader>mkdirp>minimist": {
+      "decision": "fix",
+      "madeAt": 1599655144256
+    },
+    "1179|next>webpack>mkdirp>minimist": {
+      "decision": "fix",
+      "madeAt": 1599655144256
+    },
+    "1179|next>webpack>terser-webpack-plugin>cacache>mkdirp>minimist": {
+      "decision": "fix",
+      "madeAt": 1599655144256
+    },
+    "1179|next>webpack>terser-webpack-plugin>cacache>move-concurrently>copy-concurrently>mkdirp>minimist": {
+      "decision": "fix",
+      "madeAt": 1599655144256
+    },
+    "1179|next>webpack>terser-webpack-plugin>cacache>move-concurrently>mkdirp>minimist": {
+      "decision": "fix",
+      "madeAt": 1599655144256
+    },
+    "1556|react-phone-number-input>react-responsive-ui>create-react-context>fbjs>isomorphic-fetch>node-fetch": {
+      "decision": "fix",
+      "madeAt": 1600088783364
+    },
+    "1556|next>@ampproject/toolbox-optimizer>@ampproject/toolbox-core>cross-fetch>node-fetch": {
+      "decision": "ignore",
+      "madeAt": 1600088920514,
+      "expiresAt": 1602680904070
+    },
+    "1556|next>@ampproject/toolbox-optimizer>@ampproject/toolbox-runtime-version>@ampproject/toolbox-core>cross-fetch>node-fetch": {
+      "decision": "ignore",
+      "madeAt": 1600088920515,
+      "expiresAt": 1602680904070
+    },
+    "1556|next>@ampproject/toolbox-optimizer>@ampproject/toolbox-validator-rules>cross-fetch>node-fetch": {
+      "decision": "ignore",
+      "madeAt": 1600088920515,
+      "expiresAt": 1602680904070
+    },
+    "1556|next>@ampproject/toolbox-optimizer>cross-fetch>node-fetch": {
+      "decision": "ignore",
+      "madeAt": 1600088920515,
+      "expiresAt": 1602680904070
+    },
+    "1556|next>@ampproject/toolbox-optimizer>node-fetch": {
+      "decision": "ignore",
+      "madeAt": 1600088920515,
+      "expiresAt": 1602680904070
+    }
+  },
+  "rules": {},
+  "version": 1
+}

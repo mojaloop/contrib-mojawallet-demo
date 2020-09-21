@@ -1,4 +1,4 @@
-FROM node:lts-alpine as builder
+FROM node:12.16.1-alpine as builder
 
 # Create app directory
 WORKDIR /usr/src/app
@@ -29,7 +29,6 @@ RUN adduser -D mojawallet-user
 USER mojawallet-user
 
 COPY --chown=mojawallet-user --from=builder /usr/src/app .
-RUN npm prune --production
 
 EXPOSE 3000
 CMD ["npm", "run", "start"]
