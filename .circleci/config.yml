@@ -270,7 +270,7 @@ jobs:
           command: *defaults_Dependencies
       - checkout
       - run:
-          name: Install npm dependencies
+          name: NPM install
           command: npm install
       - run:
           name: Configure git + ssh
