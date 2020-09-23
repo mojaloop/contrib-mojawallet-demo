@@ -430,7 +430,7 @@ workflows:
             - test
             - audit-licenses
             - vulnerability-check
-            - image-scan
+            # - image-scan
           filters:
             branches:
               only:
@@ -450,7 +450,7 @@ workflows:
           context: org-global
           requires:
             - audit-licenses
-            - image-scan
+            # - image-scan
             - test
           filters:
             tags:
