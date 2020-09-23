@@ -430,6 +430,7 @@ workflows:
             - test
             - audit-licenses
             - vulnerability-check
+            - build-docker-images
             # - image-scan
           filters:
             branches:
@@ -450,6 +451,7 @@ workflows:
           context: org-global
           requires:
             - audit-licenses
+            - release
             # - image-scan
             - test
           filters:
