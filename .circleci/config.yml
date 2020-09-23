@@ -412,16 +412,16 @@ workflows:
           filters:
             tags:
               only: /.*/
-      - image-scan:
-          context: org-global
-          requires:
-            - build-docker-images
-          filters:
-            tags:
-              only: /.*/
-            branches:
-              only:
-                - master
+      # - image-scan:
+      #     context: org-global
+      #     requires:
+      #       - build-docker-images
+      #     filters:
+      #       tags:
+      #         only: /.*/
+      #       branches:
+      #         only:
+      #           - master
 
       # New commits to master release automatically
       - release:
