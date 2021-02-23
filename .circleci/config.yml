@@ -92,7 +92,7 @@ jobs:
           command: cd $(npm root -g)/npm
       - run:
           name: Update NPM install
-          command: npm install --prefix ./packages/frontend
+          command: npm ci --prefix ./packages/frontend
       - run:
           name: Build
           command: npm run build --prefix ./packages/frontend
@@ -116,7 +116,7 @@ jobs:
           command: cd $(npm root -g)/npm
       - run:
           name: Update NPM install
-          command: npm install --prefix ./packages/backend
+          command: npm ci --prefix ./packages/backend
       - run:
           name: Delete build dependencies
           command: apk del build-dependencies
