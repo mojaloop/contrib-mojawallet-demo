@@ -34,7 +34,8 @@
     "react-hook-form": "^3.28.11",
     "react-phone-number-input": "^3.0.25",
     "react-select": "^3.1.0",
-    "tailwindcss-elevation": "^0.3.3"
+    "tailwindcss-elevation": "^0.3.3",
+    "webpack": "^4.4.0"
   },
   "devDependencies": {
     "@types/node": "^12.12.14",
