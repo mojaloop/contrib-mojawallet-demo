@@ -51,6 +51,38 @@
     "1523|lodash": {
       "decision": "fix",
       "madeAt": 1599654962837
+    },
+    "1500|ts-jest>yargs-parser": {
+      "decision": "fix",
+      "madeAt": 1614084490938
+    },
+    "1594|axios": {
+      "decision": "fix",
+      "madeAt": 1614084836582
+    },
+    "1589|@types/knex>knex>liftoff>findup-sync>resolve-dir>global-modules>global-prefix>ini": {
+      "decision": "fix",
+      "madeAt": 1614154052125
+    },
+    "1589|knex>liftoff>findup-sync>resolve-dir>global-modules>global-prefix>ini": {
+      "decision": "fix",
+      "madeAt": 1614154052125
+    },
+    "1589|bcrypt>node-pre-gyp>rc>ini": {
+      "decision": "fix",
+      "madeAt": 1614154052125
+    },
+    "1589|rc>ini": {
+      "decision": "fix",
+      "madeAt": 1614154052125
+    },
+    "1589|sqlite>sqlite3>node-pre-gyp>rc>ini": {
+      "decision": "fix",
+      "madeAt": 1614154052125
+    },
+    "1595|koa-joi-router>@koa/router>urijs": {
+      "decision": "fix",
+      "madeAt": 1614154063859
     }
   },
   "rules": {},

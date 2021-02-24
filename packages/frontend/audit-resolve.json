@@ -29,29 +29,36 @@
       "madeAt": 1600088783364
     },
     "1556|next>@ampproject/toolbox-optimizer>@ampproject/toolbox-core>cross-fetch>node-fetch": {
-      "decision": "ignore",
-      "madeAt": 1600088920514,
-      "expiresAt": 1602680904070
+      "decision": "fix",
+      "madeAt": 1614154522857
     },
     "1556|next>@ampproject/toolbox-optimizer>@ampproject/toolbox-runtime-version>@ampproject/toolbox-core>cross-fetch>node-fetch": {
-      "decision": "ignore",
-      "madeAt": 1600088920515,
-      "expiresAt": 1602680904070
+      "decision": "fix",
+      "madeAt": 1614154527263
     },
     "1556|next>@ampproject/toolbox-optimizer>@ampproject/toolbox-validator-rules>cross-fetch>node-fetch": {
-      "decision": "ignore",
-      "madeAt": 1600088920515,
-      "expiresAt": 1602680904070
+      "decision": "fix",
+      "madeAt": 1614154530649
     },
     "1556|next>@ampproject/toolbox-optimizer>cross-fetch>node-fetch": {
-      "decision": "ignore",
-      "madeAt": 1600088920515,
-      "expiresAt": 1602680904070
+      "decision": "fix",
+      "madeAt": 1614154507748
     },
     "1556|next>@ampproject/toolbox-optimizer>node-fetch": {
-      "decision": "ignore",
-      "madeAt": 1600088920515,
-      "expiresAt": 1602680904070
+      "decision": "fix",
+      "madeAt": 1614154507748
+    },
+    "1573|next>resolve-url-loader>adjust-sourcemap-loader>object-path": {
+      "decision": "fix",
+      "madeAt": 1614154507748
+    },
+    "1594|axios": {
+      "decision": "fix",
+      "madeAt": 1614154517734
+    },
+    "1565|next": {
+      "decision": "fix",
+      "madeAt": 1614154559054
     }
   },
   "rules": {},

@@ -1,5 +1,8 @@
 #!/bin/sh
 
+docker rm -f oauth-hydra frontend-client
+docker network rm hydra
+
 docker network create hydra
 
 export SECRETS_SYSTEM=mysupersecretsecret
@@ -22,4 +25,4 @@ docker run -d \
   -e URLS_SELF_ISSUER=http://localhost:9000/ \
   -e URLS_CONSENT=$URLS_CONSENT \
   -e URLS_LOGIN=$URLS_LOGIN \
-  oryd/hydra:latest serve all --dangerous-force-http
+  oryd/hydra:v1.8 serve all --dangerous-force-http
