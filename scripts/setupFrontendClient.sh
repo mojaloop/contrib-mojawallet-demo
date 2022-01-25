@@ -1,7 +1,7 @@
 #!/bin/sh
 
 docker run --rm -it \
-  -n frontend-client
+  --name frontend-client \
   -e HYDRA_ADMIN_URL=http://oauth-hydra:4445 \
   --network hydra \
   oryd/hydra:v1.8 \
