@@ -32,8 +32,7 @@ import { AccountsPageProps, AccountCardProps, Totals } from "../types"
 import { motion } from 'framer-motion'
 import { AccountsService } from '../services/accounts'
 import { useEffect, useState } from 'react'
-import ReactDOM from "react-dom";
-import { QRCodeSVG } from 'qrcode.react';
+import { QrReader } from 'react-qr-reader';
 
 // const generateQR = ({ text }) => {
 //   const[src, setSrc] = useState('');
@@ -62,6 +61,7 @@ import { QRCodeSVG } from 'qrcode.react';
 const accountsService = AccountsService()
 
 const Home: NextPage<AccountsPageProps> = ({accounts, user}) => {
+  const [data, setData] = useState('No result');
   return (
     <div>
       <Head>
@@ -69,6 +69,20 @@ const Home: NextPage<AccountsPageProps> = ({accounts, user}) => {
         <title>Accounts</title>
         <link rel="icon" href="/favicon.ico" />
       </Head>
+      <QrReader
+        onResult={(result, error) => {
+          if (!!result) {
+            setData(result?.text);
+          }
+
+          if (!!error) {
+            console.info(error);
+          }
+        }}
+        style={{ width: '100%' }}
+      />
+      <p>{data}</p>
+
       <div>
         <div className='w-full rounded-b-2xl fixed top-0' style={{height: '21rem', background: 'linear-gradient(#023347, #025C5E, #B1CDAC)', zIndex:-3000 }}/>
         <div className='' style={{textDecoration: 'none', color: 'inherit', zIndex:0, marginTop: '6rem' }}>
