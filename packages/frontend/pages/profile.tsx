@@ -28,6 +28,9 @@ import { NextPage } from "next"
 import Button from '../components/button'
 import { checkUser } from '../utils'
 import { ProfilePageProps } from '../types'
+import QRCode from 'qrcode';
+
+
 
 const Signup: NextPage<ProfilePageProps> = ({user}) => {
 
@@ -41,7 +44,7 @@ const Signup: NextPage<ProfilePageProps> = ({user}) => {
         'Moja Wallet',
         {
           name: 'Moja Wallet',
-          method: 'https://mojaloop.app'
+          method: 'http://localhost:3000'
         }
       )
     ])

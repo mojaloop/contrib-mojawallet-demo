@@ -36,6 +36,7 @@ import { AccountsService } from '../../services/accounts'
 import moment from 'moment'
 import { motion } from 'framer-motion'
 import Pusher from 'pusher-js'
+import QRCode from 'qrcode';
 
 const { publicRuntimeConfig } = getConfig()
 
@@ -253,6 +254,9 @@ const CreateFaucet: React.FC<CreateFaucetCardProps> = ({accountId, token}) => {
         </div>
         <div className="ml-1 mr-auto text-button uppercase" style={{ paddingTop: '1px' }}>
           add funds
+        </div>
+        <div className="ml-1 mr-auto text-button uppercase" style={{ paddingTop: '1px' }}>
+          Create QR
         </div>
       </div>
     </motion.div>

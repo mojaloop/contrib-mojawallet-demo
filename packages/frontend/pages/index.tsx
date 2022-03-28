@@ -31,6 +31,32 @@ import { formatCurrency, checkUser } from "../utils"
 import { AccountsPageProps, AccountCardProps, Totals } from "../types"
 import { motion } from 'framer-motion'
 import { AccountsService } from '../services/accounts'
+import { useEffect, useState } from 'react'
+import ReactDOM from "react-dom";
+
+const QRCode = ({ text }) => {
+  const[src, setSrc] = useState('');
+
+  useEffect(() => {
+    QRCode.toDataURL(text).then((data) => {
+      setSrc(data);
+    });
+  }, []);
+
+  return (<div>  
+    <img src={src} />
+  </div>
+  );
+};
+
+ReactDOM.render(
+  <React.StrictMode>
+    <QRCode text="Merchant QRCode" />
+  </React.StrictMode>,
+  document.getElementById('root')
+);
+
+
 
 const accountsService = AccountsService()
 
@@ -38,6 +64,7 @@ const Home: NextPage<AccountsPageProps> = ({accounts, user}) => {
   return (
     <div>
       <Head>
+
         <title>Accounts</title>
         <link rel="icon" href="/favicon.ico" />
       </Head>
