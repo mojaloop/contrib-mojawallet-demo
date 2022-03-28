@@ -33,28 +33,29 @@ import { motion } from 'framer-motion'
 import { AccountsService } from '../services/accounts'
 import { useEffect, useState } from 'react'
 import ReactDOM from "react-dom";
+import { QRCodeSVG } from 'qrcode.react';
 
-const QRCode = ({ text }) => {
-  const[src, setSrc] = useState('');
+// const generateQR = ({ text }) => {
+//   const[src, setSrc] = useState('');
 
-  useEffect(() => {
-    QRCode.toDataURL(text).then((data) => {
-      setSrc(data);
-    });
-  }, []);
+//   useEffect(() => {
+//     QRCode.toDataURL(text).then((data) => {
+//       setSrc(data);
+//     });
+//   }, []);
 
-  return (<div>  
-    <img src={src} />
-  </div>
-  );
-};
+//   return (<div>  
+//     <img src={src} />
+//   </div>
+//   );
+// };
 
-ReactDOM.render(
-  <React.StrictMode>
-    <QRCode text="Merchant QRCode" />
-  </React.StrictMode>,
-  document.getElementById('root')
-);
+// ReactDOM.render(
+//   <React.StrictMode>
+//     <QRCode text="Merchant QRCode" />
+//   </React.StrictMode>,
+//   document.getElementById('root')
+// );
 
 
 
