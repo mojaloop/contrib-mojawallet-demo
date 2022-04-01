@@ -1,3 +1,6 @@
+const BASE_URL="http://localhost:3000"
+
+
 let methodName = 'https://mojaloop.app'
 let checkoutURL = 'https://mojaloop.app/checkout'
 let resolver

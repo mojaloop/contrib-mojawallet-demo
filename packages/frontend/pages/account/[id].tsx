@@ -36,7 +36,6 @@ import { AccountsService } from '../../services/accounts'
 import moment from 'moment'
 import { motion } from 'framer-motion'
 import Pusher from 'pusher-js'
-import QRCode from 'qrcode';
 
 const { publicRuntimeConfig } = getConfig()
 
