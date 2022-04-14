@@ -28,6 +28,7 @@ import App from 'next/app'
 import '../styles/main.css'
 import { AnimatePresence, motion } from 'framer-motion'
 
+
 class MyApp extends App {
   render() {
     const { Component, pageProps, router } = this.props

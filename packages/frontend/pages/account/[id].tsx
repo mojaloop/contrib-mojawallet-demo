@@ -254,6 +254,9 @@ const CreateFaucet: React.FC<CreateFaucetCardProps> = ({accountId, token}) => {
         <div className="ml-1 mr-auto text-button uppercase" style={{ paddingTop: '1px' }}>
           add funds
         </div>
+        <div className="ml-1 mr-auto text-button uppercase" style={{ paddingTop: '1px' }}>
+          Create QR
+        </div>
       </div>
     </motion.div>
   )

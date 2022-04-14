@@ -14,10 +14,14 @@
     "baseUrl": ".",
     "rootDir": ".",
     "outDir": "dist",
-    "resolveJsonModule": true
+    "resolveJsonModule": true,
+    "skipLibCheck": true    
   },
   "include": [
     "src",
     "test"
+  ],
+  "exclude": [
+    "node_modules"
   ]
 }
