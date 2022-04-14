@@ -97,7 +97,7 @@ For the sake of this demo, follow these steps to generate a Merchant QR Code
 1. Save the QR Code to be displayed and used.
 
 ## For Example, the following
-A Merchant requires a Static QR code to provide a way for customers at his convenience store.
+A Merchant requires a Static QR code to provide a way for customers to pay at his convenience store.
 
 The Merchant registers with his phone number and inputs the following information into the JSON string.
 ```json
@@ -107,8 +107,60 @@ The Merchant registers with his phone number and inputs the following informatio
 }
 ```
 whitespace is removed and the JSON string has been validated.
+
 using the [website](https://app.qr-code-generator.com/) the following QR Code was generated.
 ![](images/QRCodeExample1.png)
 
-A Merchant requires 
-<!-- TODO: embed 3-5 examples here -->
+<br>
+
+A Merchant requires multiple static QR Codes to provide a way for customers to pay him to seperate locations.
+
+The Merchant registers with his email address and store locations and inputs the following information into the JSON string.
+
+```json
+{
+  "PartyIdType": "BUSINESS",
+  "PartyIdentifier": "merchant@email.com",
+  "PartySubIdOrType": "Norwood"
+}
+```
+```json
+{
+  "PartyIdType": "BUSINESS",
+  "PartyIdentifier": "merchant@email.com",
+  "PartySubIdOrType": "Grange"
+}
+```
+whitespace is removed and the JSON string has been validated.
+
+using the [website](https://app.qr-code-generator.com/) the following QR Codes were generated.
+![](images/QRCodeExample2.png)
+![](images/QRCodeExample3.png)
+
+<br>
+
+A Merchant requires multiple static QR Codes to provide a way for customers to pay him to seperate departments.
+
+The Merchant registers with his government issued business ID and department names and inputs the following information into the JSON string.
+
+```json
+{
+  "PartyIdType": "BUSINESS",
+  "PartyIdentifier": "abn_4567",
+  "PartySubIdOrType": "Restaurant"
+}
+```
+```json
+{
+  "PartyIdType": "BUSINESS",
+  "PartyIdentifier": "abn_4567",
+  "PartySubIdOrType": "Hotel"
+}
+```
+whitespace is removed and the JSON string has been validated.
+
+using the [website](https://app.qr-code-generator.com/) the following QR Codes were generated.
+![](images/QRCodeExample4.png)
+![](images/QRCodeExample5.png)
+
+<br>
