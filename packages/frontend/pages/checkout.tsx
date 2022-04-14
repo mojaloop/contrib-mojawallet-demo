@@ -31,7 +31,8 @@ import { AccountDetails, CheckoutProps, UserDetails } from "../types";
 import Selector from "../components/selector";
 import Button from "../components/button";
 
-const methodName = 'https://mojaloop.app'
+// const methodName = 'https://mojaloop.app'
+const methodName = 'http://localhost:3000'
 
 interface MobileMoneyPaymentDetails {
   currency: string

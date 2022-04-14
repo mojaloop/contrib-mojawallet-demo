@@ -28,8 +28,6 @@ import { NextPage } from "next"
 import Button from '../components/button'
 import { checkUser } from '../utils'
 import { ProfilePageProps } from '../types'
-import QRCode from 'qrcode';
-
 
 
 const Signup: NextPage<ProfilePageProps> = ({user}) => {

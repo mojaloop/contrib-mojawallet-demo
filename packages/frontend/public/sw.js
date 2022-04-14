@@ -1,10 +1,14 @@
+// const BASE_URL=
+
+const BACKEND_BASE_URL='http://localhost:3001'
+
 let methodName = 'https://mojaloop.app'
 let checkoutURL = 'https://mojaloop.app/checkout'
 let resolver
 let payment_request_event
 let minimalUI = false
 
-const USERS_API_URL = 'https://mojaloop.app/api'
+const USERS_API_URL = `${BACKEND_BASE_URL}/api`
 
 const getBalance = async () => {
   let token = await cookieStore.get('token')
@@ -138,6 +142,7 @@ self.addEventListener('install', function(event) {
 });
 
 const sendPaymentRequest = () => {
+  console.log('sendPaymentRequest', payment_request_event)
   if (!payment_request_event) return
   clients.matchAll({
     includeUncontrolled: false,

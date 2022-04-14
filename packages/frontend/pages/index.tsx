@@ -69,7 +69,7 @@ const Home: NextPage<AccountsPageProps> = ({accounts, user}) => {
         <title>Accounts</title>
         <link rel="icon" href="/favicon.ico" />
       </Head>
-      <QrReader
+      {/* <QrReader
         onResult={(result, error) => {
           if (!!result) {
             setData(result?.text);
@@ -80,7 +80,7 @@ const Home: NextPage<AccountsPageProps> = ({accounts, user}) => {
           }
         }}
         style={{ width: '100%' }}
-      />
+      /> */}
       <p>{data}</p>
 
       <div>
