@@ -68,6 +68,7 @@ self.addEventListener('canmakepayment', async e => {
 })
 
 self.addEventListener('paymentrequest', async e => {
+  console.log("HELLO WORLD")
   if (minimalUI) {
     console.log('Payment request:', e.methodData[0].data.invoice)
     // e.respondWith({
@@ -93,6 +94,7 @@ self.addEventListener('paymentrequest', async e => {
       })
     }
   } else {
+    // need to trigger this event before the checkout step
     payment_request_event = e
     console.log('A->', e)
     console.log('B->', e.methodData[0])
@@ -115,7 +117,7 @@ self.addEventListener('paymentrequest', async e => {
 })
 
 self.addEventListener('message', e => {
-  console.log('A message received:', e)
+  console.log('A message received:', e.data)
   if (e.data === "payment_app_window_ready") {
     sendPaymentRequest()
     return
@@ -144,6 +146,7 @@ self.addEventListener('install', function(event) {
 const sendPaymentRequest = () => {
   console.log('sendPaymentRequest', payment_request_event)
   if (!payment_request_event) return
+  
   clients.matchAll({
     includeUncontrolled: false,
     type: 'window'

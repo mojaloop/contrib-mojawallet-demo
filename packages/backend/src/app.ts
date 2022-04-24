@@ -44,6 +44,7 @@ import { KnexOtpService } from './services/otp-service'
 import { HydraApi } from './apis/hydra'
 import { AccountsAppContext } from './index'
 import { initialisePrivateRoutes, initialisePublicRoutes } from './routes'
+import DefferedJobService from './services/deffered-job-service'
 
 export type AppConfig = {
   logger: Logger;
@@ -60,7 +61,8 @@ export type AppConfig = {
   mojaloopService: MojaloopService;
   mobileMoneyTransactions: KnexMobileMoneyTransactionService;
   ilpService: IlpService;
-  knex: Knex
+  knex: Knex,
+  defferedJobService: DefferedJobService
 }
 
 export function createApp (appConfig: AppConfig): Koa<any, AccountsAppContext> {
@@ -90,6 +92,7 @@ export function createApp (appConfig: AppConfig): Koa<any, AccountsAppContext> {
     ctx.mojaloopService = appConfig.mojaloopService
     ctx.mobileMoneyTransactions = appConfig.mobileMoneyTransactions
     ctx.ilpService = appConfig.ilpService
+    ctx.deferredJob = appConfig.defferedJobService
     await next()
   })
 

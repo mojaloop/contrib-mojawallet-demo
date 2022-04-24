@@ -24,7 +24,7 @@
  ******/
 
 import { AccountsAppContext } from '../index'
-import { QuoteResponseTool } from '../services/quoteResponse-service'
+import { QuoteResponse, QuoteResponseTool } from '../services/quoteResponse-service'
 
 export async function quoteResponse (ctx: AccountsAppContext): Promise<void> {
   const { quotes, quotesResponse } = ctx
@@ -34,6 +34,12 @@ export async function quoteResponse (ctx: AccountsAppContext): Promise<void> {
   const retrievedQuote = await quotes.get(id)
   ctx.logger.info('quoteResponse retrievedQuote', retrievedQuote)
   ctx.status = 200
+
+  // Call the deferred job if we need
+  const quote = ctx.request.body as QuoteResponse
+  const matchInput = `quotes/${id}`
+  ctx.deferredJob.fire(matchInput, quote)
+
   if (retrievedQuote) {
     try {
       const transactionRequest = await ctx.transactionRequests.getByTransactionId(retrievedQuote.transactionId)

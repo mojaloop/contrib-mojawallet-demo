@@ -15,12 +15,19 @@
     "rootDir": ".",
     "outDir": "dist",
     "resolveJsonModule": true,
-    "skipLibCheck": true    
+    "skipLibCheck": true,
+    "typeRoots": [
+      "@types",
+      "node_modules/@types",
+      "src/types/mojaloopRequests.d.ts",
+    ]
   },
   "include": [
     "src",
+    "src/types/mojaloopRequests.d.ts",
     "test"
   ],
+  
   "exclude": [
     "node_modules"
   ]

@@ -23,6 +23,9 @@
  --------------
  ******/
 
+import { QuoteResponse } from "src/services/quoteResponse-service"
+import { Party, TransactionRequestsPostRequest } from "./mojaloop"
+
 export interface MobileMoneyTransactionRequest {
   amount: string
   currency: string
@@ -51,4 +54,31 @@ export interface MobileMoneyAuthorizationCodeRequest {
 export interface MobileMoneyAuthorizationCodeResponse {
   codeState: 'active' | 'inactive',
   authorisationCode: string
+}
+
+export interface MobileMoneyP2PInitializeRequest {
+  debitParty: [
+    { key: 'msisdn', value: string }
+  ]
+  creditPartyType: string,
+  creditPartyId: string,
+}
+
+
+export interface MobileMoneyP2PInitializeResult {
+  party: Party
+}
+
+export interface MobileMoneyP2PFeesRequest {
+  transactionReq: TransactionRequestsPostRequest,
+  transactionId: string
+}
+
+export interface MobileMoneyP2PMakeTransferRequest {
+  // ugh we shouldn't have this here
+  quoteId: string,
+  payeeFsp: string,
+  transactionId: string,
+  transactionRequestId: string,
+  quoteResponse: QuoteResponse
 }

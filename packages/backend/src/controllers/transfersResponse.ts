@@ -23,11 +23,17 @@
  --------------
  ******/
 
+import { TransfersIDPutResponse } from 'src/types/mojaloop'
 import { AccountsAppContext } from '../index'
 
 export async function transfersResponse (ctx: AccountsAppContext): Promise<void> {
   const { id } = ctx.params
   const { body } = ctx.request
+
+  // Call the deferred job if we need
+  const transfer = ctx.request.body as TransfersIDPutResponse
+  const matchInput = `transfers/${id}`
+  ctx.deferredJob.fire(matchInput, transfer)
 
   ctx.logger.info(`Transfer success with details: ${id}: ${body}`)
   ctx.status = 200

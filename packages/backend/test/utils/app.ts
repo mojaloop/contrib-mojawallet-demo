@@ -41,6 +41,7 @@ import { KnexQuotesResponse } from '../../src/services/quoteResponse-service'
 import { PusherService } from '../../src/services/pusher-service'
 import { KnexMobileMoneyTransactionService } from '../../src/services/mobile-money-transactions'
 import { IlpService } from '../../src/services/ilp-service'
+import DefferedJobService from 'src/services/deffered-job-service'
 const MojaloopSdk = require('@mojaloop/sdk-standard-components')
 
 export type TestAppContainer = {
@@ -60,7 +61,9 @@ export type TestAppContainer = {
   mojaloopRequests: MojaloopRequests
   otpService: KnexOtpService
   mobileMoneyTransactions: KnexMobileMoneyTransactionService
-  ilpService: IlpService
+  ilpService: IlpService,
+  defferedJobService: DefferedJobService
+
 }
 
 export const createTestApp = (): TestAppContainer => {
@@ -117,6 +120,7 @@ export const createTestApp = (): TestAppContainer => {
       }
     }
   } as HydraApi
+  const defferedJobService = new DefferedJobService()
 
   const app = createApp({
     knex,
@@ -133,7 +137,8 @@ export const createTestApp = (): TestAppContainer => {
     mojaloopService,
     otpService,
     mobileMoneyTransactions,
-    ilpService
+    ilpService,
+    defferedJobService
   })
   const server = app.listen(0)
   // @ts-ignore
@@ -156,6 +161,7 @@ export const createTestApp = (): TestAppContainer => {
     mojaloopRequests,
     otpService,
     mobileMoneyTransactions,
-    ilpService
+    ilpService,
+    defferedJobService
   }
 }

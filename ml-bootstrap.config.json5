@@ -1,0 +1,27 @@
+{
+  currencies: [
+    'PHP',
+    'MMK',
+    'UGX'
+  ],  
+  urls: {
+    fspiop: 'http://beta.moja-lab.live/api/fspiop',
+    alsAdmin: 'http://beta.moja-lab.live/api/admin/account-lookup-service-admin',
+    centralLedgerAdmin: 'http://beta.moja-lab.live/api/admin/central-ledger',
+  },
+  oracles: [
+    { oracleIdType: "MSISDN", endpoint: "http://beta.moja-lab.live/api/admin/oracle-simulator/oracle"},
+    { oracleIdType: "CONSENT", endpoint: "http://sandbox.mojaloop.io/api/admin/oracle-consent"},
+    { oracleIdType: "ALIAS", endpoint: "http://beta.moja-lab.live/api/admin/oracle-simulator/oracle"},
+    { oracleIdType: "BUSINESS", endpoint: "http://beta.moja-lab.live/api/admin/oracle-simulator/oracle"}
+  ],
+  participants: [
+     {
+      id: 'mojawallet',
+      type: 'DFSP',
+      simulatorAdminUrl: 'n/a',
+      fspiopCallbackUrl: 'https://terrible-cobra-27.loca.lt',
+      thirdpartyCallbackUrl: 'n/a'
+     }
+  ]
+}

@@ -66,3 +66,46 @@ GET /parties/MERCHANT/04404400404/3312
 ## For Example, the following
 
 <!-- TODO: embed 3-5 examples here -->
+
+## Backend:
+
+```bash
+./scripts/setupHydra.sh
+./scripts/setupFrontendClient.sh
+
+# set up config for TTK
+export MW_ALS_ENDPOINT=localhost:5000
+export MW_QUOTES_ENDPOINT=localhost:5000
+export MW_TRANSFERS_ENDPOINT=localhost:5000
+export MW_TRANSACTION_REQUEST_ENDPOINT=localhost:5000
+
+# set up config for ml sandbox
+export MW_ALS_ENDPOINT=sandbox.mojaloop.io/api/fspiop
+export MW_QUOTES_ENDPOINT=sandbox.mojaloop.io/api/fspiop
+export MW_TRANSFERS_ENDPOINT=sandbox.mojaloop.io/api/fspiop
+export MW_TRANSACTION_REQUEST_ENDPOINT=sandbox.mojaloop.io/api/fspiop
+
+
+cd packages/backend
+
+npm run build
+npm run start
+```
+
+
+## Sandbox Config:
+```bash
+# in a separate shell, run localtunnel and expose the mojalwallet backend
+npx localtunnel --port 3001
+# your url is: https://ordinary-shrimp-25.loca.lt
+
+
+cd packages/backend
+
+# Copy the above url out and put it in the ml-bootstrap config
+./node_modules/.bin/ml-bootstrap participants -c ../../ml-bootstrap.config.json5
+
+
+
+
+```

@@ -15,6 +15,7 @@ import { quoteResponse } from './controllers/quoteResponse'
 import * as QuotesController from './controllers/quotes'
 import { store as quoteErrorStore } from './controllers/quoteErrors'
 import * as MobileMoneyTransactions from './controllers/mobile-money/transactions'
+import * as P2P from './controllers/mobile-money/p2p'
 import * as MobileMoneyAuthorisationCodes from './controllers/mobile-money/authorisation-code'
 import { create as createOtp, fetch as fetchOtp, cancel as cancelOtp } from './controllers/otp'
 import { createAuthMiddleware } from './middleware/auth'
@@ -43,6 +44,7 @@ export function initialisePublicRoutes (publicRouter: Router<any, AccountsAppCon
   publicRouter.get('/parties/msisdn/:msisdnNumber', showParty)
   publicRouter.put('/parties/msisdn/:msisdnNumber', successPartiesCallback)
   publicRouter.put('/parties/msisdn/:msisdnNumber/error', errorPartiesCallback)
+  publicRouter.put('/parties/BUSINESS/:businessId', successPartiesCallback)
   publicRouter.put('/participants/:id', successParticipantsCallback)
   publicRouter.put('/participants/:id/error', errorParticipantsCallback)
   publicRouter.put('/authorizations/:id/error', errorAuthorizationCallback)
@@ -50,6 +52,11 @@ export function initialisePublicRoutes (publicRouter: Router<any, AccountsAppCon
   publicRouter.post('/transfers', TransfersController.create)
   publicRouter.put('/transfers/:id', transfersResponse)
   publicRouter.put('/transfers/:id/error', transfersErrors)
+
+  publicRouter.post('/mm/p2p/create', P2P.create)
+  publicRouter.post('/mm/p2p/getFees', P2P.getFees)
+  publicRouter.post('/mm/p2p/makeTransfer', P2P.makeTransfer)
+
   publicRouter.post('/mm/transactions', MobileMoneyTransactions.create)
   publicRouter.get('/mm/transactions/:transactionReference', MobileMoneyTransactions.show)
   publicRouter.post('/mm/accounts/accountId/:accountId/authorisationCodes', MobileMoneyAuthorisationCodes.create)

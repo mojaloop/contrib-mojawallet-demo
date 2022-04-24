@@ -26,6 +26,7 @@
 import rc from 'rc'
 import { AccountsAppContext } from '../index'
 import DefaultConfig from '../../config/default.json'
+import { Party } from 'src/types/mojaloop'
 
 const config = rc('MW', DefaultConfig)
 const fspId = config.DFSP_ID || 'mojawallet'
@@ -52,6 +53,12 @@ export async function show (ctx: AccountsAppContext): Promise<void> {
 export async function successCallback (ctx: AccountsAppContext): Promise<void> {
   const { logger } = ctx
   logger.info('sending to parties successful', ctx.request.body)
+
+  // Call the deferred job if we need
+  const party = ctx.request.body.party as Party
+  const matchInput = `parties/${party.partyIdInfo.partyIdType}/${party.partyIdInfo.partyIdentifier}`
+  ctx.deferredJob.fire(matchInput, party)
+
   ctx.status = 200
 }
 

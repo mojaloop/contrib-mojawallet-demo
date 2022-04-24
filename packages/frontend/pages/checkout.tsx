@@ -55,6 +55,19 @@ const Checkout: NextPage<CheckoutProps> = ({ accounts, user }) => {
 
   useEffect(() => {
     navigator.serviceWorker.addEventListener('message', e => {
+      // const paymentRequest = new PaymentRequest()
+      
+      // override e! for testing purposes
+      e = {
+        source: methodName,
+        data: {
+          MSISDN: '+829876544',
+          amount: '100',
+          currency: '840' 
+        }
+      } as unknown as  MessageEvent<any>
+      
+      console.log('onMessage', e)
       setClient(e.source)
       console.log('e source ->',client)
       console.log('message', e)
@@ -66,11 +79,12 @@ const Checkout: NextPage<CheckoutProps> = ({ accounts, user }) => {
       }
     })
     navigator.serviceWorker.controller.postMessage('payment_app_window_ready')
-    // setDetails({
-    //   MSISDN: '+829876544',
-    //   amount: '100',
-    //   currency: '840' 
-    // })
+    // example details - we need to generate these from a QR code + user input
+    setDetails({
+      MSISDN: '+829876544',
+      amount: '100',
+      currency: '840' 
+    })
   }, [])
 
   const onCancel = () => {
